@@ -12,7 +12,9 @@ export const useUsersStore = defineStore('users', () =>{
         //let data = [{}]
         //users.value.splice(0, users.value.length, ...data)
     }
-    function createUser(){}
+    function createUser(){
+        //users.value.push(user)
+    }
     function deleteUser(){}
     function updateUser(){}
     
