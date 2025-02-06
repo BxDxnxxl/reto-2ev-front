@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useUsersStore } from '@/stores/users'
-const store = useUsersStore()
-store.findAll()
+import { onMounted } from 'vue'
 
+const store = useUsersStore()
+store.findAll() 
 
 </script>
 <template>
