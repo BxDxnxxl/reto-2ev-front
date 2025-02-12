@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { useUsersStore } from '@/stores/users'
-import { onMounted } from 'vue'
-
-const store = useUsersStore()
-store.findAll() 
-
+import TablaUsuarios from '@/components/ListaUsuarios.vue'
 </script>
+
 <template>
-    <h1>Listado de usuarios</h1>
-    <div v-for="user in store.users">
-        {{ users.name }} {{ users.surname }}
-    </div>
+  <v-container>
+    <TablaUsuarios />
+  </v-container>
 </template>
-<style>
+
+<style lang="scss" scoped>
+@import "@/assets/styles/variables.scss";
+
+.lista-usuarios {
+  padding: $spacing-large;
+}
 </style>

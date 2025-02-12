@@ -1,6 +1,8 @@
-<script>
-</script>
 <template>
-</template>
-<style>
-</style>
+    <div>
+      <h1>Página de Inicio</h1>
+    </div>
+  </template>
+  
+  <script setup lang="ts">
+  </script>
