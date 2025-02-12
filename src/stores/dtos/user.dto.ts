@@ -1,7 +1,10 @@
-export default class UserDto{
+export interface UserDto { 
     constructor(
-        public id: number,
-        public name: string,
-        public surname: string
-    ){}
-    }
+        id: number,
+        username: string,
+        nombre: string,
+        apellido1: string,
+        apellido2?: string,
+        profilepic?: string
+    )
+}
