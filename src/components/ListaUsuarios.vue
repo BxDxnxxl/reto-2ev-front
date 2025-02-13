@@ -12,13 +12,16 @@ function deleteUsuario(id: number) {
 
 
 <template>
-  <v-container class="tabla-usuarios">
-    <v-btn class="tabla-usuarios__boton-agregar" color="primary" @click="agregarUsuario">
-      Añadir Usuario
-    </v-btn>
 
+
+  <div class="tabla-usuarios">
+    <router-link to="/gestionUsuario">
+      <v-btn class="boton-agregar" color="primary">
+          Añadir Usuario
+      </v-btn>
+    </router-link>
     <div class="tabla-usuarios__contenedor">
-      <v-table class="tabla-usuarios__tabla">
+      <table class="tabla-usuarios__tabla">
         <thead class="tabla-usuarios__encabezado">
           <tr>
             <th class="tabla-usuarios__celda">Acciones</th>
@@ -27,44 +30,53 @@ function deleteUsuario(id: number) {
           </tr>
         </thead>
         <tbody class="tabla-usuarios__cuerpo">
-          <tr v-for="usuario in store.usuarios" :key="usuario.id" class="tabla-usuarios__fila">
+          <tr v-for="usuario in store.users" :key="usuario.id" class="tabla-usuarios__fila">
             <td class="tabla-usuarios__celda tabla-usuarios__celda--acciones">
-              <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--editar" @click="store.editarUsuario(usuario)">mdi-pencil</v-icon>
-              <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--eliminar" @click="store.eliminarUsuario(usuario.id)">mdi-delete</v-icon>
+              <router-link to="/gestionUsuario?edit=true">
+                <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--editar">mdi-pencil</v-icon>
+              </router-link>
+              <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--eliminar" @click="deleteUsuario(usuario.id)">mdi-delete</v-icon>
             </td>
-            <td class="tabla-usuarios__celda">{{ usuario.nombre }} {{ usuario.apellido }}</td>
+            <td class="tabla-usuarios__celda">{{ usuario.nombre }} {{ usuario.apellido1 }}</td>
             <td class="tabla-usuarios__celda">@{{ usuario.username }}</td>
           </tr>
         </tbody>
-      </v-table>
+      </table>
     </div>
-  </v-container>
+  </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 
-.tabla-usuarios {
-  padding: $spacing-medium;
-  
-  &__boton-agregar {
-    width: 100%;
+.boton-agregar {
+    width: 20%;
     margin-bottom: $spacing-medium;
   }
 
+.tabla-usuarios {
+  padding: $spacing-medium;
+  margin-top: 16%;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+
   &__contenedor {
+    width: 100%;
     overflow-x: auto;
   }
 
   &__tabla {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
   }
 
   &__celda {
     padding: $spacing-small;
     text-align: left;
     border-bottom: 1px solid $secondary-color;
+    font-size: 1rem;
   }
 
   &__encabezado {
@@ -86,25 +98,80 @@ function deleteUsuario(id: number) {
     &--eliminar { color: red; }
     &--estado { color: green; }
   }
-}
 
-// 🖥 Adaptación para Desktop (min-width: 768px)
-@media (min-width: 768px) {
-  .tabla-usuarios {
-    max-width: 800px;
-    margin: auto;
+  .tabla-usuarios__tabla {
+    font-size: 0.9rem;
+    width: 100%;
+    table-layout: auto;
+  }
 
-    &__boton-agregar {
-      width: auto;
+  .tabla-usuarios__celda {
+    padding: $spacing-extra-small;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+  }
+
+  .tabla-usuarios__celda--acciones {
+    display: flex;
+    gap: $spacing-small;
+    justify-content: center;
+  }
+
+  .tabla-usuarios__icono {
+    font-size: 18px;
+  }
+
+  @media (min-width: 768px) {
+    .tabla-usuarios__tabla {
+      font-size: 1rem;
+      table-layout: auto;
     }
 
-    &__celda--acciones {
-      justify-content: flex-start;
+    .tabla-usuarios__celda--acciones {
+      gap: $spacing-medium;
     }
 
-    &__icono {
+    .tabla-usuarios__celda {
+      padding: $spacing-small;
+    }
+
+    .tabla-usuarios__icono {
+      font-size: 22px;
+    }
+  }
+
+
+  @media (min-width: 1024px) {
+    .tabla-usuarios__tabla {
+      font-size: 1rem;
+      table-layout: auto;
+    }
+
+    .tabla-usuarios__celda--acciones {
+      gap: $spacing-medium;
+    }
+
+    .tabla-usuarios__celda {
+      padding: $spacing-medium;
+    }
+
+    .tabla-usuarios__icono {
       font-size: 24px;
+    }
+
+    .tabla-usuarios__contenedor {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .tabla-usuarios__tabla {
+      width: 100%;
+      margin-top: 40px;
     }
   }
 }
 </style>
+
+
+
+
