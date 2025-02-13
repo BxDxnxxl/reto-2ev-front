@@ -4,10 +4,10 @@ import Header from '@/components/Header.vue'
 </script>
 
 <template>
-  <v-container>
+  
     <Header />
     <TablaUsuarios />
-  </v-container>
+
 </template>
 
 <style lang="scss" scoped>
