@@ -1,5 +1,19 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
+import { useUsersStore } from "@/stores/users";
+
+const usersStore = useUsersStore();
+
+const loginData = ref({ username: "", password: "" });
+const registerData = ref({ username: "", email: "", password: "" });
+
+const handleLogin = async () => {
+  await usersStore.login(loginData.value);
+};
+
+const handleRegister = async () => {
+  await usersStore.register(registerData.value);
+};
 
 onMounted(() => {
   const btn = document.querySelector(".img__btn") as HTMLElement;
@@ -14,61 +28,52 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="cont">
+  <div class="cont">
     <div class="form sign-in">
-        <h2>Bienvenido</h2>
-        <label>
+      <h2>Bienvenido</h2>
+      <label>
         <span>Usuario</span>
-        <input type="email" />
-        </label>
-        <label>
+        <input type="text" v-model="loginData.username" />
+      </label>
+      <label>
         <span>Contraseña</span>
-        <input type="password" />
-        </label>
-        <button type="button" class="submit">Iniciar Sesión</button>
+        <input type="password" v-model="loginData.password" />
+      </label>
+      <button type="button" class="submit" @click="handleLogin">Iniciar Sesión</button>
     </div>
     <div class="sub-cont">
-        <div class="img">
+      <div class="img">
         <div class="img__text m--up">
-            <h2>¿No estas registrado?</h2>
-            <p>Registrate y conviertete en uno más de nuestra comunidad</p>
+          <h2>¿No estas registrado?</h2>
+          <p>Registrate y conviertete en uno más de nuestra comunidad</p>
         </div>
         <div class="img__text m--in">
-            <h2>¿Ya eres usuario?</h2>
-            <p>Si ya estás registrado inicia sesión y empieza a disfrutar</p>
+          <h2>¿Ya eres usuario?</h2>
+          <p>Si ya estás registrado inicia sesión y empieza a disfrutar</p>
         </div>
         <div class="img__btn">
-            <span class="m--up">Registrate</span>
-            <span class="m--in">Inicia Sesión</span>
+          <span class="m--up">Registrate</span>
+          <span class="m--in">Inicia Sesión</span>
         </div>
-        </div>
-        <div class="form sign-up">
+      </div>
+      <div class="form sign-up">
         <h2>Unete a la comunidad</h2>
         <label>
-            <span>Nombre de usuario</span>
-            <input type="text" />
+          <span>Nombre de usuario</span>
+          <input type="text" v-model="registerData.username" />
         </label>
         <label>
-            <span>Email</span>
-            <input type="email" />
+          <span>Email</span>
+          <input type="email" v-model="registerData.email" />
         </label>
         <label>
-            <span>Contraseña</span>
-            <input type="password" />
+          <span>Contraseña</span>
+          <input type="password" v-model="registerData.password" />
         </label>
-        <button type="button" class="submit">Inicia Sesión</button>
-
-        </div>
+        <button type="button" class="submit" @click="handleRegister">Registrarse</button>
+      </div>
     </div>
-    </div>
-
-    <a href="https://dribbble.com/shots/3306190-Login-Registration-form" target="_blank" class="icon-link">
-    <img src="http://icons.iconarchive.com/icons/uiconstock/socialmedia/256/Dribbble-icon.png">
-    </a>
-    <a href="https://codepen.io/suez/pen/XWyBpre" target="_blank" class="link-footer">New 2023 Version</a>
-    <a href="https://twitter.com/NikolayTalanov" target="_blank" class="icon-link icon-link--twitter">
-    <img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/twitter-128.png">
-    </a>
+  </div>
 </template>
   
   <style lang="scss" scoped>
@@ -82,7 +87,7 @@ onMounted(() => {
 
 body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  background: #ededed;
+  background-color: #768cb6;
 }
 
 input, button {
@@ -121,6 +126,7 @@ $diffRatio: ($contW - $imgW) / $contW;
   height: 550px;
   margin: 0 auto 100px;
   background: #fff;
+  align-items: center;
 }
 
 .form {
@@ -175,7 +181,7 @@ button {
     top: 0;
     width: $contW;
     height: 100%;
-    background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/142996/sections-3.jpg');
+    background-image: ('@/assets/img/LogoSinFondo.jpg');
     background-size: cover;
     transition: transform $switchAT ease-in-out;
   }
