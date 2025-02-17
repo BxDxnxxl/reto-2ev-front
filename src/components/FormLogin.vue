@@ -15,21 +15,24 @@ const handleRegister = async () => {
   await usersStore.register(registerData.value);
 };
 
-onMounted(() => {
-  const btn = document.querySelector(".img__btn") as HTMLElement;
-  const container = document.querySelector(".cont") as HTMLElement;
+const isSignup = ref(false);  // Variable para controlar el estado
 
-  if (btn && container) {
-    btn.addEventListener("click", () => {
-      container.classList.toggle("s--signup");
+onMounted(() => {
+  const toggleBtn = document.querySelector(".toggle-btn") as HTMLElement;
+  const container = document.querySelector(".form-container") as HTMLElement;
+
+  if (toggleBtn && container) {
+    toggleBtn.addEventListener("click", () => {
+      isSignup.value = !isSignup.value;  // Alterna entre login y signup
     });
   }
 });
 </script>
 
+
 <template>
-  <div class="cont">
-    <div class="form sign-in">
+  <div class="form-container" :class="{ 'is-signup': isSignup }">
+    <div class="form login-form">
       <h2>Bienvenido</h2>
       <label>
         <span>Usuario</span>
@@ -39,25 +42,29 @@ onMounted(() => {
         <span>Contraseña</span>
         <input type="password" v-model="loginData.password" />
       </label>
-      <button type="button" class="submit" @click="handleLogin">Iniciar Sesión</button>
+      <button type="button" class="submit-btn" @click="handleLogin">Iniciar Sesión</button>
     </div>
-    <div class="sub-cont">
-      <div class="img">
-        <div class="img__text m--up">
+    
+    <div class="sub-container">
+      <div class="image-container">
+        <img src="@/assets/img/imagenLogin.jpg" alt="Imagen de Login" />
+        <div class="image-text show-up">
           <h2>¿No estas registrado?</h2>
-          <p>Registrate y conviertete en uno más de nuestra comunidad</p>
+          <p>Registrate y conviértete en uno más de nuestra comunidad</p>
         </div>
-        <div class="img__text m--in">
+        <div class="image-text show-in">
           <h2>¿Ya eres usuario?</h2>
-          <p>Si ya estás registrado inicia sesión y empieza a disfrutar</p>
+          <p>Si ya estás registrado, inicia sesión y empieza a disfrutar</p>
         </div>
-        <div class="img__btn">
-          <span class="m--up">Registrate</span>
-          <span class="m--in">Inicia Sesión</span>
+        
+        <div class="toggle-btn">
+          <span v-if="!isSignup">Registrate</span>
+          <span v-if="isSignup">Inicia Sesión</span>
         </div>
       </div>
-      <div class="form sign-up">
-        <h2>Unete a la comunidad</h2>
+
+      <div class="form signup-form">
+        <h2>Únete a la comunidad</h2>
         <label>
           <span>Nombre de usuario</span>
           <input type="text" v-model="registerData.username" />
@@ -70,16 +77,17 @@ onMounted(() => {
           <span>Contraseña</span>
           <input type="password" v-model="registerData.password" />
         </label>
-        <button type="button" class="submit" @click="handleRegister">Registrarse</button>
+        <button type="button" class="submit-btn" @click="handleRegister">Registrarse</button>
       </div>
     </div>
   </div>
 </template>
-  
-  <style lang="scss" scoped>
-  @import "@/assets/styles/variables.scss";
-  
-  *, *:before, *:after {
+
+
+<style lang="scss" scoped>
+@import "@/assets/styles/variables.scss";
+
+*, *:before, *:after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -88,6 +96,10 @@ onMounted(() => {
 body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   background-color: #768cb6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;  // Asegura que el contenido se mantenga centrado en la pantalla
 }
 
 input, button {
@@ -97,93 +109,107 @@ input, button {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
-$contW: 900px;
-$imgW: 260px;
-$formW: $contW - $imgW;
-$switchAT: 1.2s;
+$container-width: 900px;
+$image-width: 260px;
+$form-width: $container-width - $image-width;
+$transition-time: 1.2s;
 
-$inputW: 260px;
-$btnH: 36px;
+$input-width: 260px;
+$button-height: 36px;
 
-$diffRatio: ($contW - $imgW) / $contW;
+$diff-ratio: ($container-width - $image-width) / $container-width;
 
-@mixin signUpActive {
-  .cont.s--signup & {
+@mixin signupActive {
+  .form-container.is-signup & {
     @content;
   }
 }
 
-.tip {
-  font-size: 20px;
-  margin: 40px auto 50px;
-  text-align: center;
-}
-
-.cont {
+.form-container {
   overflow: hidden;
   position: relative;
-  width: $contW;
+  width: $container-width;
   height: 550px;
-  margin: 0 auto 100px;
+  margin: 20px auto 100px;  // Añadí un margen superior de 20px
   background: #fff;
-  align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;  // Centra el contenido tanto vertical como horizontalmente
 }
 
 .form {
   position: relative;
-  width: $formW;
+  width: $form-width;
   height: 100%;
-  transition: transform $switchAT ease-in-out;
-  padding: 50px 30px 0;
+  transition: transform $transition-time ease-in-out;
+  padding: 50px 30px 0;  // El espaciado de la sección del formulario
 }
 
-.sub-cont {
+.toggle-btn {
+  position: absolute;
+  bottom: 50px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  cursor: pointer;
+  text-align: center;
+  width: 100px;
+
+  span {
+    display: block;
+    color: white;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: transform $transition-time ease-in-out;
+  }
+}
+
+.sub-container {
   overflow: hidden;
   position: absolute;
-  left: $formW;
+  left: $form-width;
   top: 0;
-  width: $contW;
+  width: $container-width;
   height: 100%;
-  padding-left: $imgW;
+  padding-left: $image-width;
   background: #fff;
-  transition: transform $switchAT ease-in-out;
+  transition: transform $transition-time ease-in-out;
 
-  @include signUpActive {
-    transform: translate3d($formW * -1,0,0);
+  @include signupActive {
+    transform: translate3d($form-width * -1, 0, 0);
   }
 }
 
 button {
   display: block;
   margin: 0 auto;
-  width: $inputW;
-  height: $btnH;
+  width: $input-width;
+  height: $button-height;
   border-radius: 30px;
   color: #fff;
   font-size: 15px;
   cursor: pointer;
 }
 
-.img {
+.image-container {
   overflow: hidden;
-  z-index: 2;
   position: absolute;
   left: 0;
   top: 0;
-  width: $imgW;
+  width: $image-width;
   height: 100%;
-  padding-top: 360px;
+  padding-top: 200px;  // Ajusté para que haya el mismo espacio entre imagen y formulario
 
   &:before {
     content: '';
     position: absolute;
     right: 0;
     top: 0;
-    width: $contW;
+    width: $container-width;
     height: 100%;
-    background-image: ('@/assets/img/LogoSinFondo.jpg');
+    background-image: url('@/assets/img/imagenLogin.jpg');
     background-size: cover;
-    transition: transform $switchAT ease-in-out;
+    transition: transform $transition-time ease-in-out;
   }
 
   &:after {
@@ -193,16 +219,16 @@ button {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.6);
+    background-color: rgba(0,0,0,0.6);
   }
 
-  @include signUpActive {
+  @include signupActive {
     &:before {
-      transform: translate3d($formW,0,0);
+      transform: translate3d($form-width, 0, 0);
     }
   }
 
-  &__text {
+  .image-text {
     z-index: 2;
     position: absolute;
     left: 0;
@@ -211,7 +237,7 @@ button {
     padding: 0 20px;
     text-align: center;
     color: #fff;
-    transition: transform $switchAT ease-in-out;
+    transition: transform $transition-time ease-in-out;
 
     h2 {
       margin-bottom: 10px;
@@ -223,70 +249,17 @@ button {
       line-height: 1.5;
     }
 
-    &.m--up {
-
-      @include signUpActive {
-        transform: translateX($imgW*2);
+    &.show-up {
+      @include signupActive {
+        transform: translateX($image-width*2);
       }
     }
 
-    &.m--in {
-      transform: translateX($imgW * -2);
+    &.show-in {
+      transform: translateX($image-width * -2);
 
-      @include signUpActive {
+      @include signupActive {
         transform: translateX(0);
-      }
-    }
-  }
-
-  &__btn {
-    overflow: hidden;
-    z-index: 2;
-    position: relative;
-    width: 100px;
-    height: $btnH;
-    margin: 0 auto;
-    background: transparent;
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 15px;
-    cursor: pointer;
-    
-    &:after {
-      content: '';
-      z-index: 2;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      border: 2px solid #fff;
-      border-radius: 30px;
-    }
-
-    span {
-      position: absolute;
-      left: 0;
-      top: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-      transition: transform $switchAT;
-      
-      &.m--in {
-        transform: translateY($btnH*-2);
-        
-        @include signUpActive {
-          transform: translateY(0);
-        }
-      }
-      
-      &.m--up {
-        @include signUpActive {
-          transform: translateY($btnH*2);
-        }
       }
     }
   }
@@ -300,7 +273,7 @@ h2 {
 
 label {
   display: block;
-  width: $inputW;
+  width: $input-width;
   margin: 25px auto 0;
   text-align: center;
 
@@ -321,70 +294,30 @@ input {
   text-align: center;
 }
 
-.forgot-pass {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 12px;
-  color: #cfcfcf;
-}
-
-.submit {
+.submit-btn {
   margin-top: 40px;
   margin-bottom: 20px;
-  background: #d4af7a;
+  background: #f25421;
   text-transform: uppercase;
 }
 
-.fb-btn {
-  border: 2px solid #d3dae9;
-  color: darken(#d3dae9, 20%);
-
-  span {
-    font-weight: bold;
-    color: darken(#768cb6, 20%);
-  }
-}
-
-.sign-in {
+.login-form {
   transition-timing-function: ease-out;
 
-  @include signUpActive {
+  @include signupActive {
     transition-timing-function: ease-in-out;
-    transition-duration: $switchAT;
-    transform: translate3d($formW,0,0);
+    transition-duration: $transition-time;
+    transform: translate3d($form-width, 0, 0);
   }
 }
 
-.sign-up {
-  transform: translate3d($contW * -1,0,0);
+.signup-form {
+  transform: translate3d($container-width * -1, 0, 0);
 
-  @include signUpActive {
-    transform: translate3d(0,0,0);
+  @include signupActive {
+    transform: translate3d(0, 0, 0);
   }
 }
+</style>
 
-.icon-link {
-  position: absolute;
-  left: 5px;
-  bottom: 5px;
-  width: 32px;
 
-  img {
-    width: 100%;
-    vertical-align: top;
-  }
-
-  &--twitter {
-    left: auto;
-    right: 5px;
-  }
-}
-
-.link-footer {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-}
-  </style>
-  
