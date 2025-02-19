@@ -4,6 +4,8 @@ import type { UserDto } from "@/stores/dtos/user.dto";
 import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
 import type { UserRegistroDto } from "@/stores/dtos/userRegistro.dto";
 import type { UsersInfo } from "@/stores/dtos/userInfoListado.dto";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 export const useUsersStore = defineStore("users", () => {
   const users = ref<UserDto[]>([]);
@@ -90,17 +92,25 @@ export const useUsersStore = defineStore("users", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioLogin),
       });
-
+  
       if (!response.ok) {
-        throw new Error("Error al iniciar sesión");
+        const errorText = await response.text();
+        throw new Error(`Error al iniciar sesión: ${errorText || response.statusText}`);
       }
-
-      const data: UsersInfo = await response.json();
-      currentUser.value = data; //Almacenar usuario logueado
+  
+      const data: UsersInfo | null = response.status !== 204 ? await response.json() : null;
+  
+      if (data) {
+        currentUser.value = data; // Almacenar usuario logueado
+        return true;
+      } else {
+        console.warn("Inicio de sesión exitoso, pero no se recibió información del usuario.");
+      }
     } catch (error) {
       console.error("Error en login:", error);
     }
   }
+  
 
   //Registrar un nuevo usuario desde el formulario
   async function register(usuarioNuevo: UserRegistroDto) {
@@ -110,11 +120,13 @@ export const useUsersStore = defineStore("users", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioNuevo),
       });
-
+  
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error en respuesta:", errorText);
         throw new Error("Error al registrar usuario");
       }
-
+  
       console.log("Usuario registrado correctamente");
     } catch (error) {
       console.error("Error en registro:", error);

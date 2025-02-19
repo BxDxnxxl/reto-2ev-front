@@ -1,88 +1,85 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useUsersStore } from "@/stores/users";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const usersStore = useUsersStore();
 
 const loginData = ref({ username: "", password: "" });
-const registerData = ref({ username: "", email: "", password: "" });
+const registerData = ref({ username: "", email: "", contrasenia: "" });
+
+const isSignup = ref(false);
 
 const handleLogin = async () => {
-  await usersStore.login(loginData.value);
-};
-
+  const success = await usersStore.login(loginData.value);
+  if (success) {
+    router.push("/");
+  }
+}
 const handleRegister = async () => {
   await usersStore.register(registerData.value);
 };
 
-const isSignup = ref(false);  // Variable para controlar el estado
-
-onMounted(() => {
-  const toggleBtn = document.querySelector(".toggle-btn") as HTMLElement;
-  const container = document.querySelector(".form-container") as HTMLElement;
-
-  if (toggleBtn && container) {
-    toggleBtn.addEventListener("click", () => {
-      isSignup.value = !isSignup.value;  // Alterna entre login y signup
-    });
-  }
-});
+const toggleSignup = () => {
+  isSignup.value = !isSignup.value;
+};
 </script>
-
 
 <template>
   <div class="form-container" :class="{ 'is-signup': isSignup }">
-    <div class="form login-form">
+    <!-- Formulario de Login -->
+    <form class="form login-form" @submit.prevent="handleLogin">
       <h2>Bienvenido</h2>
       <label>
         <span>Usuario</span>
-        <input type="text" v-model="loginData.username" />
+        <input type="text" v-model="loginData.username" required />
       </label>
       <label>
         <span>Contraseña</span>
-        <input type="password" v-model="loginData.password" />
+        <input type="password" v-model="loginData.password" required />
       </label>
-      <button type="button" class="submit-btn" @click="handleLogin">Iniciar Sesión</button>
-    </div>
-    
+      <button type="submit" class="submit-btn">Iniciar Sesión</button>
+    </form>
+
     <div class="sub-container">
       <div class="image-container">
         <img src="@/assets/img/imagenLogin.jpg" alt="Imagen de Login" />
         <div class="image-text show-up">
-          <h2>¿No estas registrado?</h2>
-          <p>Registrate y conviértete en uno más de nuestra comunidad</p>
+          <h2>¿No estás registrado?</h2>
+          <p>Regístrate y conviértete en uno más de nuestra comunidad</p>
         </div>
         <div class="image-text show-in">
           <h2>¿Ya eres usuario?</h2>
           <p>Si ya estás registrado, inicia sesión y empieza a disfrutar</p>
         </div>
-        
-        <div class="toggle-btn">
-          <span v-if="!isSignup">Registrate</span>
-          <span v-if="isSignup">Inicia Sesión</span>
-        </div>
+        <button type="button" class="toggle-btn" @click="toggleSignup">
+          <span v-if="!isSignup">Regístrate</span>
+          <span v-else>Inicia Sesión</span>
+        </button>
       </div>
 
-      <div class="form signup-form">
+      <!-- Formulario de Registro -->
+      <form class="form signup-form" @submit.prevent="handleRegister">
         <h2>Únete a la comunidad</h2>
         <label>
           <span>Nombre de usuario</span>
-          <input type="text" v-model="registerData.username" />
+          <input type="text" v-model="registerData.username" required />
         </label>
         <label>
           <span>Email</span>
-          <input type="email" v-model="registerData.email" />
+          <input type="email" v-model="registerData.email" required />
         </label>
         <label>
           <span>Contraseña</span>
-          <input type="password" v-model="registerData.password" />
+          <input type="password" v-model="registerData.contrasenia" required />
         </label>
-        <button type="button" class="submit-btn" @click="handleRegister">Registrarse</button>
-      </div>
+        <button type="submit" class="submit-btn">Registrarse</button>
+      </form>
     </div>
   </div>
 </template>
-
 
 <style lang="scss" scoped>
 @import "@/assets/styles/variables.scss";
@@ -95,7 +92,7 @@ onMounted(() => {
 
 body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  background-color: #768cb6;
+  background-color: black;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -130,11 +127,14 @@ $diff-ratio: ($container-width - $image-width) / $container-width;
   position: relative;
   width: $container-width;
   height: 550px;
-  margin: 20px auto 100px;  // Añadí un margen superior de 20px
+  margin: 20px auto 100px;
   background: #fff;
   display: flex;
   justify-content: center;
-  align-items: center;  // Centra el contenido tanto vertical como horizontalmente
+  align-items: center;
+  margin-right: 15%;
+  margin-left: 30%;
+  margin-top: 300px;
 }
 
 .form {
@@ -208,7 +208,7 @@ button {
     width: $container-width;
     height: 100%;
     background-image: url('@/assets/img/imagenLogin.jpg');
-    background-size: cover;
+    background-size: fit;
     transition: transform $transition-time ease-in-out;
   }
 
@@ -319,5 +319,3 @@ input {
   }
 }
 </style>
-
-
