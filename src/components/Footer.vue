@@ -26,12 +26,22 @@ import { RouterLink } from 'vue-router'
       <h3 class="footer__title">Contacto</h3>
       <p class="footer__info">+34 123456789</p>
       <p class="footer__info">WannaGames@gmail.com</p>
-      <a href="" class="footer__button ov-btn-slide-left">Contacto</a>
+      <router-link to="/contact">
+        <a href="" class="footer__button ov-btn-slide-left">Contacto</a>
+      </router-link>
     </div>
   </footer>
 </template>
 
 <style>
+:root {
+  --form-color: #fff;
+  --primary-gradient: linear-gradient(90deg, #f25421, #ff8c00, #ffd700);
+  --primary-color: #f25421;
+  --background-color: #fff;
+  --text-color: #ffffff;
+  --btn-color: #f25421;
+}
 .footer {
   width: 100%;
   padding: 20px;
