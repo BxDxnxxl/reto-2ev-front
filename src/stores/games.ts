@@ -6,6 +6,7 @@ import type { GameDto } from "@/stores/dtos/game.dto";
 export const useGamesStore = defineStore('games', () =>{
     
     const games = ref<GameDto[]>([]);
+    const top5Videojuegos = ref<GameDto[]>([]);
     
     async function fetchVideojuegos() {
         try {
@@ -62,14 +63,28 @@ export const useGamesStore = defineStore('games', () =>{
           console.error("Error al eliminar videojuego:", error);
         }
       }
+
+      async function fetchTop5Videojuegos() {
+        try {
+          const response = await fetch("http://localhost:4444/api/Videojuegos/top5");
+          if (!response.ok) {
+            throw new Error("Error al obtener el top 5 de videojuegos");
+          }
+          top5Videojuegos.value = await response.json();
+        } catch (error) {
+          console.error("Error en fetchTop5Videojuegos:", error);
+        }
+      }
     
       return {
         games,
+        top5Videojuegos,
         fetchVideojuegos,
         fetchVideojuegoById,
         createVideojuegos,
         updateVideojuego,
-        deleteVideojuego
+        deleteVideojuego,
+        fetchTop5Videojuegos
       };
     });
     
