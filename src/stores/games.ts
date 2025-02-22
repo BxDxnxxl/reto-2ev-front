@@ -20,10 +20,10 @@ export const useGamesStore = defineStore('games', () =>{
       async function fetchVideojuegoById(id: number) {
         try {
           const response = await fetch(`http://localhost:4444/api/videojuego/${id}`);
-          const usuario = await response.json();
+          const game = await response.json();
     
           games.value = games.value.filter(g => g.id !== id);
-          games.value.push(usuario);
+          games.value.push(game);
         } catch (error) {
           console.error("Error al obtener el videojuego:", error);
         }
