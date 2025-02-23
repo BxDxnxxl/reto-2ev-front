@@ -12,7 +12,6 @@ export const useUsersStore = defineStore("users", () => {
   const users = ref<UserDto[]>([]);
 
   const usersWithRoles = ref<UsersInfo[]>([]);
-
   const currentUser = ref<UsersInfo | null>(null);
   const usuarioConRoles = ref<UsersInfo | null>(null);
 
@@ -51,12 +50,14 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(nuevoUsuario: UserDto) {
     try {
-      await fetch("http://localhost:4444/api/usuario", {
+      console.log(nuevoUsuario)
+      const response = await fetch("http://localhost:4444/api/usuario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoUsuario),
       });
       await fetchUsuarios(); // Refresca la lista después de crear
+      return await response.json();
     } catch (error) {
       console.error("Error al crear usuario:", error);
     }
@@ -65,6 +66,7 @@ export const useUsersStore = defineStore("users", () => {
   //Actualizar un usuario existente
   async function updateUsuario(id: number, usuarioActualizado: UserDto) {
     try {
+      console.log(usuarioActualizado)
       await fetch(`http://localhost:4444/api/usuario/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

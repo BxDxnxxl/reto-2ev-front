@@ -21,12 +21,5 @@ const userId = route.query.id ? Number(route.query.id) : null
 </template>
 
 <style scoped lang="scss">
-.gestion-usuario {
-  max-width: 500px;
-  margin: auto;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+
 </style>
