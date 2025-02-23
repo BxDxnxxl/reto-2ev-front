@@ -12,7 +12,7 @@ function deleteUsuario(id: number) {
 
 <template>
   <div class="tabla-usuarios">
-    <router-link to="/gestionUsuario">
+    <router-link to="/gestionUsuario?edit=false">
       <v-btn class="boton-agregar" color="primary">
         Añadir Usuario
       </v-btn>
@@ -31,7 +31,7 @@ function deleteUsuario(id: number) {
         <tbody class="tabla-usuarios__cuerpo">
           <tr v-for="usuario in store.users" :key="usuario.id" class="tabla-usuarios__fila">
             <td class="tabla-usuarios__celda tabla-usuarios__celda--acciones">
-              <router-link to="/gestionUsuario?edit=true">
+              <router-link to="`/gestionUsuario?edit=true&id=${usuario.id}`">
                 <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--editar">mdi-pencil</v-icon>
               </router-link>
               <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--eliminar" @click="deleteUsuario(usuario.id)">mdi-delete</v-icon>

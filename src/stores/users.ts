@@ -4,6 +4,7 @@ import type { UserDto } from "@/stores/dtos/user.dto";
 import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
 import type { UserRegistroDto } from "@/stores/dtos/userRegistro.dto";
 import type { UsersInfo } from "@/stores/dtos/userInfoListado.dto";
+import type { UsuarioRol } from "@/stores/dtos/UsuarioRol.dto";
 import { useRouter } from "vue-router";
 const router = useRouter();
 
@@ -13,6 +14,7 @@ export const useUsersStore = defineStore("users", () => {
   const usersWithRoles = ref<UsersInfo[]>([]);
 
   const currentUser = ref<UsersInfo | null>(null);
+  const usuarioConRoles = ref<UsersInfo | null>(null);
 
   //Obtener todos los usuarios
   async function fetchUsuarios() {
@@ -133,10 +135,45 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
+  async function fetchUsuarioConRolesById(id: number) {
+    try {
+      const response = await fetch(`http://localhost:4444/api/Usuario/detalle/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener usuario con roles: ${response.statusText}`);
+      }
+
+      usuarioConRoles.value = await response.json();
+    } catch (error) {
+      console.error("Error en fetchUsuarioConRolesById:", error);
+    }
+  }
+
+  async function asignarRolesAUsuario(asignacion: UsuarioRol) {
+    try {
+      const response = await fetch("http://localhost:4444/api/Rol/asignarRoles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(asignacion),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error al asignar roles: ${response.statusText}`);
+      }
+  
+      console.log(`Roles asignados correctamente al usuario ${asignacion.usuarioId}`);
+    } catch (error) {
+      console.error("Error en asignarRolesAUsuario:", error);
+    }
+  }
+  
+
+
   return {
     users,
     usersWithRoles,
     currentUser,
+    usuarioConRoles,
     fetchUsuarios,
     fetchUsuariosConRoles,
     fetchUsuarioById,
@@ -145,5 +182,7 @@ export const useUsersStore = defineStore("users", () => {
     deleteUsuario,
     login,
     register,
+    fetchUsuarioConRolesById,
+    asignarRolesAUsuario
   };
 });
