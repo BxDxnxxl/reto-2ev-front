@@ -50,18 +50,37 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(nuevoUsuario: UserDto) {
     try {
-      console.log(nuevoUsuario)
-      const response = await fetch("http://localhost:4444/api/usuario", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoUsuario),
-      });
-      await fetchUsuarios(); // Refresca la lista después de crear
-      return await response.json();
+        const response = await fetch("http://localhost:4444/api/usuario", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nuevoUsuario),
+        });
+
+        console.log("Raw Response:", response);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error al crear usuario:", errorText);
+            return null;
+        }
+
+        const idString = await response.text();
+        const userId = parseInt(idString, 10);
+
+        if (isNaN(userId)) {
+            console.error("Error: No se pudo convertir la respuesta a un ID válido.");
+            return null;
+        }
+
+        console.log("Usuario creado con ID:", userId);
+        await fetchUsuarios();
+        return { id: userId };
     } catch (error) {
-      console.error("Error al crear usuario:", error);
+        console.error("Error en createUsuario:", error);
+        return null;
     }
-  }
+}
+
 
   //Actualizar un usuario existente
   async function updateUsuario(id: number, usuarioActualizado: UserDto) {

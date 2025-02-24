@@ -31,6 +31,7 @@ onMounted(async () => {
 
   if (editMode.value && userId.value) {
     await usersStore.fetchUsuarioConRolesById(userId.value);
+
     if (usersStore.usuarioConRoles) {
       userData.value = {
         nombre: usersStore.usuarioConRoles.nombre || "",
@@ -38,7 +39,7 @@ onMounted(async () => {
         apellido2: usersStore.usuarioConRoles.apellido2 || "",
         username: usersStore.usuarioConRoles.username || "",
         email: usersStore.usuarioConRoles.email || "",
-        contrasenia: "",
+        contrasenia: usersStore.usuarioConRoles.contrasenia || "",
         profilePic: usersStore.usuarioConRoles.profilePic || "",
         roles: (usersStore.usuarioConRoles.roles as RolesDto[]).map((rol) => rol.id),
       };
@@ -50,6 +51,7 @@ async function saveUser() {
   let usuarioFinalId: number | null = null;
 
   const usuarioSinRoles: UserDto = {
+    id: userId.value || undefined,
     username: userData.value.username,
     email: userData.value.email,
     contrasenia: userData.value.contrasenia,
@@ -63,13 +65,15 @@ async function saveUser() {
     await usersStore.updateUsuario(userId.value, usuarioSinRoles);
     usuarioFinalId = userId.value;
   } else {
+    console.log("Creando usuario:", usuarioSinRoles);
     const nuevoUsuario = await usersStore.createUsuario(usuarioSinRoles);
+
     if (nuevoUsuario && nuevoUsuario.id) {
       usuarioFinalId = nuevoUsuario.id;
     }
   }
 
-  if (usuarioFinalId) {
+  if (usuarioFinalId && userData.value.roles.length > 0) {
     const asignacion: UsuarioRol = {
       usuarioId: usuarioFinalId,
       rolesIds: userData.value.roles,
@@ -85,7 +89,6 @@ async function saveUser() {
   <v-container>
     <v-card class="pa-5">
       <v-form @submit.prevent="saveUser">
-        <v-card-title>{{ editMode ? "Editar Usuario" : "Añadir Usuario" }}</v-card-title>
 
         <v-text-field label="Nombre" v-model="userData.nombre" required></v-text-field>
         <v-text-field label="Primer Apellido" v-model="userData.apellido1" required></v-text-field>
@@ -96,8 +99,7 @@ async function saveUser() {
         <v-text-field
           label="Contraseña"
           v-model="userData.contrasenia"
-          type="password"
-          required
+          type="text" 
         ></v-text-field>
 
         <v-text-field label="Foto de Perfil (URL)" v-model="userData.profilePic"></v-text-field>
@@ -121,9 +123,96 @@ async function saveUser() {
   </v-container>
 </template>
 
-<style scoped>
+<style lang="scss">
+@import "@/assets/styles/variables.scss";
+
+.v-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
 .v-card {
-  max-width: 500px;
-  margin: auto;
+  width: 100%;
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.v-card-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: $primary-color;
+}
+
+.v-text-field,
+.v-select {
+  background: white !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+
+  .v-input__control {
+    border-radius: 8px !important;
+    border: 1px solid #ccc !important;
+    transition: box-shadow 0.3s ease-in-out;
+
+    &:hover {
+      border-color: $primary-color;
+    }
+  }
+}
+
+.v-btn {
+  background-color: $primary-color !important;
+  color: white !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background 0.3s ease-in-out;
+  width: 100%;
+
+  &:hover {
+    background-color: darken($primary-color, 10%) !important;
+  }
+}
+
+.v-chip {
+  background: $primary-color !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .v-container {
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .v-card {
+    max-width: 500px;
+    padding: 30px;
+  }
+
+  .v-card-title {
+    font-size: 1.6rem;
+  }
+
+  .v-btn {
+    font-size: 1rem;
+  }
 }
 </style>
+
+
