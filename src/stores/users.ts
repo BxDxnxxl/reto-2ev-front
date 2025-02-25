@@ -14,6 +14,7 @@ export const useUsersStore = defineStore("users", () => {
   const usersWithRoles = ref<UsersInfo[]>([]);
   const currentUser = ref<UsersInfo | null>(null);
   const usuarioConRoles = ref<UsersInfo | null>(null);
+  const tokenLogin = ref<string | null>(null)
 
   //Obtener todos los usuarios
   async function fetchUsuarios() {
@@ -110,21 +111,24 @@ export const useUsersStore = defineStore("users", () => {
   //Iniciar sesión y almacenar datos del usuario autenticado
   async function login(usuarioLogin: UserLoginDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/usuario/login", {
+      const response = await fetch("http://localhost:4444/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioLogin),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al iniciar sesión: ${errorText || response.statusText}`);
       }
-  
-      const data: UsersInfo | null = response.status !== 204 ? await response.json() : null;
-  
+
+      const data: { token: string; usuario: UsersInfo } | null = await response.json();
+
       if (data) {
-        currentUser.value = data; // Almacenar usuario logueado
+        currentUser.value = data.usuario;
+        tokenLogin.value = data.token;
+        console.log(currentUser)
+        console.log(tokenLogin)
         return true;
       } else {
         console.warn("Inicio de sesión exitoso, pero no se recibió información del usuario.");
@@ -133,6 +137,7 @@ export const useUsersStore = defineStore("users", () => {
       console.error("Error en login:", error);
     }
   }
+
   
 
   //Registrar un nuevo usuario desde el formulario
@@ -195,6 +200,7 @@ export const useUsersStore = defineStore("users", () => {
     usersWithRoles,
     currentUser,
     usuarioConRoles,
+    tokenLogin,
     fetchUsuarios,
     fetchUsuariosConRoles,
     fetchUsuarioById,
