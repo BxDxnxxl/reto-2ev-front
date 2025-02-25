@@ -8,7 +8,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function fetchVideojuegos() {
     try {
-      const response = await fetch('http://localhost:4444/api/videojuego')
+      const response = await fetch('http://localhost:4444/api/videojuegos')
       games.value = await response.json()
     } catch (error) {
       console.error('Error al obtener videojuego:', error)
@@ -17,7 +17,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function fetchVideojuegoById(id: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/videojuego/${id}`)
+      const response = await fetch(`http://localhost:4444/api/videojuegos/${id}`)
       const game = await response.json()
 
       games.value = games.value.filter((g) => g.id !== id)
@@ -29,7 +29,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function createVideojuegos(nuevoVideojuego: GameDto) {
     try {
-      await fetch('http://localhost:4444/api/videojuego', {
+      await fetch('http://localhost:4444/api/videojuegos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoVideojuego),
@@ -42,7 +42,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function updateVideojuego(id: number, videojuegoActualizado: GameDto) {
     try {
-      await fetch(`http://localhost:4444/api/videojuego/${id}`, {
+      await fetch(`http://localhost:4444/api/videojuegos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(videojuegoActualizado),
@@ -55,7 +55,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function deleteVideojuego(id: number) {
     try {
-      await fetch(`http://localhost:4444/api/videojuego/${id}`, { method: 'DELETE' })
+      await fetch(`http://localhost:4444/api/videojuegos/${id}`, { method: 'DELETE' })
       games.value = games.value.filter((g) => g.id !== id)
     } catch (error) {
       console.error('Error al eliminar videojuego:', error)
