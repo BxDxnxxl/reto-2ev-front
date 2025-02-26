@@ -14,7 +14,7 @@ onMounted(() => {
 function showSlide(index: number) {
   currentSlide.value = index;
   const mainImage = document.querySelector('.carousel__image') as HTMLImageElement;
-  mainImage.src = `@/assets/img/banners/${store.top5Videojuegos[index].caratula}`;
+  mainImage.src = `${store.top5Videojuegos[index].caratula}`;
   updateActiveThumbnail();
 }
 
@@ -43,7 +43,7 @@ function updateActiveThumbnail() {
   <section class="carousel">
     <div class="carousel__main">
       <img
-        :src="`@/assets/img/banners/${store.top5Videojuegos[0]?.caratula}`"
+        :src="`${store.top5Videojuegos[0]?.caratula}`"
         alt="Imagen principal"
         class="carousel__image"
       />
@@ -56,7 +56,7 @@ function updateActiveThumbnail() {
         <img
           v-for="(videojuego, index) in store.top5Videojuegos"
           :key="index"
-          :src="`@/assets/img/banners/${videojuego.caratula}`"
+          :src="`${videojuego.caratula}`"
           :alt="videojuego.titulo"
           @click="showSlide(index)"
           class="carousel__thumbnail"

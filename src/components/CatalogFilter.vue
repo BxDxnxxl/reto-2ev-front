@@ -1,77 +1,38 @@
-<script setup>
-import { ref, watch } from 'vue'
-import { useGamesStore } from '@/stores/games'
+<script setup lang="ts">
 
-const gamesStore = useGamesStore()
+import { ref, onMounted } from 'vue'
+import { useGenresStore } from '@/stores/generos'
+import { usePlatformsStore } from '@/stores/plataforma'
+import { useCompaniesStore } from '@/stores/compañia'
+
+const genresStore = useGenresStore()
+const platformsStore = usePlatformsStore()
+const companiesStore = useCompaniesStore()
 
 const selectedFilter = ref({ type: '', value: '' })
-const searchQuery = ref('')
 
-const genres = ref([
-  'Rol',
-  'Acción',
-  'Estrategia',
-  'Aventura',
-  'Deportes',
-  'Shooter',
-  'Survival',
-  'Plataformas',
-  'Peleas',
-  'Carreras',
-  'Simulación',
-  'Battle Royale',
-  'Puzzle',
-])
-const platforms = ref(['PC', 'PlayStation', 'Xbox', 'Nintendo'])
-const companies = ref(['Ubisoft', 'Steam', 'Electronic Arts', 'Activision', 'Nintendo'])
-
-const fetchFilteredGames = async () => {
-  try {
-    let url = `/api/games?`
-
-    if (selectedFilter.value.type && selectedFilter.value.value) {
-      url += `${selectedFilter.value.type}=${selectedFilter.value.value}&`
-    }
-    if (searchQuery.value.trim()) {
-      url += `search=${searchQuery.value}`
-    }
-
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Error fetching filtered games')
-    }
-    const data = await response.json()
-    gamesStore.games = data
-  } catch (error) {
-    console.error('Error fetching filtered games:', error)
-  }
-}
-
-watch([selectedFilter, searchQuery], fetchFilteredGames)
+// Cargar datos al montar el componente
+onMounted(() => {
+  genresStore.fetchGenres()
+  platformsStore.fetchPlatforms()
+  companiesStore.fetchCompanies()
+})
 </script>
+
 
 <template>
   <div class="catalog">
-    <div class="catalog__search">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Buscar juegos..."
-        class="catalog__search-input"
-      />
-    </div>
-
     <div class="catalog__filters">
       <div class="filter">
         <button class="filter__button">Géneros</button>
         <div class="filter__dropdown">
-          <label v-for="genre in genres" :key="genre" class="filter__label">
+          <label v-for="genre in genresStore.generos" :key="genre.id" class="filter__label">
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'genero', value: genre }"
+              @change="selectedFilter = { type: 'genero', value: genre.name }"
             />
-            {{ genre }}
+            {{ genre.name }}
           </label>
         </div>
       </div>
@@ -79,13 +40,13 @@ watch([selectedFilter, searchQuery], fetchFilteredGames)
       <div class="filter">
         <button class="filter__button">Plataformas</button>
         <div class="filter__dropdown">
-          <label v-for="platform in platforms" :key="platform" class="filter__label">
+          <label v-for="platform in platformsStore.plataforams" :key="platform.id" class="filter__label">
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'plataforma', value: platform }"
+              @change="selectedFilter = { type: 'plataforma', value: platform.name }"
             />
-            {{ platform }}
+            {{ platform.name }}
           </label>
         </div>
       </div>
@@ -93,19 +54,20 @@ watch([selectedFilter, searchQuery], fetchFilteredGames)
       <div class="filter">
         <button class="filter__button">Compañías</button>
         <div class="filter__dropdown">
-          <label v-for="company in companies" :key="company" class="filter__label">
+          <label v-for="company in companiesStore.companias" :key="company.id" class="filter__label">
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'compañia', value: company }"
+              @change="selectedFilter = { type: 'compañia', value: company.name }"
             />
-            {{ company }}
+            {{ company.name }}
           </label>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style lang="scss" scoped>
 $color-bg: #272727;
