@@ -41,7 +41,7 @@ export default {
 
     <section class="header__main">
       <router-link to="/login">
-        <a href="" class="header__user"> <i class="ri-user-line"></i>Account </a>
+        <a href="" class="header__user"> <img src="@/assets/img/perfil.svg" alt="Perfil" width="40" height="40">Account </a>
       </router-link>
       <div class="header__menu-icon" @click="toggleMenu">
         <i class="ri-menu-line"></i>
