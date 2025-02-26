@@ -4,7 +4,7 @@ export interface GameDto {
     descripcion: string;
     anioSalida: Date;
     pegi: number;
-    imagen: string;
+    caratula: string;
   }
 
 

@@ -5,32 +5,32 @@ import { useGamesStore } from '@/stores/games';
 const currentSlide = ref(0);
 const store = useGamesStore();
 
-// Llamamos a la función de la store para obtener los videojuegos
+//Llamamos a la función de la store para obtener los videojuegos
 onMounted(() => {
-  store.fetchVideojuegos();
+  store.fetchTop5Videojuegos();
 });
 
-// Función para mostrar el slide actual
+//Función para mostrar el slide actual
 function showSlide(index: number) {
   currentSlide.value = index;
   const mainImage = document.querySelector('.carousel__image') as HTMLImageElement;
-  mainImage.src = `/images/banners/${store.games[index].imagen}`;
+  mainImage.src = `${store.top5Videojuegos[index].caratula}`;
   updateActiveThumbnail();
 }
 
-// Función para avanzar al siguiente slide
+//Función para avanzar al siguiente slide
 function nextSlide() {
-  currentSlide.value = (currentSlide.value + 1) % store.games.length;
+  currentSlide.value = (currentSlide.value + 1) % store.top5Videojuegos.length;
   showSlide(currentSlide.value);
 }
 
-// Función para retroceder al slide anterior
+//Función para retroceder al slide anterior
 function previousSlide() {
-  currentSlide.value = (currentSlide.value - 1 + store.games.length) % store.games.length;
+  currentSlide.value = (currentSlide.value - 1 + store.top5Videojuegos.length) % store.top5Videojuegos.length;
   showSlide(currentSlide.value);
 }
 
-// Función para actualizar la miniatura activa
+//Función para actualizar la miniatura activa
 function updateActiveThumbnail() {
   const thumbnails = document.querySelectorAll('.carousel__thumbnail');
   thumbnails.forEach((thumb, index) => {
@@ -43,7 +43,7 @@ function updateActiveThumbnail() {
   <section class="carousel">
     <div class="carousel__main">
       <img
-        :src="`/images/banners/${store.games[0]?.imagen}`"
+        :src="`${store.top5Videojuegos[0]?.caratula}`"
         alt="Imagen principal"
         class="carousel__image"
       />
@@ -54,9 +54,9 @@ function updateActiveThumbnail() {
 
       <div class="carousel__thumbnail-container">
         <img
-          v-for="(videojuego, index) in store.games"
+          v-for="(videojuego, index) in store.top5Videojuegos"
           :key="index"
-          :src="`/images/banners/${videojuego.imagen}`"
+          :src="`${videojuego.caratula}`"
           :alt="videojuego.titulo"
           @click="showSlide(index)"
           class="carousel__thumbnail"

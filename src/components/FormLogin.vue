@@ -96,7 +96,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;  // Asegura que el contenido se mantenga centrado en la pantalla
+  height: 100vh; // Evita que el formulario se mueva hacia abajo
+  overflow: hidden; // Previene desplazamiento vertical no deseado
 }
 
 input, button {
@@ -114,8 +115,6 @@ $transition-time: 1.2s;
 $input-width: 260px;
 $button-height: 36px;
 
-$diff-ratio: ($container-width - $image-width) / $container-width;
-
 @mixin signupActive {
   .form-container.is-signup & {
     @content;
@@ -127,14 +126,11 @@ $diff-ratio: ($container-width - $image-width) / $container-width;
   position: relative;
   width: $container-width;
   height: 550px;
-  margin: 20px auto 100px;
   background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 15%;
-  margin-left: 30%;
-  margin-top: 300px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .form {
@@ -142,12 +138,12 @@ $diff-ratio: ($container-width - $image-width) / $container-width;
   width: $form-width;
   height: 100%;
   transition: transform $transition-time ease-in-out;
-  padding: 50px 30px 0;  // El espaciado de la sección del formulario
+  padding: 50px 30px 0;
 }
 
 .toggle-btn {
   position: absolute;
-  bottom: 50px; 
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -198,17 +194,19 @@ button {
   top: 0;
   width: $image-width;
   height: 100%;
-  padding-top: 200px;  // Ajusté para que haya el mismo espacio entre imagen y formulario
+  padding-top: 100px; // Reduce espacio arriba para mejor alineación
 
   &:before {
     content: '';
     position: absolute;
     right: 0;
     top: 0;
-    width: $container-width;
+    width: 100%;
     height: 100%;
     background-image: url('@/assets/img/imagenLogin.jpg');
-    background-size: fit;
+    background-size: auto 100%;
+    background-position: center;
+    background-repeat: no-repeat;
     transition: transform $transition-time ease-in-out;
   }
 
@@ -219,7 +217,7 @@ button {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.6); // Solo oscurece sin afectar la imagen
   }
 
   @include signupActive {
@@ -251,7 +249,7 @@ button {
 
     &.show-up {
       @include signupActive {
-        transform: translateX($image-width*2);
+        transform: translateX($image-width * 2);
       }
     }
 
