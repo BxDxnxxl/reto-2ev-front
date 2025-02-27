@@ -8,7 +8,7 @@ export const useCompaniesStore = defineStore("companies", () => {
 
   async function fetchCompanies() {
     try {
-      const response = await fetch("http://localhost:4444/api/Compania'");
+      const response = await fetch("http://localhost:4444/api/Compania");
       if (!response.ok) throw new Error("Error al cargar compañías");
       companias.value = await response.json();
     } catch (error) {

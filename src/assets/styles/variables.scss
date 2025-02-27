@@ -1,10 +1,12 @@
+$primary-color: #f25421;
 $secondary-color: #272727;
-$primary-gradient: linear-gradient(90deg, #f25421, #ff8c00, #ffd700); 
-$primary-color: #f25421; 
+$primary-gradient: linear-gradient(90deg, #f25421, #ff8c00, #ffd700);
 $background-color: #272727;
 $text-color: #ffffff;
-$box-shadow: 0 2rem 3rem var(--dark-color);
+$dark-color: #272727;
+$box-shadow: 0 2rem 3rem var($dark-color);
 $btn-color: #f25421;
+
 
 $spacing-extra-small: 4px;
 $spacing-small: 8px;
