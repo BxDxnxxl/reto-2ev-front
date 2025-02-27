@@ -7,7 +7,7 @@ import DashboardMain from '@/components/DashboardMain.vue'
 <template>
   <div class="dashboard">
     <Sidebar />
-
+    
     <DashboardMain />
   </div>
 </template>

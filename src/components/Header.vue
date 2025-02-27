@@ -7,7 +7,7 @@ export default {
   },
   methods: {
     toggleMenu() {
-      this.menuOpen = !this.menuOpen
+      this.menuOpen = !this.menuOpen;
     },
   },
 }
@@ -20,8 +20,8 @@ export default {
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
-    <a href="" class="header__logo">
-      <img src="@/assets/img/LogoSinFondo.png" class="header__logo-image" />
+    <a href="/" class="header__logo">
+      <img src="@/assets/img/LogoSinFondo.png" class="header__logo-image" alt="Logo" />
     </a>
 
     <ul class="header__navbar" :class="{ open: menuOpen }">
@@ -29,19 +29,16 @@ export default {
         <router-link to="/" class="header__nav-item header__nav-item--active">Inicio</router-link>
       </li>
       <li>
-        <a href="" class="header__nav-item">Tendencias</a>
-      </li>
-      <li>
-        <a href="" class="header__nav-item">Salidas</a>
-      </li>
-      <li>
-        <a href="" class="header__nav-item">Reservas</a>
+        <router-link to="/catalog" class="header__nav-item header__nav-item--active">Catalogo</router-link>
       </li>
     </ul>
 
     <section class="header__main">
       <router-link to="/login">
-        <a href="" class="header__user"> <img src="@/assets/img/perfil.svg" alt="Perfil" width="40" height="40">Account </a>
+        <a href="/" class="header__user">
+          <img src="@/assets/img/perfil.svg" alt="Perfil" width="40" height="40" class="header__user-img" /> 
+          Account
+        </a>
       </router-link>
       <div class="header__menu-icon" @click="toggleMenu">
         <i class="ri-menu-line"></i>
@@ -49,10 +46,8 @@ export default {
     </section>
   </header>
 </template>
-  
 
-  
-  <style>
+<style>
 :root {
   --bg-color: #272727;
   --main-color: linear-gradient(90deg, #f25421, #ff8c00, #ffd700);
@@ -70,9 +65,9 @@ export default {
   justify-content: space-between;
   background: var(--bg-color);
   padding: 1rem 5%;
-  transition: all 0.5s ease;
   font-size: 1.3rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
 }
 
 .header__logo {
@@ -87,6 +82,8 @@ export default {
 .header__navbar {
   display: flex;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .header__nav-item {
@@ -125,14 +122,19 @@ export default {
   align-items: center;
 }
 
-.header__ticket,
 .header__user {
+  margin-left: 20px;
   margin-right: 20px;
-  margin-left: 10px;
   font-size: 1.2rem;
   color: var(--text-color);
   font-weight: 500;
   transition: all 0.4s ease;
+  display: flex;
+  align-items: center;
+}
+
+.header__user-img {
+  margin-right: 8px;
 }
 
 .header__user i {
@@ -173,6 +175,7 @@ export default {
     justify-content: center;
     border-radius: 10px;
     transition: all 0.5s ease;
+    margin: 0;
   }
 
   .header__nav-item {
@@ -194,6 +197,25 @@ export default {
   .header__menu-icon {
     display: block;
   }
+
+  .header__main {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header__user {
+    font-size: 1.1rem;
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .header__navbar {
+    display: flex;
+  }
+
+  .header__menu-icon {
+    display: none;
+  }
 }
 </style>
-  

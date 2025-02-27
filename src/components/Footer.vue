@@ -43,20 +43,24 @@ import { RouterLink } from 'vue-router'
   --btn-color: #f25421;
 }
 .footer {
-  width: 100%;
-  padding: 20px;
+  width: 100vw; /* Asegura que el footer ocupe el 100% del ancho de la ventana */
+  padding: 20px 0; /* Añadimos padding arriba y abajo, pero no en los lados */
   background: #272727;
   color: var(--text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
+  margin-top: 20px; /* Este margen separará el footer del contenido anterior */
+  box-sizing: border-box; /* Esto incluye el padding en el ancho total */
 }
 
 .footer__column {
+  width: 100%; /* Asegura que las columnas del footer también ocupen todo el ancho */
+  max-width: 100%; /* Evita que las columnas tengan un límite de ancho */
   text-align: center;
 }
 
@@ -150,4 +154,5 @@ import { RouterLink } from 'vue-router'
     padding: 1rem 2rem;
   }
 }
+
 </style>
