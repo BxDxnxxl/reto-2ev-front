@@ -4,15 +4,17 @@ import Footer from '@/components/Footer.vue'
 import Carrousel from '@/components/Carrousel.vue';
 </script>
 
-
 <template>
   <Header />
 
-  <Carrousel />
+
+
+    <Carrousel />
+
 
   <Footer />
 </template>
-  
 
 <style>
+
 </style>

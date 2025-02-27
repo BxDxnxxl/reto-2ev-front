@@ -30,9 +30,9 @@ onMounted(() => {
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'genero', value: genre.name }"
+              @change="selectedFilter = { type: 'genero', value: genre.nombre }"
             />
-            {{ genre.name }}
+            {{ genre.nombre }}
           </label>
         </div>
       </div>
@@ -44,9 +44,9 @@ onMounted(() => {
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'plataforma', value: platform.name }"
+              @change="selectedFilter = { type: 'plataforma', value: platform.nombre }"
             />
-            {{ platform.name }}
+            {{ platform.nombre }}
           </label>
         </div>
       </div>
@@ -58,14 +58,15 @@ onMounted(() => {
             <input
               type="radio"
               name="filter"
-              @change="selectedFilter = { type: 'compañia', value: company.name }"
+              @change="selectedFilter = { type: 'compañia', value: company.nombre }"
             />
-            {{ company.name }}
+            {{ company.nombre }}
           </label>
         </div>
       </div>
     </div>
   </div>
+  <br>
 </template>
 
 
@@ -81,6 +82,7 @@ $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
   align-items: center;
   width: 100%;
   padding: 1rem;
+  margin-top: 200px;
 }
 
 .catalog__search {

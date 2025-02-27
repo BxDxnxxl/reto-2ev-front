@@ -36,39 +36,53 @@ onMounted(() => {
   $background-color: #272727;
   $text-color: #ffffff;
   $dark-color: #272727;
-  $box-shadow: 0 2rem 3rem var($dark-color);
+  $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.1);
   $btn-color: #f25421;
 }
 
 .container-products {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: 3rem;
+  grid-template-columns: 1fr; 
+  gap: 5rem;
   width: 100%;
   margin-bottom: 50px;
+  padding: 0 1rem; 
 }
 
 .card-product {
-  background-color: #ffffff;
-  padding: 2rem 3rem;
-  border-radius: 0.5rem;
+  background-color: #272727;
+  padding: 2rem;
+  border-radius: 1rem; 
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  box-shadow: var(--box-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 100%; 
+  height: auto;
+  position: relative;
+}
+
+.card-product:hover {
+  transform: translateY(-10px); 
+  box-shadow: 0 2rem 8rem rgb(255, 115, 0); 
 }
 
 .container-img {
   width: 100%;
-  height: 15rem;
+  height: 15rem; 
   display: flex;
   justify-content: center;
   overflow: hidden;
+  border-radius: 1rem; 
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 1rem; 
   }
 }
 
@@ -77,31 +91,46 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 1rem;
 
   h3 {
-    color: #000;
-    font-weight: 600;
-    font-size: 16px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2rem;
     text-align: center;
     margin-top: 1rem;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+  }
+
+  h3:hover {
+    color: #f25421; 
   }
 }
 
-.game-button {
-  background-color: #f25421;
-  border: none;
-  border-radius: 30px;
-  padding: 14px 35px;
-  color: white;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-  width: fit-content;
 
-  &:hover {
-    background-color: #f25421;
-    color: #ffffff;
+@media (min-width: 600px) {
+  .container-products {
+    grid-template-columns: repeat(2, 1fr); 
+    padding: 0 2rem; 
+  }
+
+  .card-product {
+    max-width: 90%;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .container-products {
+    grid-template-columns: repeat(4, 1fr); 
+    padding: 0 4rem; 
+  }
+
+  .card-product {
+    max-width: 18rem; 
   }
 }
 </style>
