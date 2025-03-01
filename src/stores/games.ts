@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { GameDto } from '@/stores/dtos/game.dto'
+import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto';
 
 export const useGamesStore = defineStore('games', () => {
   const games = ref<GameDto[]>([])
   const top5Videojuegos = ref<GameDto[]>([])
+  const detalleVideojuego = ref<VideojuegoDetalleDto | null>(null)
 
   async function fetchVideojuegos() {
     try {
@@ -74,14 +76,29 @@ export const useGamesStore = defineStore('games', () => {
     }
   }
 
+  async function verDetalleVideojuego(id: number) {
+    try {
+        const response = await fetch(`http://localhost:4444/api/Videojuegos/${id}/detalle`);
+        if (!response.ok) {
+            throw new Error('Error al obtener el detalle del videojuego');
+        }
+        detalleVideojuego.value = await response.json();
+    } catch (error) {
+        console.error('Error en fetchGameDetail:', error);
+        detalleVideojuego.value = null;
+    }
+}
+
   return {
     games,
     top5Videojuegos,
+    detalleVideojuego,
     fetchVideojuegos,
     fetchVideojuegoById,
     createVideojuegos,
     updateVideojuego,
     deleteVideojuego,
     fetchTop5Videojuegos,
+    verDetalleVideojuego
   }
 })
