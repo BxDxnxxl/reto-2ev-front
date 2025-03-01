@@ -1,5 +1,9 @@
 <script>
+import PerfilAnimado from './PerfilAnimado.vue'
 export default {
+  components: {
+    PerfilAnimado
+  },
   data() {
     return {
       menuOpen: false,
@@ -34,9 +38,9 @@ export default {
     </ul>
 
     <section class="header__main">
+      <PerfilAnimado width="40" height="40" class="header__user-img" />
       <router-link to="/login">
         <a href="/" class="header__user">
-          <img src="@/assets/img/perfil.svg" alt="Perfil" width="40" height="40" class="header__user-img" /> 
           Account
         </a>
       </router-link>
