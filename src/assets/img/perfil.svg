@@ -7,12 +7,40 @@
 >
     <circle cx="50" cy="50" r="48" stroke="#272727" stroke-width="4" fill="#f25421"/>
     
-    <circle cx="50" cy="35" r="15" fill="#272727"/>
+    <circle cx="50" cy="35" r="15" fill="#272727">
+        <animate
+            attributeName="r"
+            from="15" to="30"
+            dur="0.3s"
+            begin="mouseover"
+            fill="freeze" />
+        <animate
+            attributeName="r"
+            from="30" to="15"
+            dur="0.3s"
+            begin="mouseout"
+            fill="freeze" />
+    </circle>
 
     <path 
         d="M30 80 C30 60, 70 60, 70 80" 
         stroke="#272727" 
         stroke-width="4" 
         fill="#272727"
-    />
+    >
+        <animate
+            attributeName="transform"
+            type="scale"
+            from="1 1" to="1 0.5"
+            dur="0.3s"
+            begin="mouseover"
+            fill="freeze" />
+        <animate
+            attributeName="transform"
+            type="scale"
+            from="1 0.5" to="1 1"
+            dur="0.3s"
+            begin="mouseout"
+            fill="freeze" />
+    </path>
 </svg>
