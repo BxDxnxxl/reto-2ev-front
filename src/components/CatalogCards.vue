@@ -14,19 +14,22 @@ onMounted(() => {
 
 <template>
   <div class="container-products" id="obras-container">
-    <div class="card-product" v-for="games in games.games" :key="games.id">
+    <router-link 
+      v-for="games in games.games" 
+      :key="games.id"
+      :to="`/detalleVideojuego?id=${games.id}`"
+      class="card-product"
+    >
       <div class="container-img">
-        <img :src="`${games.caratula}`" :alt="games.titulo" class="img-item" />
+        <img :src="games.caratula" :alt="games.titulo" class="img-item" />
       </div>
       <div class="content-card-product">
         <h3 class="titulo-item">{{ games.titulo }}</h3>
-   <!--     <RouterLink :to="{ name: 'Detalles', params: { id: games.id } }" class="game-button">
-          Detalles
-        </RouterLink>-->
       </div>
-    </div>
+    </router-link>
   </div>
 </template>
+
 
 <style lang="scss" scoped>
 :root {
