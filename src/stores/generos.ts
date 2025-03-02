@@ -5,6 +5,7 @@ import type { GeneroDto } from "@/stores/dtos/Genero.dto";
 
 export const useGenresStore = defineStore("genres", () => {
   const generos = ref<GeneroDto[]>([]);
+  const top5Generos = ref<GeneroDto[]>([]);
 
   async function fetchGenres() {
     try {
@@ -16,8 +17,20 @@ export const useGenresStore = defineStore("genres", () => {
     }
   }
 
+  async function fetchTop5Genres() {
+    try {
+      const response = await fetch("http://localhost:4444/api/Genero/top5");
+      if (!response.ok) throw new Error("Error al cargar los géneros más populares");
+      top5Generos.value = await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return { 
-    generos, 
-    fetchGenres 
+    generos,
+    top5Generos, 
+    fetchGenres,
+    fetchTop5Genres 
 };
 });

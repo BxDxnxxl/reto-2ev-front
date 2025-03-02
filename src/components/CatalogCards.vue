@@ -1,10 +1,18 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGamesStore } from '@/stores/games'
 
 const route = useRoute()
 const games = useGamesStore()
+
+const gamesToDisplay = computed(() => {
+  //si hay un filtro activo, se aplica
+  if (games.filtroActivo) {
+    return games.juegosFiltrados
+  }
+  return games.games
+})
 
 onMounted(() => {
   games.fetchVideojuegos(true)
@@ -13,8 +21,12 @@ onMounted(() => {
 
 <template>
   <div class="games-grid" id="obras-container">
+    <div v-if="games.filtroActivo && gamesToDisplay.length === 0" class="no-results">
+      No se encontraron videojuegos con los filtros seleccionados.
+    </div>
+    
     <router-link 
-      v-for="game in games.games" 
+      v-for="game in gamesToDisplay" 
       :key="game.id"
       :to="`/detalleVideojuego?id=${game.id}`"
       class="game-card"

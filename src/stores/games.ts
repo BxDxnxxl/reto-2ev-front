@@ -7,11 +7,16 @@ export const useGamesStore = defineStore('games', () => {
   const games = ref<GameDto[]>([])
   const top5Videojuegos = ref<GameDto[]>([])
   const detalleVideojuego = ref<VideojuegoDetalleDto | null>(null)
+  const juegosFiltrados = ref<GameDto[]>([])
+  const filtroActivo = ref(false) //comprobación de si hay filtros activos
 
   async function fetchVideojuegos() {
     try {
       const response = await fetch('http://localhost:4444/api/videojuegos')
       games.value = await response.json()
+      if (!filtroActivo.value) {
+        juegosFiltrados.value = games.value
+      }
     } catch (error) {
       console.error('Error al obtener videojuego:', error)
     }
@@ -87,18 +92,59 @@ export const useGamesStore = defineStore('games', () => {
         console.error('Error en fetchGameDetail:', error);
         detalleVideojuego.value = null;
     }
-}
+  }
+
+  async function filtrarVideojuegos(compania: string | null = null, genero: string | null = null, plataforma: string | null = null) {
+    try {
+      let url = 'http://localhost:4444/api/videojuegos/filtrar?'
+      const params = []
+      
+      if (compania) params.push(`compania=${encodeURIComponent(compania)}`)
+      if (genero) params.push(`genero=${encodeURIComponent(genero)}`)
+      if (plataforma) params.push(`plataforma=${encodeURIComponent(plataforma)}`)
+      
+      url += params.join('&')
+      
+      filtroActivo.value = params.length > 0
+      
+      //en caso de no haber filtros activos se almacenan todos los videojuegos en la variable de juegos filtrados
+      if (!filtroActivo.value) {
+        juegosFiltrados.value = games.value
+        return
+      }
+      
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error('Error al filtrar videojuegos')
+      }
+      
+      juegosFiltrados.value = await response.json()
+    } catch (error) {
+      console.error('Error al filtrar videojuegos:', error)
+      juegosFiltrados.value = []
+    }
+  }
+  
+  function clearFilters() {
+    filtroActivo.value = false
+    juegosFiltrados.value = games.value
+  }
 
   return {
     games,
     top5Videojuegos,
     detalleVideojuego,
+    filtroActivo,
+    juegosFiltrados,
     fetchVideojuegos,
     fetchVideojuegoById,
     createVideojuegos,
     updateVideojuego,
     deleteVideojuego,
     fetchTop5Videojuegos,
-    verDetalleVideojuego
+    verDetalleVideojuego,
+    filtrarVideojuegos,
+    clearFilters
   }
 })
