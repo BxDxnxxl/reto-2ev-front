@@ -1,24 +1,46 @@
 <script setup lang="ts">
-
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useGenresStore } from '@/stores/generos'
 import { usePlatformsStore } from '@/stores/plataforma'
 import { useCompaniesStore } from '@/stores/compañia'
+import { useGamesStore } from '@/stores/games'
 
 const genresStore = useGenresStore()
 const platformsStore = usePlatformsStore()
 const companiesStore = useCompaniesStore()
+const gamesStore = useGamesStore()
 
-const selectedFilter = ref({ type: '', value: '' })
+const selectedGenre = ref('')
+const selectedPlatform = ref('')
+const selectedCompany = ref('')
 
-// Cargar datos al montar el componente
 onMounted(() => {
   genresStore.fetchGenres()
   platformsStore.fetchPlatforms()
   companiesStore.fetchCompanies()
 })
-</script>
 
+//función para que aplique los filtros
+function applyFilters() {
+  gamesStore.filtrarVideojuegos(
+    selectedCompany.value || null,
+    selectedGenre.value || null,
+    selectedPlatform.value || null
+  )
+}
+
+//cada cambiio de filtro, se llama a la funciónde la llamada para que pille bien los filtros
+watch(selectedGenre, () => applyFilters())
+watch(selectedPlatform, () => applyFilters())
+watch(selectedCompany, () => applyFilters())
+
+function clearFilters() {
+  selectedGenre.value = ''
+  selectedPlatform.value = ''
+  selectedCompany.value = ''
+  gamesStore.clearFilters()
+}
+</script>
 
 <template>
   <div class="catalog">
@@ -29,8 +51,9 @@ onMounted(() => {
           <label v-for="genre in genresStore.generos" :key="genre.id" class="filter__label">
             <input
               type="radio"
-              name="filter"
-              @change="selectedFilter = { type: 'genero', value: genre.nombre }"
+              name="genreFilter"
+              :checked="selectedGenre === genre.nombre"
+              @change="selectedGenre = genre.nombre"
             />
             {{ genre.nombre }}
           </label>
@@ -43,8 +66,9 @@ onMounted(() => {
           <label v-for="platform in platformsStore.plataforams" :key="platform.id" class="filter__label">
             <input
               type="radio"
-              name="filter"
-              @change="selectedFilter = { type: 'plataforma', value: platform.nombre }"
+              name="platformFilter"
+              :checked="selectedPlatform === platform.nombre"
+              @change="selectedPlatform = platform.nombre"
             />
             {{ platform.nombre }}
           </label>
@@ -57,16 +81,18 @@ onMounted(() => {
           <label v-for="company in companiesStore.companias" :key="company.id" class="filter__label">
             <input
               type="radio"
-              name="filter"
-              @change="selectedFilter = { type: 'compañia', value: company.nombre }"
+              name="companyFilter"
+              :checked="selectedCompany === company.nombre"
+              @change="selectedCompany = company.nombre"
             />
             {{ company.nombre }}
           </label>
         </div>
       </div>
+      
+      <button class="filter__clear" @click="clearFilters">Eliminar filtros</button>
     </div>
   </div>
-  <br>
 </template>
 
 
