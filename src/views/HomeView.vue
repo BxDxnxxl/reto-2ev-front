@@ -2,6 +2,7 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Carrousel from '@/components/Carrousel.vue';
+import mainCard from '@/components/MainCard.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import Carrousel from '@/components/Carrousel.vue';
 
 
     <Carrousel />
+    <mainCard />
 
 
   <Footer />
