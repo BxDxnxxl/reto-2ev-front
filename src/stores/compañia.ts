@@ -19,7 +19,7 @@ export const useCompaniesStore = defineStore("companies", () => {
 
   async function fetchTop5Companies() {
     try {
-      const response = await fetch("http://localhost:4444/api/Compania/top");
+      const response = await fetch("http://localhost:4444/api/Compania/top5");
       if (!response.ok) throw new Error("Error al cargar las compañías más populares");
       top5Companias.value = await response.json();
     } catch (error) {
