@@ -1,8 +1,11 @@
 <script>
 import PerfilAnimado from './PerfilAnimado.vue'
+import LogoCanvasAnimation from './LogoCanvasAnimation.vue'
+
 export default {
   components: {
-    PerfilAnimado
+    PerfilAnimado,
+    LogoCanvasAnimation,
   },
   data() {
     return {
@@ -11,7 +14,7 @@ export default {
   },
   methods: {
     toggleMenu() {
-      this.menuOpen = !this.menuOpen;
+      this.menuOpen = !this.menuOpen
     },
   },
 }
@@ -25,7 +28,7 @@ export default {
     />
     <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
     <a href="/" class="header__logo">
-      <img src="@/assets/img/LogoSinFondo.png" class="header__logo-image" alt="Logo" />
+      <LogoCanvasAnimation />
     </a>
 
     <ul class="header__navbar" :class="{ open: menuOpen }">
@@ -33,16 +36,16 @@ export default {
         <router-link to="/" class="header__nav-item header__nav-item--active">Inicio</router-link>
       </li>
       <li>
-        <router-link to="/catalog" class="header__nav-item header__nav-item--active">Catalogo</router-link>
+        <router-link to="/catalog" class="header__nav-item header__nav-item--active"
+          >Catalogo</router-link
+        >
       </li>
     </ul>
 
     <section class="header__main">
       <PerfilAnimado width="40" height="40" class="header__user-img" />
       <router-link to="/login">
-        <a href="/" class="header__user">
-          Account
-        </a>
+        <a href="/" class="header__user"> Account </a>
       </router-link>
       <div class="header__menu-icon" @click="toggleMenu">
         <i class="ri-menu-line"></i>
