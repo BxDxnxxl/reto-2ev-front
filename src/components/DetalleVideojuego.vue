@@ -13,6 +13,22 @@ const props = defineProps({
 const gamesStore = useGamesStore()
 const videojuego = ref<VideojuegoDetalleDto | null>(null)
 
+// Función para obtener la URL de la imagen PEGI según el valor
+const getPegiImageUrl = (pegiValue: number) => {
+  switch (pegiValue) {
+    case 3:
+      return 'src/assets/img/pegi3.png'
+    case 7:
+      return 'src/assets/img/pegi7.png'
+    case 12:
+      return 'src/assets/img/pegi12.svg'
+    case 16:
+      return 'src/assets/img/pegi16.png'
+    case 18:
+      return 'src/assets/img/pegi18.png'
+  }
+}
+
 // Formato de fecha a española
 const formatearFechaEspañola = (fecha: string | number) => {
   // Si es un año, lo devolvemos como string
@@ -60,7 +76,12 @@ onMounted(async () => {
             <span class="icono">📅</span> {{ formatearFechaEspañola(videojuego.anioSalida) }}
           </span>
           <span v-if="videojuego.pegi" class="detalle-videojuego__pegi">
-            <span class="icono">🔞</span> PEGI {{ videojuego.pegi }}
+            <h3>Pegi:</h3>
+            <img 
+              :src="getPegiImageUrl(videojuego.pegi)" 
+              :alt="`PEGI ${videojuego.pegi}`" 
+              class="pegi-imagen" 
+            />
           </span>
         </div>
         
@@ -179,6 +200,16 @@ onMounted(async () => {
   &__valoracion {
     color: #ffcc00;
     font-weight: 600;
+  }
+
+  &__pegi {
+    display: flex;
+    align-items: center;
+  }
+  
+  .pegi-imagen {
+    height: 28px;
+    width: auto;
   }
 
   &__descripcion {
@@ -307,6 +338,10 @@ onMounted(async () => {
       .icono {
         font-size: 20px;
       }
+    }
+    
+    .pegi-imagen {
+      height: 32px;
     }
 
     &__descripcion {

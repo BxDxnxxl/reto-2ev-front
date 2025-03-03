@@ -1,46 +1,242 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useUsersStore } from "@/stores/users";
 import { useRouter } from "vue-router";
+import type { UserLoginDto } from "@/stores/dtos/UserLogin.dto";
+import type { UsersInfo } from "@/stores/dtos/UsersInfo.dto";
 
 const router = useRouter();
-
 const usersStore = useUsersStore();
 
-const loginData = ref({ username: "", password: "" });
-const registerData = ref({ username: "", email: "", contrasenia: "" });
+// Datos de formularios
+const loginData = ref({ 
+  username: "", 
+  password: "" 
+});
+
+const registerData = ref({ 
+  username: "", 
+  email: "", 
+  contrasenia: "",
+  confirmarContrasenia: ""
+});
 
 const isSignup = ref(false);
 
-const handleLogin = async () => {
-  const success = await usersStore.login(loginData.value);
-  if (success) {
-    router.push("/");
-  }
+const loginErrors = ref({
+  username: "",
+  password: "",
+  general: ""
+});
+
+const registerErrors = ref({
+  username: "",
+  email: "",
+  contrasenia: "",
+  confirmarContrasenia: "",
+  general: ""
+});
+
+const currentUser = ref<UsersInfo | null>(null);
+
+const isLoginValid = computed(() => {
+  return !loginErrors.value.username && 
+         !loginErrors.value.password && 
+         loginData.value.username && 
+         loginData.value.password;
+});
+
+const isRegisterValid = computed(() => {
+  return !registerErrors.value.username && 
+         !registerErrors.value.email && 
+         !registerErrors.value.contrasenia && 
+         !registerErrors.value.confirmarContrasenia && 
+         registerData.value.username && 
+         registerData.value.email && 
+         registerData.value.contrasenia &&
+         registerData.value.contrasenia === registerData.value.confirmarContrasenia;
+});
+
+function isValidEmail(email: string) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
+
+function validateLogin() {
+  loginErrors.value = {
+    username: "",
+    password: "",
+    general: ""
+  };
+  
+  if (!loginData.value.username) {
+    loginErrors.value.username = "El nombre de usuario es obligatorio";
+  } else if (loginData.value.username.length < 3) {
+    loginErrors.value.username = "El nombre de usuario debe tener al menos 3 caracteres";
+  }
+  
+  if (!loginData.value.password) {
+    loginErrors.value.password = "La contraseña es obligatoria";
+  } else if (loginData.value.password.length < 6) {
+    loginErrors.value.password = "La contraseña debe tener al menos 6 caracteres";
+  }
+  
+  return isLoginValid.value;
+}
+
+function validateRegister() {
+  registerErrors.value = {
+    username: "",
+    email: "",
+    contrasenia: "",
+    confirmarContrasenia: "",
+    general: ""
+  };
+  
+  if (!registerData.value.username) {
+    registerErrors.value.username = "El nombre de usuario es obligatorio";
+  } else if (registerData.value.username.length < 3) {
+    registerErrors.value.username = "El nombre de usuario debe tener al menos 3 caracteres";
+  }
+  
+  if (!registerData.value.email) {
+    registerErrors.value.email = "El email es obligatorio";
+  } else if (!isValidEmail(registerData.value.email)) {
+    registerErrors.value.email = "El formato del email no es válido";
+  }
+  
+  if (!registerData.value.contrasenia) {
+    registerErrors.value.contrasenia = "La contraseña es obligatoria";
+  } else if (registerData.value.contrasenia.length < 6) {
+    registerErrors.value.contrasenia = "La contraseña debe tener al menos 6 caracteres";
+  }
+  
+  if (!registerData.value.confirmarContrasenia) {
+    registerErrors.value.confirmarContrasenia = "Debe confirmar su contraseña";
+  } else if (registerData.value.confirmarContrasenia !== registerData.value.contrasenia) {
+    registerErrors.value.confirmarContrasenia = "Las contraseñas no coinciden";
+  }
+  
+  return isRegisterValid.value;
+}
+
+const handleLogin = async () => {
+  if (!validateLogin()) {
+    return;
+  }
+  
+  const usuarioLogin: UserLoginDto = {
+    username: loginData.value.username,
+    password: loginData.value.password
+  };
+  
+  try {
+    const success = await usersStore.login(usuarioLogin);
+    
+    if (success) {
+      currentUser.value = usersStore.currentUser;
+      router.push("/");
+    } else {
+      loginErrors.value.general = "Credenciales inválidas. Por favor, inténtelo de nuevo.";
+    }
+  } catch (error) {
+    console.error("Error en login:", error);
+    loginErrors.value.general = `Error al iniciar sesión: ${error instanceof Error ? error.message : 'Desconocido'}`;
+  }
+};
+
 const handleRegister = async () => {
-  await usersStore.register(registerData.value);
+  if (!validateRegister()) {
+    return;
+  }
+  
+  try {
+    const success = await usersStore.register({
+      username: registerData.value.username,
+      email: registerData.value.email,
+      contrasenia: registerData.value.contrasenia
+    });
+    
+    if (success) {
+
+      isSignup.value = false;
+      registerData.value = { username: "", email: "", contrasenia: "", confirmarContrasenia: "" };
+ 
+      loginErrors.value.general = "Registro exitoso. Por favor, inicie sesión.";
+    } else {
+      registerErrors.value.general = "No se pudo completar el registro. Por favor, inténtelo de nuevo.";
+    }
+  } catch (error) {
+    console.error("Error en registro:", error);
+    registerErrors.value.general = `Error al registrarse: ${error instanceof Error ? error.message : 'Desconocido'}`;
+  }
 };
 
 const toggleSignup = () => {
   isSignup.value = !isSignup.value;
+  
+  if (isSignup.value) {
+    loginData.value = { username: "", password: "" };
+    loginErrors.value = { username: "", password: "", general: "" };
+  } else {
+    registerData.value = { username: "", email: "", contrasenia: "", confirmarContrasenia: "" };
+    registerErrors.value = { username: "", email: "", contrasenia: "", confirmarContrasenia: "", general: "" };
+  }
+};
+
+const clearLoginError = (field: keyof typeof loginErrors.value) => {
+  loginErrors.value[field] = "";
+};
+
+const clearRegisterError = (field: keyof typeof registerErrors.value) => {
+  registerErrors.value[field] = "";
 };
 </script>
 
 <template>
   <div class="form-container" :class="{ 'is-signup': isSignup }">
-    <!-- Formulario de Login -->
+
     <form class="form login-form" @submit.prevent="handleLogin">
       <h2>Bienvenido</h2>
+      
+      <div v-if="loginErrors.general" class="error-message general-error">
+        {{ loginErrors.general }}
+      </div>
+      
       <label>
         <span>Usuario</span>
-        <input type="text" v-model="loginData.username" required />
+        <input 
+          type="text" 
+          v-model="loginData.username" 
+          @input="clearLoginError('username')"
+          required 
+        />
+        <div v-if="loginErrors.username" class="error-message">
+          {{ loginErrors.username }}
+        </div>
       </label>
+      
       <label>
         <span>Contraseña</span>
-        <input type="password" v-model="loginData.password" required />
+        <input 
+          type="password" 
+          v-model="loginData.password" 
+          @input="clearLoginError('password')"
+          required 
+        />
+        <div v-if="loginErrors.password" class="error-message">
+          {{ loginErrors.password }}
+        </div>
       </label>
-      <button type="submit" class="submit-btn">Iniciar Sesión</button>
+      
+      <button type="submit" class="submit-btn" :disabled="!loginData.username || !loginData.password">
+        Iniciar Sesión
+      </button>
+      
+      <div v-if="currentUser" class="success-message">
+        <p>Sesión iniciada correctamente</p>
+        <router-link to="/" class="dashboard-link">Ir al panel principal</router-link>
+      </div>
     </form>
 
     <div class="sub-container">
@@ -60,22 +256,72 @@ const toggleSignup = () => {
         </button>
       </div>
 
-      <!-- Formulario de Registro -->
       <form class="form signup-form" @submit.prevent="handleRegister">
         <h2>Únete a la comunidad</h2>
+        
+        <div v-if="registerErrors.general" class="error-message general-error">
+          {{ registerErrors.general }}
+        </div>
+        
         <label>
           <span>Nombre de usuario</span>
-          <input type="text" v-model="registerData.username" required />
+          <input 
+            type="text" 
+            v-model="registerData.username" 
+            @input="clearRegisterError('username')"
+            required 
+          />
+          <div v-if="registerErrors.username" class="error-message">
+            {{ registerErrors.username }}
+          </div>
         </label>
+        
         <label>
           <span>Email</span>
-          <input type="email" v-model="registerData.email" required />
+          <input 
+            type="email" 
+            v-model="registerData.email" 
+            @input="clearRegisterError('email')"
+            required 
+          />
+          <div v-if="registerErrors.email" class="error-message">
+            {{ registerErrors.email }}
+          </div>
         </label>
+        
         <label>
           <span>Contraseña</span>
-          <input type="password" v-model="registerData.contrasenia" required />
+          <input 
+            type="password" 
+            v-model="registerData.contrasenia" 
+            @input="clearRegisterError('contrasenia')"
+            required 
+          />
+          <div v-if="registerErrors.contrasenia" class="error-message">
+            {{ registerErrors.contrasenia }}
+          </div>
         </label>
-        <button type="submit" class="submit-btn">Registrarse</button>
+        
+        <label>
+          <span>Confirmar Contraseña</span>
+          <input 
+            type="password" 
+            v-model="registerData.confirmarContrasenia" 
+            @input="clearRegisterError('confirmarContrasenia')"
+            required 
+          />
+          <div v-if="registerErrors.confirmarContrasenia" class="error-message">
+            {{ registerErrors.confirmarContrasenia }}
+          </div>
+        </label>
+        
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          :disabled="!registerData.username || !registerData.email || !registerData.contrasenia || !registerData.confirmarContrasenia"
+        >
+          Registrarse
+        </button>
       </form>
     </div>
   </div>
@@ -96,8 +342,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; // Evita que el formulario se mueva hacia abajo
-  overflow: hidden; // Previene desplazamiento vertical no deseado
+  height: 100vh;
+  overflow: hidden;
 }
 
 input, button {
@@ -185,6 +431,11 @@ button {
   color: #fff;
   font-size: 15px;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .image-container {
@@ -194,7 +445,7 @@ button {
   top: 0;
   width: $image-width;
   height: 100%;
-  padding-top: 100px; // Reduce espacio arriba para mejor alineación
+  padding-top: 100px;
 
   &:before {
     content: '';
@@ -217,7 +468,7 @@ button {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); // Solo oscurece sin afectar la imagen
+    background-color: rgba(0, 0, 0, 0.6);
   }
 
   @include signupActive {
@@ -314,6 +565,43 @@ input {
 
   @include signupActive {
     transform: translate3d(0, 0, 0);
+  }
+}
+
+.error-message {
+  font-size: 12px;
+  color: #f25421;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.general-error {
+  margin: 15px auto;
+  width: $input-width;
+  padding: 8px;
+  background-color: rgba(242, 84, 33, 0.1);
+  border-radius: 4px;
+}
+
+.success-message {
+  margin: 15px auto;
+  width: $input-width;
+  padding: 8px;
+  background-color: rgba(75, 181, 67, 0.1);
+  border-radius: 4px;
+  text-align: center;
+  color: #4bb543;
+}
+
+.dashboard-link {
+  display: block;
+  margin-top: 10px;
+  color: #f25421;
+  text-decoration: none;
+  font-weight: bold;
+  
+  &:hover {
+    text-decoration: underline;
   }
 }
 </style>
