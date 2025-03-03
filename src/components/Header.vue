@@ -14,7 +14,7 @@ export default {
   },
   methods: {
     toggleMenu() {
-      this.menuOpen = !this.menuOpen
+      this.menuOpen = !this.menuOpen;
     },
   },
 }
@@ -28,7 +28,7 @@ export default {
     />
     <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
     <a href="/" class="header__logo">
-      <LogoCanvasAnimation />
+      <LogoCanvasAnimation :canvasSize="120" />  
     </a>
 
     <ul class="header__navbar" :class="{ open: menuOpen }">
@@ -36,17 +36,19 @@ export default {
         <router-link to="/" class="header__nav-item header__nav-item--active">Inicio</router-link>
       </li>
       <li>
-        <router-link to="/catalog" class="header__nav-item header__nav-item--active"
-          >Catalogo</router-link
-        >
+        <router-link to="/catalog" class="header__nav-item header__nav-item--active">
+          Catalogo
+        </router-link>
       </li>
     </ul>
+
 
     <section class="header__main">
       <PerfilAnimado width="40" height="40" class="header__user-img" />
       <router-link to="/login">
         <a href="/" class="header__user"> Account </a>
       </router-link>
+
       <div class="header__menu-icon" @click="toggleMenu">
         <i class="ri-menu-line"></i>
       </div>
@@ -80,10 +82,6 @@ export default {
 .header__logo {
   display: flex;
   align-items: center;
-}
-
-.header__logo-image {
-  width: 160px;
 }
 
 .header__navbar {
@@ -169,6 +167,7 @@ export default {
     font-size: 1.1rem;
   }
 
+
   .header__navbar {
     display: none;
     position: absolute;
@@ -200,6 +199,7 @@ export default {
     right: 0;
     display: flex;
   }
+
 
   .header__menu-icon {
     display: block;
