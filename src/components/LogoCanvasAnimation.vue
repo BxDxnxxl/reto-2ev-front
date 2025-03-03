@@ -2,8 +2,8 @@
   <div class="logo-wrapper">
     <canvas
       ref="logoCanvas"
-      width="160"
-      height="160"
+      :width="canvasSize"
+      :height="canvasSize"
       @mouseenter="startAnimation"
       @mouseleave="resetAnimation"
       class="logo-canvas"
@@ -14,6 +14,12 @@
 
 <script>
 export default {
+  props: {
+    canvasSize: {
+      type: Number,
+      default: 120, // tamaño predeterminado
+    }
+  },
   data() {
     return {
       canvas: null,
@@ -22,7 +28,7 @@ export default {
       imagesLoaded: 0,
       isAnimating: false,
       animationState: 0,
-      separationDistance: 15,
+      separationDistance: 10,
       animationSpeed: 0.08,
       animationProgress: 0,
 
@@ -128,12 +134,12 @@ export default {
 
 .logo-canvas {
   cursor: pointer;
-  width: 160px;
-  height: 160px;
+  width: 120px; /* Cambié el tamaño */
+  height: 120px; /* Cambié el tamaño */
 }
 
 .logo-name {
   margin-top: 10px;
-  width: 160px;
+  width: 120px; /* Cambié el tamaño */
 }
 </style>
