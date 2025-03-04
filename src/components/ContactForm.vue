@@ -1,5 +1,5 @@
 <template>
-  <form action="https://formsubmit.co/wannagames@gmail.com" method="POST" class="contact-form">
+  <form action="https://formsubmit.co/wannagamessv@gmail.com" method="POST" class="contact-form">
     <div class="contact-form__header">
       <router-link to="/" class="contact-form__back-button">
         <a>&#8592;</a>
@@ -49,6 +49,15 @@
           required
           class="contact-form__textarea"
         ></textarea>
+
+        <!-- Configuración de FormSubmit -->
+        <input type="hidden" name="_next" value="https://tuweb.com/gracias.html" />
+        <input type="hidden" name="_subject" value="Nuevo mensaje de contacto" />
+        <input
+          type="hidden"
+          name="_autoresponse"
+          value="Hemos recibido tu mensaje y te contactaremos pronto."
+        />
 
         <input class="contact-form__submit" type="submit" value="Enviar" />
       </div>
