@@ -12,7 +12,6 @@ import DashboardMain from '@/components/DashboardMain.vue'
   </div>
 </template>
   
-
 <style lang="scss">
 .dashboard {
   display: flex;

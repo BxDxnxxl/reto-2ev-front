@@ -16,6 +16,17 @@ export const useUsersStore = defineStore("users", () => {
   const usuarioConRoles = ref<UsersInfo | null>(null);
   const tokenLogin = ref<string | null>(null)
 
+  const storedUser = localStorage.getItem("currentUser");
+  const storedToken = localStorage.getItem("tokenLogin");
+
+  if (storedUser) {
+    currentUser.value = JSON.parse(storedUser);
+  }
+
+  if (storedToken) {
+    tokenLogin.value = storedToken;
+  }
+
   //Obtener todos los usuarios
   async function fetchUsuarios() {
     try {
@@ -92,9 +103,42 @@ export const useUsersStore = defineStore("users", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioActualizado),
       });
-      await fetchUsuarios(); // Refresca la lista después de actualizar
+      await fetchUsuarios(); //Refresca la lista después de actualizar
     } catch (error) {
       console.error("Error al actualizar usuario:", error);
+    }
+  }
+
+  async function updateCurrentUser(usuarioActualizado: UserDto) {
+    try {
+      //en caso de no tener algun valor del usuario, lo cogemos del currentuser para que no llegue nulo
+      const usaurioTotal = {
+        id: currentUser.value.id,
+        username: usuarioActualizado.username || currentUser.value.username,
+        email: usuarioActualizado.email || currentUser.value.email,
+        contrasenia: usuarioActualizado.contrasenia || currentUser.value.contrasenia,
+        nombre: usuarioActualizado.nombre || currentUser.value.nombre,
+        apellido1: usuarioActualizado.apellido1 || currentUser.value.apellido1,
+        apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || null,
+        profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || null
+      };
+  
+      const response = await fetch(`http://localhost:4444/api/usuario/${currentUser.value.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(usaurioTotal),
+      });
+
+      const updatedUser = { 
+        ...currentUser.value, 
+        ...usuarioActualizado 
+      };
+  
+      currentUser.value = updatedUser;
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+  
+      return updatedUser;
+    } catch (error) {
     }
   }
 
@@ -116,29 +160,27 @@ export const useUsersStore = defineStore("users", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioLogin),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al iniciar sesión: ${errorText || response.statusText}`);
       }
-
+  
       const data: { token: string; usuario: UsersInfo } | null = await response.json();
-
+  
       if (data) {
         currentUser.value = data.usuario;
         tokenLogin.value = data.token;
-        console.log(currentUser)
-        console.log(tokenLogin)
+  
+        localStorage.setItem("currentUser", JSON.stringify(data.usuario));
+        localStorage.setItem("tokenLogin", data.token);
+  
         return true;
-      } else {
-        console.warn("Inicio de sesión exitoso, pero no se recibió información del usuario.");
       }
     } catch (error) {
-      console.error("Error en login:", error);
+   
     }
   }
-
-  
 
   //Registrar un nuevo usuario desde el formulario
   async function register(usuarioNuevo: UserRegistroDto) {
@@ -192,8 +234,17 @@ export const useUsersStore = defineStore("users", () => {
       console.error("Error en asignarRolesAUsuario:", error);
     }
   }
-  
 
+  function logout() {
+    currentUser.value = null;
+    tokenLogin.value = null;
+  
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("tokenLogin");
+  
+    router.push("/");
+  }
+  
 
   return {
     users,
@@ -206,10 +257,12 @@ export const useUsersStore = defineStore("users", () => {
     fetchUsuarioById,
     createUsuario,
     updateUsuario,
+    updateCurrentUser,
     deleteUsuario,
     login,
     register,
     fetchUsuarioConRolesById,
-    asignarRolesAUsuario
+    asignarRolesAUsuario,
+    logout
   };
 });
