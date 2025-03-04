@@ -1,3 +1,22 @@
+<script>
+import { useUsersStore } from '@/stores/users';
+
+export default {
+  setup() {
+    const userStore = useUsersStore();
+
+    const logout = () => {
+      userStore.currentUser = null;
+      userStore.tokenLogin = null;
+    };
+
+    return {
+      logout
+    };
+  }
+}
+</script>
+
 <template>
   <div class="sidebar">
     <div class="sidebar__profile">
@@ -18,11 +37,17 @@
         >Catálogo</router-link
       >
     </nav>
-    <button class="sidebar__logout">Logout</button>
+    <router-link 
+      to="/" 
+      class="sidebar__logout" 
+      @click="logout"
+    >
+      Cerrar Sesión
+    </router-link>
   </div>
 </template>
   
-  <style lang="scss" scoped>
+<style lang="scss" scoped>
 .sidebar {
   width: 100%;
   background: #272727;
@@ -73,7 +98,14 @@
     color: white;
     width: 100%;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
     transition: background 0.3s;
+    display: block;
+
+    &:hover {
+      background: #d64321;
+    }
   }
 }
 </style>

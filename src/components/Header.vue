@@ -1,4 +1,6 @@
 <script>
+import { useUsersStore } from '@/stores/users';
+import { computed } from 'vue';
 import PerfilAnimado from './PerfilAnimado.vue'
 import LogoCanvasAnimation from './LogoCanvasAnimation.vue'
 
@@ -6,6 +8,18 @@ export default {
   components: {
     PerfilAnimado,
     LogoCanvasAnimation,
+  },
+  setup() {
+    const userStore = useUsersStore();
+    
+    const isLoggedIn = computed(() => !!userStore.currentUser);
+    const username = computed(() => userStore.currentUser?.username || 'Iniciar Sesión');
+
+    return {
+      userStore,
+      isLoggedIn,
+      username
+    }
   },
   data() {
     return {
@@ -37,16 +51,18 @@ export default {
       </li>
       <li>
         <router-link to="/catalog" class="header__nav-item header__nav-item--active">
-          Catalogo
+          Catálogo
         </router-link>
       </li>
     </ul>
 
-
     <section class="header__main">
       <PerfilAnimado width="40" height="40" class="header__user-img" />
-      <router-link to="/login">
-        <a href="/" class="header__user"> Account </a>
+      
+      <router-link :to="isLoggedIn ? '/dashboard' : '/login'">
+        <a href="/" class="header__user">
+          {{ isLoggedIn ? username : 'Cuenta' }}
+        </a>
       </router-link>
 
       <div class="header__menu-icon" @click="toggleMenu">
