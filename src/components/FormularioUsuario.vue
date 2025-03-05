@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRolesStore } from '@/stores/roles'
 import { useRoute, useRouter } from 'vue-router'
-import type { UsuarioRol } from '@/stores/dtos/UsuarioRol.dto'
+import type { RolAsignacionDto } from '@/stores/dtos/UsuarioRol.dto'
 import type { UserDto } from '@/stores/dtos/user.dto'
 import type { RolesDto } from '@/stores/dtos/Roles.dto'
 
@@ -74,9 +74,9 @@ async function saveUser() {
   }
 
   if (usuarioFinalId && userData.value.roles.length > 0) {
-    const asignacion: UsuarioRol = {
+    const asignacion: RolAsignacionDto = {
       usuarioId: usuarioFinalId,
-      rolesIds: userData.value.roles,
+      rolesIds: userData.value.roles.map(id => ({ id } as RolesDto))
     }
     await usersStore.asignarRolesAUsuario(asignacion)
   }

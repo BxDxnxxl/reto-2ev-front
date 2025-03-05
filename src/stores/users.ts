@@ -2,18 +2,18 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { UserDto } from "@/stores/dtos/user.dto";
 import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
-import type { UserRegistroDto } from "@/stores/dtos/userRegistro.dto";
-import type { UsersInfo } from "@/stores/dtos/userInfoListado.dto";
-import type { UsuarioRol } from "@/stores/dtos/UsuarioRol.dto";
+import type { UserRegistrorDto } from "@/stores/dtos/userRegistro.dto";
+import type { UserInfoDto } from "@/stores/dtos/userInfoListado.dto";
+import type { RolAsignacionDto } from "@/stores/dtos/UsuarioRol.dto";
 import { useRouter } from "vue-router";
 const router = useRouter();
 
 export const useUsersStore = defineStore("users", () => {
   const users = ref<UserDto[]>([]);
 
-  const usersWithRoles = ref<UsersInfo[]>([]);
-  const currentUser = ref<UsersInfo | null>(null);
-  const usuarioConRoles = ref<UsersInfo | null>(null);
+  const usersWithRoles = ref<UserInfoDto[]>([]);
+  const currentUser = ref<UserInfoDto | null>(null);
+  const usuarioConRoles = ref<UserInfoDto | null>(null);
   const tokenLogin = ref<string | null>(null)
 
   const storedUser = localStorage.getItem("currentUser");
@@ -111,17 +111,20 @@ export const useUsersStore = defineStore("users", () => {
 
   async function updateCurrentUser(usuarioActualizado: UserDto) {
     try {
+      if (!currentUser.value) {
+        throw new Error("No hay usuario autenticado.");
+      }
       //en caso de no tener algun valor del usuario, lo cogemos del currentuser para que no llegue nulo
-      const usaurioTotal = {
-        id: currentUser.value.id,
+      const usaurioTotal: UserDto ={
+        id: currentUser.value.id, // 
         username: usuarioActualizado.username || currentUser.value.username,
-        email: usuarioActualizado.email || currentUser.value.email,
-        contrasenia: usuarioActualizado.contrasenia || currentUser.value.contrasenia,
+        email: usuarioActualizado.email || currentUser.value.email || '',
+        contrasenia: usuarioActualizado.contrasenia || undefined,
         nombre: usuarioActualizado.nombre || currentUser.value.nombre,
         apellido1: usuarioActualizado.apellido1 || currentUser.value.apellido1,
-        apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || null,
-        profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || null
-      };
+        apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || '',
+        profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || '',
+    };
   
       const response = await fetch(`http://localhost:4444/api/usuario/${currentUser.value.id}`, {
         method: "PUT",
@@ -166,7 +169,7 @@ export const useUsersStore = defineStore("users", () => {
         throw new Error(`Error al iniciar sesión: ${errorText || response.statusText}`);
       }
   
-      const data: { token: string; usuario: UsersInfo } | null = await response.json();
+      const data: { token: string; usuario: UserInfoDto } | null = await response.json();
   
       if (data) {
         currentUser.value = data.usuario;
@@ -183,7 +186,7 @@ export const useUsersStore = defineStore("users", () => {
   }
 
   //Registrar un nuevo usuario desde el formulario
-  async function register(usuarioNuevo: UserRegistroDto) {
+  async function register(usuarioNuevo: UserRegistrorDto) {
     try {
       const response = await fetch("http://localhost:4444/api/usuario/CrearDesdeLogin", {
         method: "POST",
@@ -217,7 +220,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  async function asignarRolesAUsuario(asignacion: UsuarioRol) {
+  async function asignarRolesAUsuario(asignacion: RolAsignacionDto) {
     try {
       const response = await fetch("http://localhost:4444/api/Rol/asignarRoles", {
         method: "POST",
@@ -229,9 +232,7 @@ export const useUsersStore = defineStore("users", () => {
         throw new Error(`Error al asignar roles: ${response.statusText}`);
       }
   
-      console.log(`Roles asignados correctamente al usuario ${asignacion.usuarioId}`);
     } catch (error) {
-      console.error("Error en asignarRolesAUsuario:", error);
     }
   }
 
