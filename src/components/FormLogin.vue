@@ -154,7 +154,7 @@ const handleRegister = async () => {
     const success = await usersStore.register({
       username: registerData.value.username,
       email: registerData.value.email,
-      contrasenia: registerData.value.contrasenia
+      Contrasenia: registerData.value.contrasenia
     });
     
     if (success) {

@@ -1,20 +1,14 @@
-<script>
+<script setup>
 import { useUsersStore } from '@/stores/users';
+import { useRouter } from 'vue-router';
 
-export default {
-  setup() {
-    const userStore = useUsersStore();
+const userStore = useUsersStore();
+const router = useRouter();
 
-    const logout = () => {
-      userStore.currentUser = null;
-      userStore.tokenLogin = null;
-    };
-
-    return {
-      logout
-    };
-  }
-}
+const logout = () => {
+  userStore.logout();
+  router.push('/');
+};
 </script>
 
 <template>
@@ -27,15 +21,17 @@ export default {
         to="/usuarios"
         :class="{ 'sidebar__link--active': $route.path === '/usuarios' }"
         class="sidebar__link"
-        >Usuarios</router-link
       >
+        Usuarios
+      </router-link>
       <hr />
       <router-link
-        to="/catalogo"
+        to="/catalog"
         :class="{ 'sidebar__link--active': $route.path === '/catalogo' }"
         class="sidebar__link"
-        >Catálogo</router-link
       >
+        Catálogo
+      </router-link>
     </nav>
     <router-link 
       to="/" 
@@ -46,7 +42,7 @@ export default {
     </router-link>
   </div>
 </template>
-  
+
 <style lang="scss" scoped>
 .sidebar {
   width: 100%;

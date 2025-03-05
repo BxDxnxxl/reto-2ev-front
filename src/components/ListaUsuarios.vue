@@ -1,20 +1,45 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useUsersStore } from '@/stores/users'
+import { useRouter } from 'vue-router'
 
 const store = useUsersStore()
+const router = useRouter()
 
-store.fetchUsuarios()
+// Fetch users on component mount
+onMounted(() => {
+  store.fetchUsuarios()
+})
 
-function deleteUsuario(id: number) {
-  store.deleteUsuario(id)
+// Navigate to add user page
+function navigateToAddUser() {
+  router.push('/gestionUsuario?edit=false')
+}
+
+// Delete user with confirmation
+async function deleteUsuario(id: number) {
+  const confirmDelete = window.confirm('¿Estás seguro de eliminar este usuario?')
+  if (confirmDelete) {
+    await store.deleteUsuario(id)
+  }
+}
+
+// Navigate to edit user page
+function editUsuario(id: number) {
+  router.push(`/gestionUsuario?edit=true&id=${id}`)
 }
 </script>
 
 <template>
   <div class="tabla-usuarios">
-    <router-link to="/gestionUsuario?edit=false">
-      <v-btn class="boton-agregar" color="primary"> Añadir Usuario </v-btn>
-    </router-link>
+    <v-btn 
+      class="boton-agregar" 
+      color="primary" 
+      @click="navigateToAddUser"
+    >
+      Añadir Usuario
+    </v-btn>
+    
     <div class="tabla-usuarios__contenedor">
       <table class="tabla-usuarios__tabla">
         <thead class="tabla-usuarios__encabezado">
@@ -27,18 +52,24 @@ function deleteUsuario(id: number) {
           </tr>
         </thead>
         <tbody class="tabla-usuarios__cuerpo">
-          <tr v-for="usuario in store.users" :key="usuario.id" class="tabla-usuarios__fila">
+          <tr 
+            v-for="usuario in store.users" 
+            :key="usuario.id" 
+            class="tabla-usuarios__fila"
+          >
             <td class="tabla-usuarios__celda tabla-usuarios__celda--acciones">
-              <router-link :to="`/gestionUsuario?edit=true&id=${usuario.id}`">
-                <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--editar"
-                  >mdi-pencil</v-icon
-                >
-              </router-link>
-              <v-icon
-                class="tabla-usuarios__icono tabla-usuarios__icono--eliminar"
-                @click="deleteUsuario(usuario.id)"
-                >mdi-delete</v-icon
+              <v-icon 
+                class="tabla-usuarios__icono tabla-usuarios__icono--editar"
+                @click="editUsuario(usuario.id || 0)"
               >
+                mdi-pencil
+              </v-icon>
+              <v-icon 
+                class="tabla-usuarios__icono tabla-usuarios__icono--eliminar"
+                @click="deleteUsuario(usuario.id || 0)"
+              >
+                mdi-delete
+              </v-icon>
             </td>
             <td class="tabla-usuarios__celda">{{ usuario.nombre }}</td>
             <td class="tabla-usuarios__celda">{{ usuario.apellido1 }}</td>
@@ -68,7 +99,7 @@ function deleteUsuario(id: number) {
 
 .tabla-usuarios {
   padding: $spacing-medium;
-  margin-top: $spacing-large; // Cambiado de 100px a variable para consistencia
+  margin-top: $spacing-large;
   width: 100%;
   max-width: 90%;
   margin-left: auto;
@@ -79,14 +110,14 @@ function deleteUsuario(id: number) {
     overflow-x: auto;
     display: flex;
     justify-content: center;
-    margin-bottom: $spacing-medium; // Añadido espacio inferior
+    margin-bottom: $spacing-medium;
   }
   
   &__tabla {
     width: 100%;
-    border-collapse: separate; // Cambiado de collapse a separate
-    border-spacing: 0 $spacing-small; // Añadido espaciado entre filas
-    margin-top: $spacing-medium; // Estandarizado con variables
+    border-collapse: separate;
+    border-spacing: 0 $spacing-small;
+    margin-top: $spacing-medium;
     font-size: 0.85rem;
     table-layout: fixed;
     text-align: center;
@@ -97,7 +128,7 @@ function deleteUsuario(id: number) {
   }
   
   &__celda {
-    padding: $spacing-small $spacing-medium; // Mejorado el padding horizontal
+    padding: $spacing-small $spacing-medium;
     text-align: center;
     border-bottom: 1px solid $secondary-color;
     font-size: 0.85rem;
@@ -113,20 +144,16 @@ function deleteUsuario(id: number) {
     color: white;
     
     th {
-      padding-top: $spacing-medium; // Mayor espacio superior en encabezado
-      padding-bottom: $spacing-medium; // Mayor espacio inferior en encabezado
+      padding-top: $spacing-medium;
+      padding-bottom: $spacing-medium;
     }
   }
   
   &__fila {
-    transition: background-color 0.2s; // Añadida transición suave
-    
-    &:not(:last-child) {
-      margin-bottom: $spacing-small; // Espacio entre filas
-    }
+    transition: background-color 0.2s;
     
     &:hover {
-      background-color: rgba($secondary-color, 0.05); // Efecto hover sutil
+      background-color: rgba($secondary-color, 0.05);
     }
   }
   
@@ -146,10 +173,6 @@ function deleteUsuario(id: number) {
     
     &--eliminar {
       color: red;
-    }
-    
-    &--estado {
-      color: green;
     }
     
     @media (min-width: 768px) {

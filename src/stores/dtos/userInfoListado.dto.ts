@@ -1,13 +1,6 @@
 import type { RolesDto } from "@/stores/dtos/Roles.dto";
+import type { UserDto } from "./user.dto";
 
-export interface UserInfoDto {
-  id: number;
-  username: string;
-  email: string;
-  contrasenia?: string;
-  nombre?: string;
-  apellido1?: string;
-  apellido2?: string;
-  profilePic?: string;
+export interface UserInfoDto extends UserDto {
   roles: RolesDto[];
 }
