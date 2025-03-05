@@ -25,31 +25,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useGamesStore } from '@/stores/games';
+import { ref, onMounted } from 'vue'
+import { useGamesStore } from '@/stores/games'
 
-const currentSlide = ref(0);
-const store = useGamesStore();
+const currentSlide = ref(0)
+const store = useGamesStore()
 
 // Llamamos a la función de la store para obtener los videojuegos
 onMounted(() => {
-  store.fetchTop5Videojuegos();
-});
+  store.fetchTop5Videojuegos()
+})
 
 // Función para mostrar el slide actual
 function showSlide(index: number) {
-  currentSlide.value = index;
-  const mainImage = document.querySelector('.carousel__image') as HTMLImageElement;
-  mainImage.src = `${store.top5Videojuegos[index].caratula}`;
-  updateActiveThumbnail();
+  currentSlide.value = index
+  const mainImage = document.querySelector('.carousel__image') as HTMLImageElement
+  mainImage.src = `${store.top5Videojuegos[index].caratula}`
+  updateActiveThumbnail()
 }
 
 // Función para actualizar la miniatura activa
 function updateActiveThumbnail() {
-  const thumbnails = document.querySelectorAll('.carousel__thumbnail');
+  const thumbnails = document.querySelectorAll('.carousel__thumbnail')
   thumbnails.forEach((thumb, index) => {
-    thumb.classList.toggle('active', index === currentSlide.value);
-  });
+    thumb.classList.toggle('active', index === currentSlide.value)
+  })
 }
 </script>
 
