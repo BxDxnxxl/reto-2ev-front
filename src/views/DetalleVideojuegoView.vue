@@ -5,7 +5,7 @@ import DetalleVideojuego from '@/components/DetalleVideojuego.vue'
 
 const route = useRoute()
 
-const gameId = route.query.id ? Number(route.query.id) : null
+const gameId = route.query.id ? Number(route.query.id) : undefined
 </script>
 
 <template>

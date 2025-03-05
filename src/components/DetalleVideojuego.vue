@@ -30,7 +30,7 @@ const getPegiImageUrl = (pegiValue: number) => {
 }
 
 // Formato de fecha a española
-const formatearFechaEspañola = (fecha: string | number) => {
+const formatearFechaEspañola = (fecha: string | number | Date) => {
   // Si es un año, lo devolvemos como string
   if (typeof fecha === 'number') {
     return fecha.toString();

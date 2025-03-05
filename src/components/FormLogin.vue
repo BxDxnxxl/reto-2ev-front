@@ -2,8 +2,8 @@
 import { ref, computed } from "vue";
 import { useUsersStore } from "@/stores/users";
 import { useRouter } from "vue-router";
-import type { UserLoginDto } from "@/stores/dtos/UserLogin.dto";
-import type { UsersInfo } from "@/stores/dtos/UsersInfo.dto";
+import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
+import type { UserDto } from "@/stores/dtos/user.dto";
 
 const router = useRouter();
 const usersStore = useUsersStore();
@@ -37,7 +37,7 @@ const registerErrors = ref({
   general: ""
 });
 
-const currentUser = ref<UsersInfo | null>(null);
+const currentUser = ref<UserDto | null>(null);
 
 const isLoginValid = computed(() => {
   return !loginErrors.value.username && 
