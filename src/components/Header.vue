@@ -1,5 +1,26 @@
 <script>
+import { useUsersStore } from '@/stores/users';
+import { computed } from 'vue';
+import PerfilAnimado from './PerfilAnimado.vue'
+import LogoCanvasAnimation from './LogoCanvasAnimation.vue'
+
 export default {
+  components: {
+    PerfilAnimado,
+    LogoCanvasAnimation,
+  },
+  setup() {
+    const userStore = useUsersStore();
+    
+    const isLoggedIn = computed(() => !!userStore.currentUser);
+    const username = computed(() => userStore.currentUser?.username || 'Iniciar Sesión');
+
+    return {
+      userStore,
+      isLoggedIn,
+      username
+    }
+  },
   data() {
     return {
       menuOpen: false,
@@ -21,7 +42,7 @@ export default {
     />
     <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
     <a href="/" class="header__logo">
-      <img src="@/assets/img/LogoSinFondo.png" class="header__logo-image" alt="Logo" />
+      <LogoCanvasAnimation :canvasSize="120" />  
     </a>
 
     <ul class="header__navbar" :class="{ open: menuOpen }">
@@ -29,17 +50,21 @@ export default {
         <router-link to="/" class="header__nav-item header__nav-item--active">Inicio</router-link>
       </li>
       <li>
-        <router-link to="/catalog" class="header__nav-item header__nav-item--active">Catalogo</router-link>
+        <router-link to="/catalog" class="header__nav-item header__nav-item--active">
+          Catálogo
+        </router-link>
       </li>
     </ul>
 
     <section class="header__main">
-      <router-link to="/login">
+      <PerfilAnimado width="40" height="40" class="header__user-img" />
+      
+      <router-link :to="isLoggedIn ? '/dashboard' : '/login'">
         <a href="/" class="header__user">
-          <img src="@/assets/img/perfil.svg" alt="Perfil" width="40" height="40" class="header__user-img" /> 
-          Account
+          {{ isLoggedIn ? username : 'Cuenta' }}
         </a>
       </router-link>
+
       <div class="header__menu-icon" @click="toggleMenu">
         <i class="ri-menu-line"></i>
       </div>
@@ -73,10 +98,6 @@ export default {
 .header__logo {
   display: flex;
   align-items: center;
-}
-
-.header__logo-image {
-  width: 160px;
 }
 
 .header__navbar {
@@ -162,6 +183,7 @@ export default {
     font-size: 1.1rem;
   }
 
+
   .header__navbar {
     display: none;
     position: absolute;
@@ -193,6 +215,7 @@ export default {
     right: 0;
     display: flex;
   }
+
 
   .header__menu-icon {
     display: block;

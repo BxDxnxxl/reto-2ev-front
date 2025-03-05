@@ -27,7 +27,7 @@ import { RouterLink } from 'vue-router'
       <p class="footer__info">+34 123456789</p>
       <p class="footer__info">WannaGames@gmail.com</p>
       <router-link to="/contact">
-        <a href="" class="footer__button ov-btn-slide-left">Contacto</a>
+        <a class="footer__button ov-btn-slide-left">Contacto</a>
       </router-link>
     </div>
   </footer>
@@ -43,8 +43,8 @@ import { RouterLink } from 'vue-router'
   --btn-color: #f25421;
 }
 .footer {
-  width: 100vw; /* Asegura que el footer ocupe el 100% del ancho de la ventana */
-  padding: 20px 0; /* Añadimos padding arriba y abajo, pero no en los lados */
+  width: 100%;
+  padding: 20px 0;
   background: #272727;
   color: var(--text-color);
   display: flex;
@@ -54,13 +54,13 @@ import { RouterLink } from 'vue-router'
   position: relative;
   bottom: 0;
   left: 0;
-  margin-top: 20px; /* Este margen separará el footer del contenido anterior */
-  box-sizing: border-box; /* Esto incluye el padding en el ancho total */
+  margin-top: 20px;
+  box-sizing: border-box;
 }
 
 .footer__column {
-  width: 100%; /* Asegura que las columnas del footer también ocupen todo el ancho */
-  max-width: 100%; /* Evita que las columnas tengan un límite de ancho */
+  width: 100%;
+  max-width: 100%;
   text-align: center;
 }
 
@@ -98,6 +98,7 @@ import { RouterLink } from 'vue-router'
   cursor: pointer;
   position: relative;
   display: inline-block;
+  text-decoration: none; /* Elimina la decoración del texto */
 }
 
 .footer__button:hover {
@@ -130,9 +131,9 @@ import { RouterLink } from 'vue-router'
 @media (min-width: 768px) {
   .footer {
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: 2rem 4rem;
-    text-align: center;
+    text-align: left;
   }
 
   .footer__column {
@@ -155,4 +156,17 @@ import { RouterLink } from 'vue-router'
   }
 }
 
+@media (max-width: 768px) {
+  .footer__column--socials {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .footer__column--contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
 </style>
