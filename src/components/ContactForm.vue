@@ -105,7 +105,7 @@ body {
 
 .contact-form__back-button {
   font-size: 1.8rem;
-  color: var(--primary-color);
+  color: var(--text-color);
   text-decoration: none;
   transition: color 0.3s ease;
   margin-right: 10px; /* Espacio entre la flecha y el título */
@@ -116,7 +116,7 @@ body {
 }
 
 .contact-form__title {
-  color: var(--primary-color);
+  color: var(--text-color);
   font-size: 2.2rem;
   font-weight: 700;
   text-align: center; /* Centrado del título */

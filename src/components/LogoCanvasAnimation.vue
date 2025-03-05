@@ -17,8 +17,8 @@ export default {
   props: {
     canvasSize: {
       type: Number,
-      default: 120, // tamaño predeterminado
-    }
+      default: 120,
+    },
   },
   data() {
     return {
@@ -134,12 +134,12 @@ export default {
 
 .logo-canvas {
   cursor: pointer;
-  width: 120px; /* Cambié el tamaño */
-  height: 120px; /* Cambié el tamaño */
+  width: 120px;
+  height: 120px;
 }
 
 .logo-name {
   margin-top: 10px;
-  width: 120px; /* Cambié el tamaño */
+  width: 120px;
 }
 </style>
