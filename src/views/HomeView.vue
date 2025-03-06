@@ -15,5 +15,5 @@ import MainCard from "@/components/MainCard.vue";
 </template>
 
 <style>
-/* Tus estilos aquí */
+
 </style>
