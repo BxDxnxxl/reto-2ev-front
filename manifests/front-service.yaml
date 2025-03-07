@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-wannagames-svc
+  labels:
+    app: wannagames
+spec:
+  selector:
+    app: wannagames
+
+  ports:
+    - port: 80
+      targetPort: 80
+
+  type: LoadBalancer
