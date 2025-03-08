@@ -66,28 +66,40 @@ function updateActiveThumbnail() {
   padding-bottom: 20px;
 }
 
-.carousel__main {
-  position: relative;
-  width: 90%;
-  max-width: 600px;
-  overflow: hidden;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+.carousel__contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.carousel__image {
+.carousel__imagen-wrapper {
   width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel__imagen {
+  width: 100%;
+  max-width: 600px;
   border-radius: 15px;
   object-fit: cover;
   transition: opacity 0.5s ease;
+}
+
+.carousel__info {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .carousel__thumbnails {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 15px;
-  width: 100%;
   overflow-x: auto;
   padding-bottom: 10px;
 }
@@ -119,24 +131,57 @@ function updateActiveThumbnail() {
 }
 
 @media (min-width: 768px) {
-  .carousel__main {
-    max-width: 900px;
+  .carousel {
+    margin-bottom: 40px;
   }
 
-  .carousel__thumbnail {
-    width: 90px;
-    height: 60px;
+  .carousel__contenedor {
+    flex-direction: row;
+    align-items: stretch;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .carousel__imagen-wrapper {
+    width: 40%;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+  }
+
+  .carousel__imagen {
+    max-width: 100%;
+  }
+
+  .carousel__info {
+    width: 60%;
+    padding: 30px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 
-@media (min-width: 1024px) {
-  .carousel__main {
-    max-width: 1200px;
+@media (min-width: 1200px) {
+  .carousel__imagen-wrapper {
+    width: 35%;
   }
 
-  .carousel__thumbnail {
-    width: 110px;
-    height: 70px;
+  .carousel__info {
+    width: 65%;
+  }
+}
+
+@media (min-width: 1440px) {
+  .carousel__contenedor {
+    max-width: 1400px;
+  }
+
+  .carousel__imagen-wrapper {
+    width: 33%;
+  }
+
+  .carousel__info {
+    width: 67%;
+    padding: 40px;
   }
 }
 </style>
