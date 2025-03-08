@@ -6,12 +6,14 @@ import MainCard from '@/components/MainCard.vue'
 </script>
 
 <template>
-  <Header />
-
-  <Carrousel />
-  <MainCard />
-
-  <Footer />
+  <div class="app-layout">
+    <Header />
+    <main class="app-content">
+      <Carrousel />
+      <MainCard />
+      <Footer />
+    </main>
+  </div>
 </template>
 
 <style lang="scss" scoped>

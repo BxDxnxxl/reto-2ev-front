@@ -61,45 +61,35 @@ function updateActiveThumbnail() {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 150px;
+  padding-top: 120px; /* Ajustamos el espacio superior para el mobile-first */
   margin-bottom: 20px;
   padding-bottom: 20px;
 }
 
-.carousel__contenedor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.carousel__main {
+  position: relative;
   width: 100%;
-}
-
-.carousel__imagen-wrapper {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.carousel__imagen {
-  width: 100%;
-  max-width: 600px;
+  max-width: 100%;
+  overflow: hidden;
   border-radius: 15px;
-  object-fit: cover;
-  transition: opacity 0.5s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1; /* Asegura que la imagen principal no se corte por el header */
 }
 
-.carousel__info {
+.carousel__image {
   width: 100%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  height: auto; /* Garantiza que la imagen mantenga su proporción */
+  border-radius: 15px;
+  object-fit: contain; /* Usamos contain para que la imagen no se corte */
+  transition: opacity 0.5s ease;
 }
 
 .carousel__thumbnails {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 15px;
+  width: 100%;
   overflow-x: auto;
   padding-bottom: 10px;
 }
@@ -130,58 +120,26 @@ function updateActiveThumbnail() {
   transform: scale(1.1);
 }
 
+/* Mobile First */
 @media (min-width: 768px) {
-  .carousel {
-    margin-bottom: 40px;
-  }
-
-  .carousel__contenedor {
-    flex-direction: row;
-    align-items: stretch;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .carousel__imagen-wrapper {
-    width: 40%;
-    padding: 30px;
-    display: flex;
-    align-items: center;
-  }
-
-  .carousel__imagen {
+  .carousel__main {
     max-width: 100%;
   }
 
-  .carousel__info {
-    width: 60%;
-    padding: 30px;
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  .carousel__thumbnail {
+    width: 90px;
+    height: 60px;
   }
 }
 
-@media (min-width: 1200px) {
-  .carousel__imagen-wrapper {
-    width: 35%;
+@media (min-width: 1024px) {
+  .carousel__main {
+    max-width: 1200px;
   }
 
-  .carousel__info {
-    width: 65%;
-  }
-}
-
-@media (min-width: 1440px) {
-  .carousel__contenedor {
-    max-width: 1400px;
-  }
-
-  .carousel__imagen-wrapper {
-    width: 33%;
-  }
-
-  .carousel__info {
-    width: 67%;
-    padding: 40px;
+  .carousel__thumbnail {
+    width: 110px;
+    height: 70px;
   }
 }
 </style>
