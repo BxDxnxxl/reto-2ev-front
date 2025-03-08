@@ -1,29 +1,3 @@
-<template>
-  <section class="carousel">
-    <div class="carousel__main">
-      <img
-        :src="`${store.top5Videojuegos[0]?.caratula}`"
-        alt="Imagen principal"
-        class="carousel__image"
-      />
-    </div>
-
-    <!-- Miniaturas debajo de la imagen principal -->
-    <div class="carousel__thumbnails">
-      <div class="carousel__thumbnail-container">
-        <img
-          v-for="(videojuego, index) in store.top5Videojuegos"
-          :key="index"
-          :src="`${videojuego.caratula}`"
-          :alt="videojuego.titulo"
-          @click="showSlide(index)"
-          class="carousel__thumbnail"
-        />
-      </div>
-    </div>
-  </section>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useGamesStore } from '@/stores/games'
@@ -53,6 +27,35 @@ function updateActiveThumbnail() {
 }
 </script>
 
+
+
+<template>
+  <section class="carousel">
+    <div class="carousel__main">
+      <img
+        :src="`${store.top5Videojuegos[0]?.caratula}`"
+        alt="Imagen principal"
+        class="carousel__image"
+      />
+    </div>
+
+    <!-- Miniaturas debajo de la imagen principal -->
+    <div class="carousel__thumbnails">
+      <div class="carousel__thumbnail-container">
+        <img
+          v-for="(videojuego, index) in store.top5Videojuegos"
+          :key="index"
+          :src="`${videojuego.caratula}`"
+          :alt="videojuego.titulo"
+          @click="showSlide(index)"
+          class="carousel__thumbnail"
+        />
+      </div>
+    </div>
+  </section>
+</template>
+
+
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
 
@@ -61,7 +64,7 @@ function updateActiveThumbnail() {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-top: 120px; /* Ajustamos el espacio superior para el mobile-first */
+  padding-top: 120px;
   margin-bottom: 20px;
   padding-bottom: 20px;
 }
@@ -69,18 +72,18 @@ function updateActiveThumbnail() {
 .carousel__main {
   position: relative;
   width: 100%;
-  max-width: 100%;
+  height: 50vh;
   overflow: hidden;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  z-index: 1; /* Asegura que la imagen principal no se corte por el header */
+  z-index: 1;
 }
 
 .carousel__image {
   width: 100%;
-  height: auto; /* Garantiza que la imagen mantenga su proporción */
+  height: 100%;
+  object-fit: cover;
   border-radius: 15px;
-  object-fit: contain; /* Usamos contain para que la imagen no se corte */
   transition: opacity 0.5s ease;
 }
 
@@ -123,7 +126,7 @@ function updateActiveThumbnail() {
 /* Mobile First */
 @media (min-width: 768px) {
   .carousel__main {
-    max-width: 100%;
+    height: 60vh;
   }
 
   .carousel__thumbnail {
@@ -134,7 +137,7 @@ function updateActiveThumbnail() {
 
 @media (min-width: 1024px) {
   .carousel__main {
-    max-width: 1200px;
+    height: 70vh;
   }
 
   .carousel__thumbnail {
