@@ -11,8 +11,8 @@ import MainCard from '@/components/MainCard.vue'
     <main class="app-content">
       <Carrousel />
       <MainCard />
-      <Footer />
     </main>
+    <Footer />
   </div>
 </template>
 
