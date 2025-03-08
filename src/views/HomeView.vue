@@ -35,5 +35,9 @@ import MainCard from '@/components/MainCard.vue'
     padding-left: 5%;
     padding-right: 5%;
   }
+
+  @media (min-width: 1024px) {
+    padding-top: 13rem;
+  }
 }
 </style>
