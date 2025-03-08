@@ -1,20 +1,20 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { useCompaniesStore } from "@/stores/compañia";
-import { useGenresStore } from "@/stores/generos";
+import { ref, onMounted } from 'vue'
+import { useCompaniesStore } from '@/stores/compañia'
+import { useGenresStore } from '@/stores/generos'
 
-const companiesStore = useCompaniesStore();
-const genresStore = useGenresStore();
+const companiesStore = useCompaniesStore()
+const genresStore = useGenresStore()
 
-const top5Companias = ref([]);
-const top5Generos = ref([]);
+const top5Companias = ref([])
+const top5Generos = ref([])
 
 onMounted(async () => {
-  await companiesStore.fetchTop5Companies();
-  await genresStore.fetchTop5Genres();
-  top5Companias.value = companiesStore.top5Companias;
-  top5Generos.value = genresStore.top5Generos;
-});
+  await companiesStore.fetchTop5Companies()
+  await genresStore.fetchTop5Genres()
+  top5Companias.value = companiesStore.top5Companias
+  top5Generos.value = genresStore.top5Generos
+})
 </script>
 
 <template>
@@ -34,7 +34,12 @@ onMounted(async () => {
     <div class="section">
       <h2 class="section__title">Compañías Populares</h2>
       <div class="cards">
-        <router-link v-for="compania in top5Companias" :key="compania.id" to="/catalog" class="card">
+        <router-link
+          v-for="compania in top5Companias"
+          :key="compania.id"
+          to="/catalog"
+          class="card"
+        >
           <img :src="compania.url_imagen" :alt="compania.nombre" class="card__image" />
           <p class="card__name">{{ compania.nombre }}</p>
         </router-link>
@@ -44,11 +49,20 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/variables.scss';
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .cards-container {
   display: flex;
   flex-direction: column;
-  gap: 3rem; 
-  padding: 1rem;
+  gap: $spacing-large;
+  padding: $spacing-medium;
 }
 
 .section {
@@ -58,79 +72,75 @@ onMounted(async () => {
 }
 
 .section__title {
-  font-size: 1.75rem;
+  font-size: $font-size-xlarge;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin-bottom: $spacing-medium;
   text-align: center;
-  color: #f25421;
+  color: $primary-color;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-
 .cards {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); 
-  gap: 1.5rem;
-  width: 100%;
-  justify-content: center;
-  padding: 20px;
-
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: $spacing-medium;
+  padding-bottom: $spacing-small;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #272727;
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: $background-color;
+  border-radius: $border-radius;
+  padding: $spacing-medium;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  color: #e0e0e0;
+  color: $text-color;
   text-decoration: none;
-  box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
-  min-width: 160px; 
-  height: auto; 
-  flex-shrink: 0; 
+  box-shadow: $box-shadow;
+  min-width: 160px;
+  max-width: 200px;
+  height: auto;
+  scroll-snap-align: start;
 }
 
 .card__image {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   border-radius: 50%;
-  border: 4px solid #ffffff;
+  border: 4px solid $text-color;
 }
 
 .card__name {
-  margin-top: 1rem;
-  font-size: 1.1rem;
+  margin-top: $spacing-small;
+  font-size: $font-size-large;
   font-weight: 600;
-  letter-spacing: 1px;
-  color: #ffffff;
+  color: $text-color;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-
-@media (max-width: 1024px) {
+@media (min-width: $desktop) {
   .cards {
-    display: flex;
-    flex-wrap: nowrap; 
-    overflow-x: scroll; 
-    gap: 1.5rem;
-    padding-bottom: 1rem;
-    scroll-snap-type: x mandatory; 
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-large;
+    justify-content: center;
   }
 
   .card {
-    scroll-snap-align: start; 
-    min-width: 200px; 
+    min-width: auto;
+    max-width: 250px;
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: $laptop) {
   .cards {
-    gap: 1rem;
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 </style>
