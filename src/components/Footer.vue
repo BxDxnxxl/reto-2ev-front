@@ -54,10 +54,11 @@ body {
 
 /* 🔹 Footer */
 .footer {
-  width: 100vw;
+  width: 100%;
   background: $background-color;
   color: $text-color;
   padding: $spacing-large 0;
+  right: 0;
   margin-top: auto;
   text-align: center;
   display: flex;
@@ -125,6 +126,9 @@ body {
 }
 
 @media (min-width: $desktop) {
+  .footer {
+    width: 100%;
+  }
   .footer__content {
     flex-direction: row;
     justify-content: space-around;
@@ -141,6 +145,9 @@ body {
 }
 
 @media (min-width: $laptop) {
+  .footer {
+    width: 100%;
+  }
   .footer__content {
     max-width: 1400px;
     padding: 0 $spacing-large;

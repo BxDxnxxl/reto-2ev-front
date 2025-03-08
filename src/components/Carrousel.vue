@@ -71,8 +71,8 @@ function updateActiveThumbnail() {
 
 .carousel__main {
   position: relative;
-  width: 100%;
-  height: 50vh;
+  width: 80%;
+  height: 40vh;
   overflow: hidden;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -126,7 +126,7 @@ function updateActiveThumbnail() {
 /* Mobile First */
 @media (min-width: 768px) {
   .carousel__main {
-    height: 60vh;
+    height: 50vh;
   }
 
   .carousel__thumbnail {
@@ -137,7 +137,7 @@ function updateActiveThumbnail() {
 
 @media (min-width: 1024px) {
   .carousel__main {
-    height: 70vh;
+    height: 50vh;
   }
 
   .carousel__thumbnail {
