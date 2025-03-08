@@ -35,97 +35,115 @@ import { RouterLink } from 'vue-router'
   </footer>
 </template>
 
-<style>
-:root {
-  --form-color: #fff;
-  --primary-gradient: linear-gradient(90deg, #f25421, #ff8c00, #ffd700);
-  --primary-color: #f25421;
-  --background-color: #fff;
-  --text-color: #ffffff;
-  --btn-color: #f25421;
+<style lang="scss">
+@import '@/assets/styles/variables.scss';
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 🔹 Footer */
 .footer {
   width: 100vw;
-  padding: 40px 0;
-  background: #272727;
-  color: var(--text-color);
-  position: relative;
-  bottom: 0;
-  left: 0;
-  margin-top: 20px;
-  box-sizing: border-box;
+  background: $background-color;
+  color: $text-color;
+  padding: $spacing-large 0;
+  margin-top: auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .footer__content {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   align-items: center;
-  padding: 0 40px;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  gap: $spacing-medium;
+  padding: 0 $spacing-medium;
 }
 
 .footer__column {
-  text-align: center;
-  flex: 1;
-  min-width: 250px;
+  width: 100%;
+  max-width: 300px;
 }
 
+/* 🔹 Títulos */
 .footer__title {
   font-weight: bold;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  letter-spacing: 1px;
+  font-size: $font-size-xlarge;
+  margin-bottom: $spacing-medium;
+}
+
+.footer__links {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-medium;
 }
 
 .footer__icon {
-  color: var(--text-color);
   font-size: 2rem;
-  margin: 0 1rem;
+  color: $text-color;
   transition: color 0.3s;
-}
 
-.footer__icon:hover {
-  color: var(--btn-color);
+  &:hover {
+    color: $primary-color;
+  }
 }
 
 .footer__info {
-  margin-bottom: 0.5rem;
-  font-size: 1.2rem;
+  font-size: $font-size-large;
 }
 
 .footer__button {
-  background-color: #333;
-  border: none;
-  border-radius: 30px;
-  padding: 1rem 2rem;
-  color: var(--text-color);
-  font-size: 1.2rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
   display: inline-block;
-  margin-top: 10px;
+  background-color: $primary-color;
+  border-radius: $border-radius;
+  padding: $spacing-medium $spacing-large;
+  color: $text-color;
+  font-size: $font-size-base;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: $box-shadow;
+  transition: background 0.3s;
+
+  &:hover {
+    background-color: $secondary-color;
+  }
 }
 
-.footer__button:hover {
-  background-color: var(--btn-color);
-  color: #ffffff;
-}
-
-@media (max-width: 768px) {
+@media (min-width: $desktop) {
   .footer__content {
-    flex-direction: column;
-    gap: 2rem;
-    padding: 0 20px;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: left;
   }
 
   .footer__column {
-    width: 100%;
-    text-align: center;
+    max-width: 400px;
+  }
+
+  .footer__links {
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: $laptop) {
+  .footer__content {
+    max-width: 1400px;
+    padding: 0 $spacing-large;
   }
 }
 </style>
