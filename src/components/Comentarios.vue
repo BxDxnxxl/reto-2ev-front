@@ -1,75 +1,65 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import { useCommentsStore } from '@/stores/Comentarios';
-  
-  const props = defineProps({
+import { onMounted } from 'vue'
+import { useCommentsStore } from '@/stores/Comentarios'
+
+const props = defineProps({
   gameId: {
     type: Number,
-    default: null
+    default: null,
+  },
+})
+const commentsStore = useCommentsStore()
+
+const formatearFechaEspañola = (fecha: string | number | Date) => {
+  if (typeof fecha === 'number') {
+    return fecha.toString()
   }
-  })
-  const commentsStore = useCommentsStore();
-  
-  const formatearFechaEspañola = (fecha: string | number | Date) => {
-    if (typeof fecha === 'number') {
-      return fecha.toString();
-    }
-    
-    const fechaObj = new Date(fecha);
-    const dia = fechaObj.getDate().toString().padStart(2, '0');
-    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
-    const anio = fechaObj.getFullYear();
-    
-    return `${dia}/${mes}/${anio}`;
+
+  const fechaObj = new Date(fecha)
+  const dia = fechaObj.getDate().toString().padStart(2, '0')
+  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
+  const anio = fechaObj.getFullYear()
+
+  return `${dia}/${mes}/${anio}`
+}
+
+onMounted(async () => {
+  if (props.gameId) {
+    await commentsStore.fetchComentariosByVideojuegos(props.gameId)
   }
-  
-  onMounted(async () => {
-    if (props.gameId) {
-      await commentsStore.fetchComentariosByVideojuegos(props.gameId);
-    }
-  });
-  </script>
+})
+</script>
 
 <template>
   <div class="comentarios">
     <h2 class="comentarios__titulo">Comentarios</h2>
-    
+
     <div class="comentarios__lista">
-      <div 
-        v-for="comentario in commentsStore.comentariosByVideojuego" 
-        :key="comentario.id" 
+      <div
+        v-for="comentario in commentsStore.comentariosByVideojuego"
+        :key="comentario.id"
         class="comentarios__item"
       >
         <div class="comentarios__cabecera">
           <h3 class="comentarios__nombre">{{ comentario.usuarioNombre }}</h3>
           <span class="comentarios__fecha">{{ formatearFechaEspañola(comentario.fecha) }}</span>
         </div>
-        
+
         <h4 class="comentarios__titulo-texto">{{ comentario.titulo }}</h4>
         <p class="comentarios__texto">{{ comentario.texto }}</p>
-        
-        <div class="comentarios__valoracion">
-          Valoración: {{ comentario.valoracion }}
-        </div>
-        
+
+        <div class="comentarios__valoracion">Valoración: {{ comentario.valoracion }}</div>
+
         <div class="comentarios__acciones">
           <div class="comentarios__like">
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-            >
+            <v-btn icon variant="text" size="small">
               <v-icon>mdi-thumb-up</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.likes }}</span>
           </div>
-          
+
           <div class="comentarios__dislike">
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-            >
+            <v-btn icon variant="text" size="small">
               <v-icon>mdi-thumb-down</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.dislikes }}</span>
@@ -85,6 +75,7 @@
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/variables.scss';
 .comentarios {
   width: 100%;
   max-width: 100%;
