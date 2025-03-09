@@ -6,8 +6,8 @@ import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto'
 const props = defineProps({
   gameId: {
     type: Number,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const gamesStore = useGamesStore()
@@ -33,23 +33,23 @@ const getPegiImageUrl = (pegiValue: number) => {
 const formatearFechaEspañola = (fecha: string | number | Date) => {
   // Si es un año, lo devolvemos como string
   if (typeof fecha === 'number') {
-    return fecha.toString();
+    return fecha.toString()
   }
-  
+
   // Si es fecha completa, la formateamos como DD/MM/AAAA
-  const fechaObj = new Date(fecha);
-  const dia = fechaObj.getDate().toString().padStart(2, '0');
-  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
-  const anio = fechaObj.getFullYear();
-  
-  return `${dia}/${mes}/${anio}`;
+  const fechaObj = new Date(fecha)
+  const dia = fechaObj.getDate().toString().padStart(2, '0')
+  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
+  const anio = fechaObj.getFullYear()
+
+  return `${dia}/${mes}/${anio}`
 }
 
 onMounted(async () => {
   if (props.gameId !== null) {
     await gamesStore.verDetalleVideojuego(props.gameId)
     videojuego.value = gamesStore.detalleVideojuego
-    console.log("Cargado:", videojuego.value)
+    console.log('Cargado:', videojuego.value)
   }
 })
 </script>
@@ -58,16 +58,16 @@ onMounted(async () => {
   <div class="detalle-videojuego">
     <div v-if="videojuego" class="detalle-videojuego__contenedor">
       <div class="detalle-videojuego__imagen-wrapper">
-        <img 
-          :src="videojuego.caratula" 
-          :alt="videojuego.titulo" 
+        <img
+          :src="videojuego.caratula"
+          :alt="videojuego.titulo"
           class="detalle-videojuego__imagen"
         />
       </div>
 
       <div class="detalle-videojuego__info">
         <h1 class="detalle-videojuego__titulo">{{ videojuego.titulo }}</h1>
-        
+
         <div class="detalle-videojuego__meta">
           <span class="detalle-videojuego__valoracion">
             <span class="icono">⭐</span> {{ videojuego.valoracionPromedio.toFixed(2) }}/10
@@ -77,16 +77,16 @@ onMounted(async () => {
           </span>
           <span v-if="videojuego.pegi" class="detalle-videojuego__pegi">
             <h3>Pegi:</h3>
-            <img 
-              :src="getPegiImageUrl(videojuego.pegi)" 
-              :alt="`PEGI ${videojuego.pegi}`" 
-              class="pegi-imagen" 
+            <img
+              :src="getPegiImageUrl(videojuego.pegi)"
+              :alt="`PEGI ${videojuego.pegi}`"
+              class="pegi-imagen"
             />
           </span>
         </div>
-        
+
         <p class="detalle-videojuego__descripcion">{{ videojuego.descripcion }}</p>
-        
+
         <div class="detalle-videojuego__compania">
           <span class="etiqueta">Desarrolladora:</span>
           <span class="valor">{{ videojuego.compania }}</span>
@@ -96,11 +96,7 @@ onMounted(async () => {
         <div class="detalle-videojuego__seccion">
           <h3><span class="icono">🎮</span> Géneros</h3>
           <div class="detalle-videojuego__tags">
-            <span 
-              v-for="genero in videojuego.generos" 
-              :key="genero.id"
-              class="tag tag--genero"
-            >
+            <span v-for="genero in videojuego.generos" :key="genero.id" class="tag tag--genero">
               {{ genero.nombre }}
             </span>
           </div>
@@ -110,8 +106,8 @@ onMounted(async () => {
         <div class="detalle-videojuego__seccion">
           <h3><span class="icono">🕹️</span> Plataformas</h3>
           <div class="detalle-videojuego__tags">
-            <span 
-              v-for="plataforma in videojuego.plataformas" 
+            <span
+              v-for="plataforma in videojuego.plataformas"
               :key="plataforma.id"
               class="tag tag--plataforma"
             >
@@ -121,7 +117,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    
+
     <div v-else class="detalle-videojuego__error">
       <p>No se ha encontrado información del videojuego.</p>
     </div>
@@ -129,6 +125,7 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/variables.scss';
 .detalle-videojuego {
   width: 100%;
   margin-top: 0;

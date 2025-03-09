@@ -63,7 +63,11 @@ function clearFilters() {
       <div class="filter">
         <button class="filter__button">Plataformas</button>
         <div class="filter__dropdown">
-          <label v-for="platform in platformsStore.plataforams" :key="platform.id" class="filter__label">
+          <label
+            v-for="platform in platformsStore.plataforams"
+            :key="platform.id"
+            class="filter__label"
+          >
             <input
               type="radio"
               name="platformFilter"
@@ -78,7 +82,11 @@ function clearFilters() {
       <div class="filter">
         <button class="filter__button">Compañías</button>
         <div class="filter__dropdown">
-          <label v-for="company in companiesStore.companias" :key="company.id" class="filter__label">
+          <label
+            v-for="company in companiesStore.companias"
+            :key="company.id"
+            class="filter__label"
+          >
             <input
               type="radio"
               name="companyFilter"
@@ -89,7 +97,7 @@ function clearFilters() {
           </label>
         </div>
       </div>
-      
+
       <button class="filter__clear" @click="clearFilters">Eliminar filtros</button>
     </div>
   </div>
@@ -97,10 +105,7 @@ function clearFilters() {
 
 
 <style lang="scss" scoped>
-$color-bg: #272727;
-$color-text: #ffffff;
-$color-primary: #f25421;
-$box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
+@import '@/assets/styles/variables.scss';
 
 .catalog {
   display: flex;
@@ -123,8 +128,8 @@ $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   border: none;
   font-size: 1rem;
-  background-color: $color-bg;
-  color: $color-text;
+  background-color: $background-color;
+  color: $text-color;
   box-shadow: $box-shadow;
 }
 
@@ -142,8 +147,8 @@ $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
 }
 
 .filter__button {
-  background-color: $color-primary;
-  color: $color-text;
+  background-color: $primary-color;
+  color: $text-color;
   padding: 10px 15px;
   border: none;
   cursor: pointer;
@@ -153,7 +158,7 @@ $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
 .filter__dropdown {
   display: none;
   position: absolute;
-  background-color: $color-bg;
+  background-color: $background-color;
   min-width: 200px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   padding: 10px;
@@ -167,7 +172,7 @@ $box-shadow: 0 2rem 3rem rgba(0, 0, 0, 0.3);
 
 .filter__label {
   display: block;
-  color: $color-text;
+  color: $text-color;
   padding: 5px;
 }
 
