@@ -196,7 +196,7 @@ const innerHeight = ref<number>(window.innerHeight);
 </script>
 
 <template>
-  <main id="main" :style="{ height: innerHeight+'px' ?? '100%' }">
+  <main id="main" :style="{ height: innerHeight ? innerHeight + 'px' : '100%' }">
   <div class="form-container" :class="{ 'is-signup': isSignup }">
 
     <form class="form login-form" @submit.prevent="handleLogin">

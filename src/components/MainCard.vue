@@ -14,6 +14,8 @@ onMounted(async () => {
   await genresStore.fetchTop5Genres()
   top5Companias.value = companiesStore.top5Companias
   top5Generos.value = genresStore.top5Generos
+  console.log(top5Companias.value);
+  console.log(top5Generos.value);
 })
 </script>
 
@@ -24,7 +26,7 @@ onMounted(async () => {
       <h2 class="section__title">Géneros Populares</h2>
       <div class="cards">
         <router-link v-for="genero in top5Generos" :key="genero.id" to="/catalog" class="card">
-          <img :src="genero.url_imagen" :alt="genero.nombre" class="card__image" />
+          <img :src="`${genero.urlImagen}`" :alt="genero.nombre" class="card__image" />
           <p class="card__name">{{ genero.nombre }}</p>
         </router-link>
       </div>
@@ -40,7 +42,7 @@ onMounted(async () => {
           to="/catalog"
           class="card"
         >
-          <img :src="compania.url_imagen" :alt="compania.nombre" class="card__image" />
+          <img :src="`${compania.urlImagen}`" :alt="compania.nombre" class="card__image" />
           <p class="card__name">{{ compania.nombre }}</p>
         </router-link>
       </div>
