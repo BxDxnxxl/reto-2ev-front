@@ -1,3 +1,92 @@
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
+import { useUsersStore } from "@/stores/users";
+import type { UserDto } from "@/stores/dtos/user.dto";
+import PerfilAnimado from './PerfilAnimado.vue';
+
+const usersStore = useUsersStore();
+console.log(usersStore.currentUser)
+// Estado del formulario
+const editedUser = ref<UserDto>({
+  username: "",
+  email: "",
+  contrasenia: "",
+  nombre: "",
+  apellido1: "",
+  apellido2: "",
+  profilePic: ""
+});
+
+const valid = ref(false);
+const snackbar = ref(false);
+const snackbarMessage = ref("");
+const snackbarColor = ref("success");
+const editProfileForm = ref<any>(null);
+const showPassword = ref(false);
+const isUpdating = ref(false);
+
+// Reglas de validación para la contraseña
+const passwordRules = [
+  (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
+  (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
+  (v: string) => !v || /[a-z]/.test(v) || "Password must contain a lowercase letter",
+  (v: string) => !v || /[0-9]/.test(v) || "Password must contain a number"
+];
+
+// Cargar datos del usuario al montar el componente
+onMounted(() => {
+  if (usersStore.currentUser) {
+    editedUser.value = { 
+      ...usersStore.currentUser, 
+      contrasenia: "" 
+    };
+  }
+});
+
+// Manejar subida de imagen de perfil
+const handleProfilePicUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      editedUser.value.profilePic = e.target?.result as string;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+};
+
+const updateProfile = async () => {
+  if (!editProfileForm.value) return;
+
+  const { valid } = await editProfileForm.value.validate();
+  if (!valid) return;
+
+  try {
+    if (usersStore.currentUser?.id) {
+      const userToUpdate: UserDto = {
+        ...editedUser.value,
+        contrasenia: editedUser.value.contrasenia && editedUser.value.contrasenia.trim() !== "" 
+          ? editedUser.value.contrasenia 
+          : usersStore.currentUser.contrasenia
+      };
+
+      const updatedUser = await usersStore.updateCurrentUser(userToUpdate);
+
+      if (updatedUser) {
+        snackbarMessage.value = "Profile updated successfully!";
+        snackbarColor.value = "success";
+        snackbar.value = true;
+
+        editedUser.value.contrasenia = "";
+      } else {
+        throw new Error("Failed to update profile");
+      }
+    }
+  } catch (error) {
+  }
+};
+</script>
+
 <template>
   <v-container fluid class="profile-edit-container px-0">
     <v-row justify="center" align="center" class="ma-0 h-100">
@@ -109,98 +198,6 @@
     </v-snackbar>
   </v-container>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useUsersStore } from "@/stores/users";
-import type { UserDto } from "@/stores/dtos/user.dto";
-import PerfilAnimado from './PerfilAnimado.vue';
-
-const usersStore = useUsersStore();
-console.log(usersStore.currentUser)
-// Estado del formulario
-const editedUser = ref<UserDto>({
-  username: "",
-  email: "",
-  contrasenia: "",
-  nombre: "",
-  apellido1: "",
-  apellido2: "",
-  profilePic: ""
-});
-
-const valid = ref(false);
-const snackbar = ref(false);
-const snackbarMessage = ref("");
-const snackbarColor = ref("success");
-const editProfileForm = ref<any>(null);
-const showPassword = ref(false);
-const isUpdating = ref(false);
-
-// Reglas de validación para la contraseña
-const passwordRules = [
-  (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
-  (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
-  (v: string) => !v || /[a-z]/.test(v) || "Password must contain a lowercase letter",
-  (v: string) => !v || /[0-9]/.test(v) || "Password must contain a number"
-];
-
-// Cargar datos del usuario al montar el componente
-onMounted(() => {
-  if (usersStore.currentUser) {
-    editedUser.value = { 
-      ...usersStore.currentUser, 
-      contrasenia: "" 
-    };
-  }
-});
-
-// Manejar subida de imagen de perfil
-const handleProfilePicUpload = (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      editedUser.value.profilePic = e.target?.result as string;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-};
-
-// Método para actualizar el perfil
-const updateProfile = async () => {
-  if (!editProfileForm.value) return;
-
-  const { valid } = await editProfileForm.value.validate();
-  if (!valid) return;
-
-  isUpdating.value = true;
-
-  try {
-    if (usersStore.currentUser?.id) {
-      const updatedUser = await usersStore.updateCurrentUser(editedUser.value);
-
-      if (updatedUser) {
-        snackbarMessage.value = "Profile updated successfully!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
-        
-        // Reset password field after successful update
-        editedUser.value.contrasenia = "";
-      } else {
-        throw new Error("Failed to update profile");
-      }
-    }
-  } catch (error) {
-    snackbarMessage.value = "Error updating profile. Please try again.";
-    snackbarColor.value = "error";
-    snackbar.value = true;
-    console.error(error);
-  } finally {
-    isUpdating.value = false;
-  }
-};
-</script>
 
 <style scoped>
 .profile-edit-container {

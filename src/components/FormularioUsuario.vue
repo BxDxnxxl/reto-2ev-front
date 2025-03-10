@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRolesStore } from '@/stores/roles'
 import { useRoute, useRouter } from 'vue-router'
-import type { UsuarioRol } from '@/stores/dtos/UsuarioRol.dto'
+import type { RolAsignacionDto } from '@/stores/dtos/UsuarioRol.dto'
 import type { UserDto } from '@/stores/dtos/user.dto'
 import type { RolesDto } from '@/stores/dtos/Roles.dto'
 
@@ -12,20 +12,28 @@ const router = useRouter()
 const usersStore = useUsersStore()
 const rolesStore = useRolesStore()
 
+// Computed for edit mode and user ID
 const editMode = computed(() => route.query.edit === 'true')
-const userId = computed(() => (route.query.id ? Number(route.query.id) : null))
+const userId = computed(() => {
+  const id = route.query.id ? Number(route.query.id) : null
+  return id
+})
 
-const userData = ref({
-  nombre: '',
-  apellido1: '',
-  apellido2: '',
+// Initial user data structure
+const userData = ref<UserDto>({
   username: '',
   email: '',
   contrasenia: '',
+  nombre: '',
+  apellido1: '',
+  apellido2: '',
   profilePic: '',
-  roles: [] as number[],
 })
 
+// Additional state for roles
+const userRoles = ref<number[]>([])
+
+// Fetch roles and user data on component mount
 onMounted(async () => {
   await rolesStore.fetchRoles()
 
@@ -33,55 +41,76 @@ onMounted(async () => {
     await usersStore.fetchUsuarioConRolesById(userId.value)
 
     if (usersStore.usuarioConRoles) {
+      // Populate user data
       userData.value = {
+        id: usersStore.usuarioConRoles.id,
+        username: usersStore.usuarioConRoles.username || '',
+        email: usersStore.usuarioConRoles.email || '',
+        contrasenia: '',
         nombre: usersStore.usuarioConRoles.nombre || '',
         apellido1: usersStore.usuarioConRoles.apellido1 || '',
         apellido2: usersStore.usuarioConRoles.apellido2 || '',
-        username: usersStore.usuarioConRoles.username || '',
-        email: usersStore.usuarioConRoles.email || '',
-        contrasenia: usersStore.usuarioConRoles.contrasenia || '',
         profilePic: usersStore.usuarioConRoles.profilePic || '',
-        roles: (usersStore.usuarioConRoles.roles as RolesDto[]).map((rol) => rol.id),
       }
+
+      // Populate roles
+      userRoles.value = usersStore.usuarioConRoles.roles.map(rol => rol.id)
     }
   }
 })
 
 async function saveUser() {
-  let usuarioFinalId: number | null = null
+  try {
+    const requiredFields = [
+      { field: userData.value.username, message: 'Nombre de usuario' },
+      { field: userData.value.email, message: 'Email' },
+      { field: userData.value.nombre, message: 'Nombre' },
+      { field: userData.value.apellido1, message: 'Primer apellido' }
+    ];
 
-  const usuarioSinRoles: UserDto = {
-    id: userId.value || undefined,
-    username: userData.value.username,
-    email: userData.value.email,
-    contrasenia: userData.value.contrasenia,
-    nombre: userData.value.nombre || '',
-    apellido1: userData.value.apellido1 || '',
-    apellido2: userData.value.apellido2 || '',
-    profilePic: userData.value.profilePic || '',
-  }
+    const missingFields = requiredFields
+      .filter(req => !req.field || req.field.trim() === '')
+      .map(req => req.message);
 
-  if (editMode.value && userId.value) {
-    await usersStore.updateUsuario(userId.value, usuarioSinRoles)
-    usuarioFinalId = userId.value
-  } else {
-    console.log('Creando usuario:', usuarioSinRoles)
-    const nuevoUsuario = await usersStore.createUsuario(usuarioSinRoles)
-
-    if (nuevoUsuario && nuevoUsuario.id) {
-      usuarioFinalId = nuevoUsuario.id
+    if (missingFields.length > 0) {
+      throw new Error(`Por favor complete los siguientes campos: ${missingFields.join(', ')}`);
     }
-  }
 
-  if (usuarioFinalId && userData.value.roles.length > 0) {
-    const asignacion: UsuarioRol = {
-      usuarioId: usuarioFinalId,
-      rolesIds: userData.value.roles,
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.value.email.trim())) {
+      throw new Error('Por favor, introduce un email válido');
     }
-    await usersStore.asignarRolesAUsuario(asignacion)
-  }
 
-  router.push('/usuarios')
+    // Si está en edición y la contraseña está vacía, se mantiene la actual
+    const userToSave: UserDto = {
+      ...userData.value,
+      username: userData.value.username.trim(),
+      email: userData.value.email.trim(),
+      contrasenia: editMode.value && !userData.value.contrasenia ? usersStore.usuarioConRoles?.contrasenia : userData.value.contrasenia
+    };
+
+    let savedUserId: number | undefined;
+
+    if (editMode.value && userId.value) {
+      await usersStore.updateUsuario(userId.value, userToSave);
+      savedUserId = userId.value;
+    } else {
+      const createdUser = await usersStore.createUsuario(userToSave);
+      savedUserId = createdUser?.id;
+    }
+
+    if (savedUserId && userRoles.value.length > 0) {
+      const roleAssignment: RolAsignacionDto = {
+        usuarioId: savedUserId,
+        rolesIds: userRoles.value
+      };
+      await usersStore.asignarRolesAUsuario(roleAssignment);
+    }
+
+    router.push('/usuarios');
+  } catch (error) {
+    console.error("Error al guardar usuario:", error);
+  }
 }
 </script>
 
@@ -91,7 +120,11 @@ async function saveUser() {
       <v-form @submit.prevent="saveUser">
         <v-row>
           <v-col cols="12" md="6">
-            <v-text-field label="Nombre" v-model="userData.nombre" required></v-text-field>
+            <v-text-field 
+              label="Nombre" 
+              v-model="userData.nombre" 
+              required
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
@@ -101,7 +134,10 @@ async function saveUser() {
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field label="Segundo Apellido" v-model="userData.apellido2"></v-text-field>
+            <v-text-field 
+              label="Segundo Apellido" 
+              v-model="userData.apellido2"
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
@@ -122,16 +158,20 @@ async function saveUser() {
             <v-text-field
               label="Contraseña"
               v-model="userData.contrasenia"
-              type="text"
+              type="password"
+              :hint="editMode ? 'Dejar en blanco si no se quiere cambiar' : ''"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field label="Foto de Perfil (URL)" v-model="userData.profilePic"></v-text-field>
+            <v-text-field 
+              label="Foto de Perfil (URL)" 
+              v-model="userData.profilePic"
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
             <v-select
               label="Roles"
-              v-model="userData.roles"
+              v-model="userRoles"
               :items="rolesStore.roles"
               item-title="nombre"
               item-value="id"
@@ -174,29 +214,10 @@ async function saveUser() {
   }
 }
 
-.v-card-title {
-  text-align: center;
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: $primary-color;
-}
-
 .v-text-field,
 .v-select {
   background: white !important;
   border-radius: 8px !important;
-  box-shadow: none !important;
-
-  .v-input__control {
-    border-radius: 8px !important;
-    border: 1px solid #ccc !important;
-    transition: box-shadow 0.3s ease-in-out;
-
-    &:hover {
-      border-color: $primary-color;
-    }
-  }
 }
 
 .v-btn {
@@ -213,34 +234,4 @@ async function saveUser() {
     background-color: darken($primary-color, 10%) !important;
   }
 }
-
-.v-chip {
-  background: $primary-color !important;
-  color: white !important;
-  font-weight: bold;
-}
-
-@media (min-width: 768px) {
-  .v-container {
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  .v-card {
-    max-width: 900px;
-    padding: 30px;
-  }
-
-  .v-card-title {
-    font-size: 1.6rem;
-  }
-
-  .v-btn {
-    font-size: 1rem;
-  }
-}
 </style>
-
-
-
-

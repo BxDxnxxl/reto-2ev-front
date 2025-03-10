@@ -1,0 +1,29 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: front-wannagames-deployment
+  labels: 
+     app: wannagames
+
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: wannagames
+
+  template:
+    metadata:
+      labels:
+        app: wannagames
+    spec:
+      containers:
+      - name: wannagames
+        image: bydaniel1111/docker-front-deployement:00
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1

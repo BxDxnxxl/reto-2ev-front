@@ -1,20 +1,46 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useUsersStore } from '@/stores/users'
+import { useRouter } from 'vue-router'
 
 const store = useUsersStore()
+const router = useRouter()
 
-store.fetchUsuarios()
+// Fetch users on component mount
+onMounted(() => {
+  store.fetchUsuarios()
+})
 
-function deleteUsuario(id: number) {
-  store.deleteUsuario(id)
+// Navigate to add user page
+function navigateToAddUser() {
+  router.push('/gestionUsuario?edit=false')
+}
+
+// Delete user with confirmation
+async function deleteUsuario(id: number) {
+  const confirmDelete = window.confirm('¿Estás seguro de eliminar este usuario?')
+  if (confirmDelete) {
+    await store.deleteUsuario(id)
+  }
+}
+
+// Navigate to edit user page
+function editUsuario(id: number) {
+  router.push(`/gestionUsuario?edit=true&id=${id}`)
 }
 </script>
 
 <template>
   <div class="tabla-usuarios">
-    <router-link to="/gestionUsuario?edit=false">
-      <v-btn class="boton-agregar" color="primary"> Añadir Usuario </v-btn>
-    </router-link>
+    <v-btn 
+      class="boton-agregar" 
+      color="primary"
+      prepend-icon="mdi-plus"
+      @click="navigateToAddUser"
+    >
+      Añadir Usuario
+    </v-btn>
+    
     <div class="tabla-usuarios__contenedor">
       <table class="tabla-usuarios__tabla">
         <thead class="tabla-usuarios__encabezado">
@@ -27,18 +53,34 @@ function deleteUsuario(id: number) {
           </tr>
         </thead>
         <tbody class="tabla-usuarios__cuerpo">
-          <tr v-for="usuario in store.users" :key="usuario.id" class="tabla-usuarios__fila">
+          <tr 
+            v-for="usuario in store.users" 
+            :key="usuario.id" 
+            class="tabla-usuarios__fila"
+          >
             <td class="tabla-usuarios__celda tabla-usuarios__celda--acciones">
-              <router-link :to="`/gestionUsuario?edit=true&id=${usuario.id}`">
-                <v-icon class="tabla-usuarios__icono tabla-usuarios__icono--editar"
-                  >mdi-pencil</v-icon
-                >
-              </router-link>
-              <v-icon
-                class="tabla-usuarios__icono tabla-usuarios__icono--eliminar"
-                @click="deleteUsuario(usuario.id)"
-                >mdi-delete</v-icon
+              <v-btn
+                icon
+                density="comfortable"
+                color="primary"
+                variant="text"
+                class="tabla-usuarios__boton"
+                @click="editUsuario(usuario.id || 0)"
               >
+                <v-icon>mdi-pencil</v-icon>
+                <v-tooltip activator="parent" location="top">Editar</v-tooltip>
+              </v-btn>
+              <v-btn
+                icon
+                density="comfortable"
+                color="error"
+                variant="text"
+                class="tabla-usuarios__boton"
+                @click="deleteUsuario(usuario.id || 0)"
+              >
+                <v-icon>mdi-delete</v-icon>
+                <v-tooltip activator="parent" location="top">Eliminar</v-tooltip>
+              </v-btn>
             </td>
             <td class="tabla-usuarios__celda">{{ usuario.nombre }}</td>
             <td class="tabla-usuarios__celda">{{ usuario.apellido1 }}</td>
@@ -48,113 +90,208 @@ function deleteUsuario(id: number) {
         </tbody>
       </table>
     </div>
+
+    <!-- Vista móvil alternativa -->
+    <div class="tabla-usuarios__mobile">
+      <v-card
+        v-for="usuario in store.users"
+        :key="usuario.id"
+        variant="outlined"
+        class="tabla-usuarios__card mb-4"
+      >
+        <div class="tabla-usuarios__card-header">
+          <span class="tabla-usuarios__nombre">{{ usuario.nombre }} {{ usuario.apellido1 }}</span>
+          <div class="tabla-usuarios__card-actions">
+            <v-btn
+              icon
+              size="small"
+              color="primary"
+              variant="text"
+              @click="editUsuario(usuario.id || 0)"
+            >
+              <v-icon size="small">mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              size="small"
+              color="error"
+              variant="text"
+              @click="deleteUsuario(usuario.id || 0)"
+            >
+              <v-icon size="small">mdi-delete</v-icon>
+            </v-btn>
+          </div>
+        </div>
+        <v-divider></v-divider>
+        <div class="tabla-usuarios__card-content">
+          <div class="tabla-usuarios__card-item">
+            <span class="tabla-usuarios__label">Nombre:</span>
+            <span>{{ usuario.nombre }}</span>
+          </div>
+          <div class="tabla-usuarios__card-item">
+            <span class="tabla-usuarios__label">Primer Apellido:</span>
+            <span>{{ usuario.apellido1 }}</span>
+          </div>
+          <div class="tabla-usuarios__card-item">
+            <span class="tabla-usuarios__label">Segundo Apellido:</span>
+            <span>{{ usuario.apellido2 }}</span>
+          </div>
+          <div class="tabla-usuarios__card-item">
+            <span class="tabla-usuarios__label">Usuario:</span>
+            <span>@{{ usuario.username }}</span>
+          </div>
+        </div>
+      </v-card>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
-.boton-agregar {
-  width: 100%;
-  margin-top: $spacing-medium;
-  margin-bottom: $spacing-medium;
-  display: flex;
-  justify-content: center;
-  
-  @media (min-width: 768px) {
-    width: 20%;
-  }
-}
-
 .tabla-usuarios {
   padding: $spacing-medium;
-  margin-top: $spacing-large; // Cambiado de 100px a variable para consistencia
   width: 100%;
-  max-width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 1200px;
+  margin: $spacing-large auto;
   
+  // Botón para agregar usuario
+  .boton-agregar {
+    margin-bottom: $spacing-large;
+    display: block;
+    width: 100%;
+    
+    @media (min-width: 768px) {
+      width: auto;
+      margin-left: 0;
+    }
+  }
+
+  // Contenedor de la tabla
   &__contenedor {
     width: 100%;
     overflow-x: auto;
-    display: flex;
-    justify-content: center;
-    margin-bottom: $spacing-medium; // Añadido espacio inferior
+    display: none; // Ocultar en móvil
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    @media (min-width: 768px) {
+      display: block; // Mostrar en desktop
+    }
   }
-  
+
+  // Tabla principal
   &__tabla {
     width: 100%;
-    border-collapse: separate; // Cambiado de collapse a separate
-    border-spacing: 0 $spacing-small; // Añadido espaciado entre filas
-    margin-top: $spacing-medium; // Estandarizado con variables
-    font-size: 0.85rem;
+    border-collapse: collapse;
     table-layout: fixed;
-    text-align: center;
-    
-    @media (min-width: 768px) {
-      font-size: 1rem;
-    }
+    font-size: 0.9rem;
   }
-  
-  &__celda {
-    padding: $spacing-small $spacing-medium; // Mejorado el padding horizontal
-    text-align: center;
-    border-bottom: 1px solid $secondary-color;
-    font-size: 0.85rem;
-    word-wrap: break-word;
-    
-    @media (min-width: 768px) {
-      font-size: 1rem;
-    }
-  }
-  
+
+  // Encabezado
   &__encabezado {
     background: $primary-color;
     color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     
     th {
-      padding-top: $spacing-medium; // Mayor espacio superior en encabezado
-      padding-bottom: $spacing-medium; // Mayor espacio inferior en encabezado
+      padding: $spacing-medium;
+      font-weight: 500;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
   }
-  
-  &__fila {
-    transition: background-color 0.2s; // Añadida transición suave
+
+  // Celdas
+  &__celda {
+    padding: $spacing-medium;
+    text-align: center;
+    border-bottom: 1px solid rgba($secondary-color, 0.2);
+    vertical-align: middle;
+    word-wrap: break-word;
+    min-width: 120px;
     
-    &:not(:last-child) {
-      margin-bottom: $spacing-small; // Espacio entre filas
+    &--acciones {
+      display: flex;
+      justify-content: center;
+      gap: $spacing-small;
+      min-width: 100px;
     }
+  }
+
+  // Filas
+  &__fila {
+    transition: background-color 0.2s;
     
     &:hover {
-      background-color: rgba($secondary-color, 0.05); // Efecto hover sutil
+      background-color: rgba($secondary-color, 0.05);
+    }
+    
+    &:last-child .tabla-usuarios__celda {
+      border-bottom: none;
     }
   }
   
-  &__celda--acciones {
-    display: flex;
-    gap: $spacing-small;
-    justify-content: center;
+  // Botones de acciones
+  &__boton {
+    margin: 0 2px;
   }
   
-  &__icono {
-    cursor: pointer;
-    font-size: 18px;
-    
-    &--editar {
-      color: blue;
-    }
-    
-    &--eliminar {
-      color: red;
-    }
-    
-    &--estado {
-      color: green;
-    }
+  // Vista móvil
+  &__mobile {
+    display: block;
     
     @media (min-width: 768px) {
-      font-size: 22px;
+      display: none;
     }
+  }
+  
+  // Tarjetas móviles
+  &__card {
+    border-radius: 8px;
+    overflow: hidden;
+    
+    &-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-medium;
+      background-color: rgba($primary-color, 0.05);
+    }
+    
+    &-actions {
+      display: flex;
+      gap: $spacing-small;
+    }
+    
+    &-content {
+      padding: $spacing-medium;
+    }
+    
+    &-item {
+      padding: $spacing-small 0;
+      display: flex;
+      flex-direction: column;
+      
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba($secondary-color, 0.1);
+        margin-bottom: $spacing-small;
+      }
+    }
+  }
+  
+  &__nombre {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+  
+  &__label {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 4px;
   }
 }
 </style>

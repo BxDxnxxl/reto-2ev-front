@@ -1,14 +1,14 @@
 <template>
-  <div class="logo-wrapper">
+  <div class="logo__wrapper">
     <canvas
       ref="logoCanvas"
       :width="canvasSize"
       :height="canvasSize"
       @mouseenter="startAnimation"
       @mouseleave="resetAnimation"
-      class="logo-canvas"
+      class="logo__canvas"
     ></canvas>
-    <img :src="logoNameSrc" class="logo-name" alt="Logo Name" />
+    <img :src="logoNameSrc" class="logo__name" alt="Logo Name" />
   </div>
 </template>
 
@@ -17,8 +17,8 @@ export default {
   props: {
     canvasSize: {
       type: Number,
-      default: 120, // tamaño predeterminado
-    }
+      default: 120,
+    },
   },
   data() {
     return {
@@ -125,21 +125,23 @@ export default {
 }
 </script>
 
-<style scoped>
-.logo-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+<style lang="scss" scoped>
+.logo {
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.logo-canvas {
-  cursor: pointer;
-  width: 120px; /* Cambié el tamaño */
-  height: 120px; /* Cambié el tamaño */
-}
+  &__canvas {
+    cursor: pointer;
+    width: 120px;
+    height: 120px;
+  }
 
-.logo-name {
-  margin-top: 10px;
-  width: 120px; /* Cambié el tamaño */
+  &__name {
+    margin-top: 10px;
+    width: 120px;
+  }
 }
 </style>

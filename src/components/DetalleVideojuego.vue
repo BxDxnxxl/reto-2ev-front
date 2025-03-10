@@ -6,8 +6,8 @@ import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto'
 const props = defineProps({
   gameId: {
     type: Number,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const gamesStore = useGamesStore()
@@ -30,26 +30,26 @@ const getPegiImageUrl = (pegiValue: number) => {
 }
 
 // Formato de fecha a española
-const formatearFechaEspañola = (fecha: string | number) => {
+const formatearFechaEspañola = (fecha: string | number | Date) => {
   // Si es un año, lo devolvemos como string
   if (typeof fecha === 'number') {
-    return fecha.toString();
+    return fecha.toString()
   }
-  
+
   // Si es fecha completa, la formateamos como DD/MM/AAAA
-  const fechaObj = new Date(fecha);
-  const dia = fechaObj.getDate().toString().padStart(2, '0');
-  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
-  const anio = fechaObj.getFullYear();
-  
-  return `${dia}/${mes}/${anio}`;
+  const fechaObj = new Date(fecha)
+  const dia = fechaObj.getDate().toString().padStart(2, '0')
+  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
+  const anio = fechaObj.getFullYear()
+
+  return `${dia}/${mes}/${anio}`
 }
 
 onMounted(async () => {
   if (props.gameId !== null) {
     await gamesStore.verDetalleVideojuego(props.gameId)
     videojuego.value = gamesStore.detalleVideojuego
-    console.log("Cargado:", videojuego.value)
+    console.log('Cargado:', videojuego.value)
   }
 })
 </script>
@@ -58,16 +58,16 @@ onMounted(async () => {
   <div class="detalle-videojuego">
     <div v-if="videojuego" class="detalle-videojuego__contenedor">
       <div class="detalle-videojuego__imagen-wrapper">
-        <img 
-          :src="videojuego.caratula" 
-          :alt="videojuego.titulo" 
+        <img
+          :src="videojuego.caratula"
+          :alt="videojuego.titulo"
           class="detalle-videojuego__imagen"
         />
       </div>
 
       <div class="detalle-videojuego__info">
         <h1 class="detalle-videojuego__titulo">{{ videojuego.titulo }}</h1>
-        
+
         <div class="detalle-videojuego__meta">
           <span class="detalle-videojuego__valoracion">
             <span class="icono">⭐</span> {{ videojuego.valoracionPromedio.toFixed(2) }}/10
@@ -77,16 +77,16 @@ onMounted(async () => {
           </span>
           <span v-if="videojuego.pegi" class="detalle-videojuego__pegi">
             <h3>Pegi:</h3>
-            <img 
-              :src="getPegiImageUrl(videojuego.pegi)" 
-              :alt="`PEGI ${videojuego.pegi}`" 
-              class="pegi-imagen" 
+            <img
+              :src="getPegiImageUrl(videojuego.pegi)"
+              :alt="`PEGI ${videojuego.pegi}`"
+              class="pegi-imagen"
             />
           </span>
         </div>
-        
+
         <p class="detalle-videojuego__descripcion">{{ videojuego.descripcion }}</p>
-        
+
         <div class="detalle-videojuego__compania">
           <span class="etiqueta">Desarrolladora:</span>
           <span class="valor">{{ videojuego.compania }}</span>
@@ -96,11 +96,7 @@ onMounted(async () => {
         <div class="detalle-videojuego__seccion">
           <h3><span class="icono">🎮</span> Géneros</h3>
           <div class="detalle-videojuego__tags">
-            <span 
-              v-for="genero in videojuego.generos" 
-              :key="genero.id"
-              class="tag tag--genero"
-            >
+            <span v-for="genero in videojuego.generos" :key="genero.id" class="tag tag--genero">
               {{ genero.nombre }}
             </span>
           </div>
@@ -110,8 +106,8 @@ onMounted(async () => {
         <div class="detalle-videojuego__seccion">
           <h3><span class="icono">🕹️</span> Plataformas</h3>
           <div class="detalle-videojuego__tags">
-            <span 
-              v-for="plataforma in videojuego.plataformas" 
+            <span
+              v-for="plataforma in videojuego.plataformas"
               :key="plataforma.id"
               class="tag tag--plataforma"
             >
@@ -121,7 +117,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    
+
     <div v-else class="detalle-videojuego__error">
       <p>No se ha encontrado información del videojuego.</p>
     </div>
@@ -129,9 +125,11 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/variables.scss';
 .detalle-videojuego {
-  margin-top: 40px; 
-  padding: 0 16px 30px;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 24px;
 
   &__contenedor {
     display: flex;
@@ -159,7 +157,7 @@ onMounted(async () => {
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease;
-    
+
     &:hover {
       transform: scale(1.02);
     }
@@ -179,24 +177,24 @@ onMounted(async () => {
     color: #fff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
-  
+
   &__meta {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
     font-size: 15px;
-    
+
     > span {
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    
+
     .icono {
       font-size: 18px;
     }
   }
-  
+
   &__valoracion {
     color: #ffcc00;
     font-weight: 600;
@@ -206,7 +204,7 @@ onMounted(async () => {
     display: flex;
     align-items: center;
   }
-  
+
   .pegi-imagen {
     height: 28px;
     width: auto;
@@ -218,28 +216,28 @@ onMounted(async () => {
     color: #e0e0e0;
     margin: 0;
   }
-  
+
   &__compania {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    
+
     .etiqueta {
       font-size: 14px;
       color: #a0a0a0;
     }
-    
+
     .valor {
       font-weight: 600;
       font-size: 16px;
     }
   }
-  
+
   &__seccion {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    
+
     h3 {
       margin: 0;
       font-size: 18px;
@@ -247,19 +245,19 @@ onMounted(async () => {
       display: flex;
       align-items: center;
       gap: 8px;
-      
+
       .icono {
         font-size: 20px;
       }
     }
   }
-  
+
   &__tags {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
   }
-  
+
   .tag {
     display: inline-block;
     padding: 6px 12px;
@@ -267,29 +265,29 @@ onMounted(async () => {
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
-    
+
     &--genero {
       background: #f25421;
       color: #fff;
-      
+
       &:hover {
         background: #e04a17;
         transform: translateY(-2px);
       }
     }
-    
+
     &--plataforma {
       background: #333;
       color: #fff;
       border: 1px solid #f25421;
-      
+
       &:hover {
         background: #3e3e3e;
         transform: translateY(-2px);
       }
     }
   }
-  
+
   &__error {
     display: flex;
     justify-content: center;
@@ -302,13 +300,12 @@ onMounted(async () => {
   }
 
   @media (min-width: 768px) {
-    padding: 0 30px 40px;
-    margin-top: 50px;
-    
+    margin-bottom: 40px;
+
     &__contenedor {
       flex-direction: row;
       align-items: stretch;
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -331,15 +328,15 @@ onMounted(async () => {
     &__titulo {
       font-size: 32px;
     }
-    
+
     &__meta {
       font-size: 16px;
-      
+
       .icono {
         font-size: 20px;
       }
     }
-    
+
     .pegi-imagen {
       height: 32px;
     }
@@ -347,43 +344,96 @@ onMounted(async () => {
     &__descripcion {
       font-size: 17px;
     }
-    
+
     &__compania {
       flex-direction: row;
       align-items: center;
       gap: 10px;
-      
+
       .etiqueta {
         font-size: 15px;
       }
-      
+
       .valor {
         font-size: 17px;
       }
     }
-    
+
     &__seccion {
       h3 {
         font-size: 20px;
       }
     }
-    
+
     .tag {
       font-size: 15px;
     }
   }
 
   @media (min-width: 1200px) {
-    &__contenedor {
-      max-width: 1200px;
-    }
-    
     &__imagen-wrapper {
       width: 35%;
     }
-    
+
     &__info {
       width: 65%;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    &__contenedor {
+      max-width: 1400px;
+    }
+
+    &__imagen-wrapper {
+      width: 33%;
+    }
+
+    &__info {
+      width: 67%;
+      padding: 40px;
+    }
+
+    &__titulo {
+      font-size: 36px;
+    }
+
+    &__meta {
+      font-size: 18px;
+
+      .icono {
+        font-size: 22px;
+      }
+    }
+
+    .pegi-imagen {
+      height: 38px;
+    }
+
+    &__descripcion {
+      font-size: 18px;
+      line-height: 1.8;
+    }
+
+    &__compania {
+      .etiqueta {
+        font-size: 16px;
+      }
+
+      .valor {
+        font-size: 18px;
+      }
+    }
+
+    &__seccion {
+      h3 {
+        font-size: 22px;
+      }
+    }
+
+    .tag {
+      font-size: 16px;
+      padding: 8px 14px;
     }
   }
 }

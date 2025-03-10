@@ -1,3 +1,34 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useGamesStore } from '@/stores/games'
+
+const currentSlide = ref(0)
+const store = useGamesStore()
+
+// Llamamos a la función de la store para obtener los videojuegos
+onMounted(() => {
+  store.fetchTop5Videojuegos()
+})
+
+// Función para mostrar el slide actual
+function showSlide(index: number) {
+  currentSlide.value = index
+  const mainImage = document.querySelector('.carousel__image') as HTMLImageElement
+  mainImage.src = `${store.top5Videojuegos[index].caratula}`
+  updateActiveThumbnail()
+}
+
+// Función para actualizar la miniatura activa
+function updateActiveThumbnail() {
+  const thumbnails = document.querySelectorAll('.carousel__thumbnail')
+  thumbnails.forEach((thumb, index) => {
+    thumb.classList.toggle('active', index === currentSlide.value)
+  })
+}
+</script>
+
+
+
 <template>
   <section class="carousel">
     <div class="carousel__main">
@@ -24,91 +55,65 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useGamesStore } from '@/stores/games';
-
-const currentSlide = ref(0);
-const store = useGamesStore();
-
-// Llamamos a la función de la store para obtener los videojuegos
-onMounted(() => {
-  store.fetchTop5Videojuegos();
-});
-
-// Función para mostrar el slide actual
-function showSlide(index: number) {
-  currentSlide.value = index;
-  const mainImage = document.querySelector('.carousel__image') as HTMLImageElement;
-  mainImage.src = `${store.top5Videojuegos[index].caratula}`;
-  updateActiveThumbnail();
-}
-
-// Función para actualizar la miniatura activa
-function updateActiveThumbnail() {
-  const thumbnails = document.querySelectorAll('.carousel__thumbnail');
-  thumbnails.forEach((thumb, index) => {
-    thumb.classList.toggle('active', index === currentSlide.value);
-  });
-}
-</script>
 
 <style lang="scss" scoped>
+@import '@/assets/styles/variables.scss';
 .carousel {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 200px; /* Añadido espacio arriba */
-  margin-bottom: 20px; /* Añadido espacio abajo */
-  padding-bottom: 20px; /* Asegura que haya espacio entre el carrousel y el footer */
+  margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .carousel__main {
   position: relative;
-  width: 100%;
-  max-width: 900px;
+  width: 80%;
+  height: 40vh;
   overflow: hidden;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
 
-  .carousel__image {
-    width: 100%;
-    border-radius: 15px;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
+.carousel__image {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  border-radius: 15px;
+  transition: opacity 0.5s ease;
 }
 
 .carousel__thumbnails {
   display: flex;
-  justify-content: center; /* Centra las miniaturas */
+  justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 15px;
   width: 100%;
-  overflow-x: auto; /* Permite el desplazamiento horizontal de miniaturas */
-  padding-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .carousel__thumbnail-container {
   display: flex;
-  gap: 10px;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 0 15px;
 }
 
 .carousel__thumbnail {
-  width: 80px;
+  width: 70px;
   height: 50px;
   object-fit: cover;
   cursor: pointer;
-  border-radius: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 3px solid transparent;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+  border: 2px solid transparent;
 }
 
 .carousel__thumbnail:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(255, 99, 71, 0.8);
+  box-shadow: 0 0 12px rgba(255, 99, 71, 0.8);
 }
 
 .carousel__thumbnail.active {
@@ -116,24 +121,25 @@ function updateActiveThumbnail() {
   transform: scale(1.1);
 }
 
-@media (min-width: 600px) {
+/* Mobile First */
+@media (min-width: 768px) {
   .carousel__main {
-    max-width: 1000px;
+    height: 50vh;
   }
 
-  .carousel__thumbnail-container .carousel__thumbnail {
-    width: 100px;
+  .carousel__thumbnail {
+    width: 90px;
     height: 60px;
   }
 }
 
 @media (min-width: 1024px) {
   .carousel__main {
-    max-width: 1200px;
+    height: 50vh;
   }
 
-  .carousel__thumbnail-container .carousel__thumbnail {
-    width: 120px;
+  .carousel__thumbnail {
+    width: 110px;
     height: 70px;
   }
 }
