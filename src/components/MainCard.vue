@@ -55,7 +55,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
 }
 
 .cards-container {
@@ -81,7 +80,9 @@ body {
 }
 
 .cards {
-  display: flex;
+  display: column;
+  justify-content: center;
+  grid-template-columns: repeat(1, 1fr);
   flex-wrap: nowrap;
   overflow-x: auto;
   gap: $spacing-medium;
@@ -94,6 +95,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 2%;
   background: $background-color;
   border-radius: $border-radius;
   padding: $spacing-medium;

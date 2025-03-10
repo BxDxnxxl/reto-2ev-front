@@ -80,7 +80,7 @@ export default {
 }
 
 .header {
-  position: fixed;
+  position:sticky;
   width: 100%;
   top: 0;
   right: 0;
