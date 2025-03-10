@@ -24,20 +24,16 @@ import MainCard from '@/components/MainCard.vue'
 }
 
 .app-content {
-  padding-top: 45rem;
+  padding-top: 2%;
   padding-left: 2%;
   padding-right: 2%;
   margin-top: 0;
   width: 100%;
 
   @media (min-width: 768px) {
-    padding-top: 90rem;
     padding-left: 5%;
     padding-right: 5%;
   }
 
-  @media (min-width: 1024px) {
-    padding-top: 50rem;
-  }
 }
-</style>
+

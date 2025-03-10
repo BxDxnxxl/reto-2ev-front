@@ -58,13 +58,11 @@ function updateActiveThumbnail() {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
-
 .carousel {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-top: 120px;
   margin-bottom: 20px;
   padding-bottom: 20px;
 }
@@ -82,7 +80,7 @@ function updateActiveThumbnail() {
 .carousel__image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   border-radius: 15px;
   transition: opacity 0.5s ease;
 }

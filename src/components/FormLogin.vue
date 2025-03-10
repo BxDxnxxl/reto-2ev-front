@@ -191,9 +191,12 @@ const clearLoginError = (field: keyof typeof loginErrors.value) => {
 const clearRegisterError = (field: keyof typeof registerErrors.value) => {
   registerErrors.value[field] = "";
 };
+
+const innerHeight = ref<number>(window.innerHeight);
 </script>
 
 <template>
+  <main id="main" :style="{ height: innerHeight+'px' ?? '100%' }">
   <div class="form-container" :class="{ 'is-signup': isSignup }">
 
     <form class="form login-form" @submit.prevent="handleLogin">
@@ -325,15 +328,19 @@ const clearRegisterError = (field: keyof typeof registerErrors.value) => {
       </form>
     </div>
   </div>
+  </main>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/variables.scss";
 
-*, *:before, *:after {
-  box-sizing: border-box;
-  margin: 0;
+#main {
   padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 body {
@@ -343,7 +350,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  overflow: hidden;
+  margin: 0; 
 }
 
 input, button {
@@ -377,14 +384,16 @@ $button-height: 36px;
   justify-content: center;
   align-items: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1; 
 }
 
 .form {
   position: relative;
   width: $form-width;
   height: 100%;
-  transition: transform $transition-time ease-in-out;
   padding: 50px 30px 0;
+  transition: transform $transition-time ease-in-out;
+  z-index: 2; 
 }
 
 .toggle-btn {

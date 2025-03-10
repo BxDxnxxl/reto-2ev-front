@@ -3,7 +3,9 @@
 </script>
 
 <template>
+
     <LoginForm />
+
 </template>
   
 <style>
