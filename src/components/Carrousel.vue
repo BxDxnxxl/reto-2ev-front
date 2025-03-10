@@ -58,7 +58,6 @@ function updateActiveThumbnail() {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
-
 .carousel {
   display: flex;
   flex-direction: column;

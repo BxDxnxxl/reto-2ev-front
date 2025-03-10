@@ -36,4 +36,4 @@ import MainCard from '@/components/MainCard.vue'
   }
 
 }
-</style>
+
