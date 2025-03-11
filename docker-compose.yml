@@ -3,13 +3,11 @@ version: '3.8'
 services:
   frontend:
     container_name: vue-frontend
-    image: bydaniel1111/docker-front-deployement:02
+    image: bydaniel1111/docker-front-deployement:03
     build: 
       context: .
       dockerfile: Dockerfile
     ports:
       - "5555:80"
-    volumes:
-      # Montar assets para desarrollo si es necesario
-      - ./src/assets:/usr/share/nginx/html/src/assets
+      - "5556:443"  
     restart: always
