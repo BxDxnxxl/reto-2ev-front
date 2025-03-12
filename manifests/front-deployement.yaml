@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: wannagames
-        image: bydaniel1111/docker-front-deployement:10
+        image: bydaniel1111/docker-front-deployement:11
         imagePullPolicy: Always
         ports:
         - containerPort: 80

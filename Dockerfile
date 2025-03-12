@@ -12,9 +12,8 @@ FROM nginx:stable-alpine as production-stage
 
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-COPY --from=build-stage /app/src/assets /usr/share/nginx/html/assets
+COPY --from=build-stage /app/src/assets/img /usr/share/nginx/html/src/assets/img
 
-# Copiar configuración de Nginx
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
