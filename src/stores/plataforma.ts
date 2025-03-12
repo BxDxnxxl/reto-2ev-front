@@ -8,7 +8,7 @@ export const usePlatformsStore = defineStore("platforms", () => {
 
   async function fetchPlatforms() {
     try {
-      const response = await fetch("http://localhost:4444/api/Plataforma");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Plataforma");
       if (!response.ok) throw new Error("Error al cargar plataformas");
       plataforams.value = await response.json();
     } catch (error) {

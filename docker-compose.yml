@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     container_name: vue-frontend
-    image: bydaniel1111/docker-front-deployement:11
+    image: bydaniel1111/docker-front-deployement:12
     build: 
       context: .
       dockerfile: Dockerfile

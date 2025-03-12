@@ -30,7 +30,7 @@ export const useUsersStore = defineStore("users", () => {
   //Obtener todos los usuarios
   async function fetchUsuarios() {
     try {
-      const response = await fetch("http://localhost:4444/api/usuario");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario");
       users.value = await response.json();
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
@@ -40,7 +40,7 @@ export const useUsersStore = defineStore("users", () => {
   //Obtener todos los usuarios con sus roles
   async function fetchUsuariosConRoles() {
     try {
-      const response = await fetch("http://localhost:4444/api/usuario/usuarios-con-roles");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario/usuarios-con-roles");
       usersWithRoles.value = await response.json();
     } catch (error) {
       console.error("Error al obtener usuarios con roles:", error);
@@ -50,7 +50,7 @@ export const useUsersStore = defineStore("users", () => {
   //Obtener un usuario por ID
   async function fetchUsuarioById(id: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/usuario/${id}`);
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`);
       const usuario = await response.json();
       users.value = users.value.filter((u) => u.id !== id);
       users.value.push(usuario);
@@ -62,7 +62,7 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(nuevoUsuario: UserDto) {
     try {
-        const response = await fetch("http://localhost:4444/api/usuario", {
+        const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(nuevoUsuario),
@@ -98,7 +98,7 @@ export const useUsersStore = defineStore("users", () => {
   async function updateUsuario(id: number, usuarioActualizado: UserDto) {
     try {
       console.log(usuarioActualizado)
-      await fetch(`http://localhost:4444/api/usuario/${id}`, {
+      await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioActualizado),
@@ -129,7 +129,7 @@ export const useUsersStore = defineStore("users", () => {
             : currentUser.value.contrasenia
         };
 
-        const response = await fetch(`http://localhost:4444/api/usuario/${currentUser.value.id}`, {
+        const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${currentUser.value.id}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -163,7 +163,7 @@ export const useUsersStore = defineStore("users", () => {
   //Eliminar un usuario
   async function deleteUsuario(id: number) {
     try {
-      await fetch(`http://localhost:4444/api/usuario/${id}`, { method: "DELETE" });
+      await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, { method: "DELETE" });
       users.value = users.value.filter((u) => u.id !== id);
     } catch (error) {
       console.error("Error al eliminar usuario:", error);
@@ -173,7 +173,7 @@ export const useUsersStore = defineStore("users", () => {
   //Iniciar sesión y almacenar datos del usuario autenticado
   async function login(usuarioLogin: UserLoginDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/auth/login", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioLogin),
@@ -203,7 +203,7 @@ export const useUsersStore = defineStore("users", () => {
   //Registrar un nuevo usuario desde el formulario
   async function register(usuarioNuevo: UserRegistrorDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/usuario/CrearDesdeLogin", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario/CrearDesdeLogin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(usuarioNuevo),
@@ -223,7 +223,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function fetchUsuarioConRolesById(id: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/Usuario/detalle/${id}`);
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/Usuario/detalle/${id}`);
 
       if (!response.ok) {
         throw new Error(`Error al obtener usuario con roles: ${response.statusText}`);
@@ -237,7 +237,7 @@ export const useUsersStore = defineStore("users", () => {
 
   async function asignarRolesAUsuario(asignacion: RolAsignacionDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/Rol/asignarRoles", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Rol/asignarRoles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(asignacion),
