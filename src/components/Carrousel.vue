@@ -30,6 +30,7 @@ function updateActiveThumbnail() {
 
 
 <template>
+   <h2>Examen de Santos, un 10 o que</h2>
   <section class="carousel">
     <div class="carousel__main">
       <img
