@@ -26,6 +26,14 @@ const logout = () => {
       </router-link>
       <hr />
       <router-link
+        to="/gestionarIdeas"
+        :class="{ 'sidebar__link--active': $route.path === '/gestionarIdeas' }"
+        class="sidebar__link"
+      >
+        lista ideas
+      </router-link>
+      <hr/>
+      <router-link
         to="/catalog"
         :class="{ 'sidebar__link--active': $route.path === '/catalogo' }"
         class="sidebar__link"

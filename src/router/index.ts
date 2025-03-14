@@ -7,6 +7,11 @@ import ContactForm from '@/components/ContactForm.vue'
 import Dashboard from '@/views/DashboardView.vue'
 import Catalog from '@/views/CatalogView.vue'
 import DetalleVideojuego from '@/views/DetalleVideojuegoView.vue'
+import Ideas from '@/views/IdeasView.vue'
+import GestionIdeas from '@/views/GestionIdeas.vue'
+import AñadirIdeaView from '@/views/AñadirIdeaView.vue'
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +55,21 @@ const router = createRouter({
       path: '/detalleVideojuego',
       name: 'detalleVideojuego',
       component: DetalleVideojuego,
+    },
+    {
+      path: '/ideas',
+      name: 'ideas',
+      component: Ideas,
+    },
+    {
+      path: '/gestionarIdeas',
+      name: 'gestionarIdeas',
+      component: GestionIdeas,
+    },
+    {
+      path: '/añadirIdea',
+      name: 'añadirIdea',
+      component: AñadirIdeaView,
     },
   ],
 })
