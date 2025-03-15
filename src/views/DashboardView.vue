@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue'
 import DashboardMain from '@/components/DashboardMain.vue'
-import { onMounted, computed } from 'vue'
+import ListaUsuarios from '@/components/ListaUsuarios.vue'
+import { ref, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRouter } from 'vue-router'
 
 const userStore = useUsersStore()
 const router = useRouter()
-console.log(userStore.currentUser)
 const isLoggedIn = computed(() => !!userStore.currentUser)
 
+const currentView = ref<'dashboard' | 'usuarios'>('dashboard')
+
+const changeView = (view: 'dashboard' | 'usuarios') => {
+  currentView.value = view
+}
 </script>
 
 <template>
@@ -22,12 +27,13 @@ const isLoggedIn = computed(() => !!userStore.currentUser)
     </div>
 
     <template v-else>
-      <Sidebar />
-      <DashboardMain />
+      <Sidebar @change-view="changeView" />
+
+      <component :is="currentView === 'dashboard' ? DashboardMain : ListaUsuarios" />
     </template>
   </div>
 </template>
-  
+
 <style lang="scss">
 .dashboard {
   display: flex;

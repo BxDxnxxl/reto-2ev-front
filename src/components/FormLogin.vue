@@ -77,8 +77,8 @@ function validateLogin() {
   
   if (!loginData.value.password) {
     loginErrors.value.password = "La contraseña es obligatoria";
-  } else if (loginData.value.password.length < 6) {
-    loginErrors.value.password = "La contraseña debe tener al menos 6 caracteres";
+  } else if (loginData.value.password.length < 8) {
+    loginErrors.value.password = "La contraseña debe tener al menos 8 caracteres";
   }
   
   return isLoginValid.value;
@@ -107,8 +107,8 @@ function validateRegister() {
   
   if (!registerData.value.contrasenia) {
     registerErrors.value.contrasenia = "La contraseña es obligatoria";
-  } else if (registerData.value.contrasenia.length < 6) {
-    registerErrors.value.contrasenia = "La contraseña debe tener al menos 6 caracteres";
+  } else if (registerData.value.contrasenia.length < 8) {
+    registerErrors.value.contrasenia = "La contraseña debe tener al menos 8 caracteres";
   }
   
   if (!registerData.value.confirmarContrasenia) {

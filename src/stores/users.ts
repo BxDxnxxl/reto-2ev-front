@@ -104,55 +104,74 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  async function updateCurrentUser(usuarioActualizado: UserDto) {
-      try {
+async function updateCurrentUser(usuarioActualizado: UserDto) {
+    try {
         if (!currentUser.value) {
-          throw new Error("No hay usuario autenticado.");
+            throw new Error("No hay usuario autenticado.");
         }
 
-        // Preparar el objeto para enviar al backend
+        let contraseniaFinal = usuarioActualizado.contrasenia?.trim() || "";
+        const usuarioId = currentUser.value.id ?? 0;
+
+        if (!contraseniaFinal) {
+            await fetchUsuarioById(usuarioId);
+            const usuarioDesdeApi = users.value.find(u => u.id === usuarioId);
+
+            if (!usuarioDesdeApi || !usuarioDesdeApi.contrasenia) {
+                throw new Error("No se pudo obtener la contraseña actual del usuario.");
+            }
+
+            contraseniaFinal = usuarioDesdeApi.contrasenia;
+        }
+
         const usuarioParaActualizar: UserDto = {
-          id: currentUser.value.id,
-          username: usuarioActualizado.username || currentUser.value.username,
-          email: usuarioActualizado.email || currentUser.value.email || '',
-          nombre: usuarioActualizado.nombre || currentUser.value.nombre,
-          apellido1: usuarioActualizado.apellido1 || currentUser.value.apellido1,
-          apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || '',
-          profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || '',
-          contrasenia: usuarioActualizado.contrasenia && usuarioActualizado.contrasenia.trim() !== ""
-            ? usuarioActualizado.contrasenia 
-            : currentUser.value.contrasenia
+            id: currentUser.value.id,
+            username: usuarioActualizado.username || currentUser.value.username,
+            email: usuarioActualizado.email || currentUser.value.email || '',
+            nombre: usuarioActualizado.nombre || currentUser.value.nombre,
+            apellido1: usuarioActualizado.apellido1 || currentUser.value.apellido1,
+            apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || '',
+            profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || '',
+            contrasenia: contraseniaFinal
         };
 
         const response = await fetch(`http://localhost:4444/api/usuario/${currentUser.value.id}`, {
-          method: "PUT",
-          headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${tokenLogin}`
-          },
-          body: JSON.stringify(usuarioParaActualizar),
+            method: "PUT",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${tokenLogin}`
+            },
+            body: JSON.stringify(usuarioParaActualizar),
         });
 
         if (!response.ok) {
-          throw new Error(`Error en la actualización: ${await response.text()}`);
+            throw new Error(`Error en la actualización: ${await response.text()}`);
         }
 
-        const updatedUser = { 
-          ...currentUser.value, 
-          ...usuarioActualizado,
-          contrasenia: currentUser.value.contrasenia
-        };
+        await fetchUsuarioById(usuarioId);
+        const usuarioActualizadoDesdeApi = users.value.find(u => u.id === usuarioId);
 
-        currentUser.value = updatedUser;
-        
-        await fetchUsuarios(); // Refresca la lista después de actualizar
+        if (!usuarioActualizadoDesdeApi) {
+            throw new Error("Error al obtener el usuario actualizado.");
+        }
 
-        return updatedUser;
-      } catch (error) {
+        const usuarioPlano = JSON.parse(JSON.stringify(usuarioActualizadoDesdeApi));
+
+        currentUser.value = usuarioPlano;
+
+        await set("currentUser", usuarioPlano);
+
+        await fetchUsuarios();
+
+        return currentUser.value;
+    } catch (error) {
         console.error('Error en la actualización del usuario:', error);
         throw error;
-      }
+    }
   }
+
+
+
 
   //Eliminar un usuario
   async function deleteUsuario(id: number) {
