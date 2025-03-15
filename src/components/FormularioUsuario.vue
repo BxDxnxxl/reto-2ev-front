@@ -107,7 +107,7 @@ async function saveUser() {
       await usersStore.asignarRolesAUsuario(roleAssignment);
     }
 
-    router.push('/usuarios');
+    router.push('/dashboard');
   } catch (error) {
     console.error("Error al guardar usuario:", error);
   }

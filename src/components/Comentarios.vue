@@ -52,14 +52,14 @@ onMounted(async () => {
 
         <div class="comentarios__acciones">
           <div class="comentarios__like">
-            <v-btn icon variant="text" size="small">
+            <v-btn icon variant="text" size="small" @click="commentsStore.likeComentario(comentario.id, props.gameId)">
               <v-icon>mdi-thumb-up</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.likes }}</span>
           </div>
 
           <div class="comentarios__dislike">
-            <v-btn icon variant="text" size="small">
+            <v-btn icon variant="text" size="small" @click="commentsStore.dislikeComentario(comentario.id, props.gameId)">
               <v-icon>mdi-thumb-down</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.dislikes }}</span>
