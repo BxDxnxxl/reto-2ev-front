@@ -6,26 +6,21 @@ import type { UserRegistrorDto } from "@/stores/dtos/userRegistro.dto";
 import type { UserInfoDto } from "@/stores/dtos/userInfoListado.dto";
 import type { RolAsignacionDto } from "@/stores/dtos/UsuarioRol.dto";
 import { useRouter } from "vue-router";
+import { get, set, del } from "idb-keyval";
 const router = useRouter();
 
 export const useUsersStore = defineStore("users", () => {
   const users = ref<UserDto[]>([]);
-
   const usersWithRoles = ref<UserInfoDto[]>([]);
   const currentUser = ref<UserInfoDto | null>(null);
   const usuarioConRoles = ref<UserInfoDto | null>(null);
-  const tokenLogin = ref<string | null>(null)
+  const tokenLogin = ref<string | null>(null);
 
-  const storedUser = localStorage.getItem("currentUser");
-  const storedToken = localStorage.getItem("tokenLogin");
-
-  if (storedUser) {
-    currentUser.value = JSON.parse(storedUser);
+  async function loadPersistedData() {
+    currentUser.value = await get("currentUser") ?? null;
+    tokenLogin.value = await get("tokenLogin") ?? null;
   }
-
-  if (storedToken) {
-    tokenLogin.value = storedToken;
-  }
+  loadPersistedData();
 
   //Obtener todos los usuarios
   async function fetchUsuarios() {
@@ -133,7 +128,7 @@ export const useUsersStore = defineStore("users", () => {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+            "Authorization": `Bearer ${tokenLogin}`
           },
           body: JSON.stringify(usuarioParaActualizar),
         });
@@ -149,7 +144,6 @@ export const useUsersStore = defineStore("users", () => {
         };
 
         currentUser.value = updatedUser;
-        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
         
         await fetchUsuarios(); // Refresca la lista después de actualizar
 
@@ -189,9 +183,9 @@ export const useUsersStore = defineStore("users", () => {
       if (data) {
         currentUser.value = data.usuario;
         tokenLogin.value = data.token;
-  
-        localStorage.setItem("currentUser", JSON.stringify(data.usuario));
-        localStorage.setItem("tokenLogin", data.token);
+
+        await set("currentUser", data.usuario);
+        await set("tokenLogin", data.token);
   
         return true;
       }
@@ -251,14 +245,12 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  function logout() {
+  async function logout() {
     currentUser.value = null;
     tokenLogin.value = null;
-  
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("tokenLogin");
-  
-    router.push("/");
+
+    await del("currentUser");
+    await del("tokenLogin");
   }
   
 

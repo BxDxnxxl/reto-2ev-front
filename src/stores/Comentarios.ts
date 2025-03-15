@@ -42,6 +42,36 @@ export const useCommentsStore = defineStore("comments", () => {
 
       comentarios.value.push(nuevoComentario);
       await fetchComentarios();
+      await fetchComentariosByVideojuegos(nuevoComentario.fkIdVideojuego);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function likeComentario(comentarioId: number, videojuegoId: number) {
+    try {
+      const response = await fetch(`http://localhost:4444/api/comentario/like/${comentarioId}`, {
+        method: "PUT"
+      });
+
+      if (!response.ok) throw new Error("Error al dar like");
+      await fetchComentarios();
+      await fetchComentariosByVideojuegos(videojuegoId);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function dislikeComentario(comentarioId: number, videojuegoId: number) {
+    try {
+      const response = await fetch(`http://localhost:4444/api/comentario/dislike/${comentarioId}`, {
+        method: "PUT"
+      });
+
+      if (!response.ok) throw new Error("Error al dar dislike");
+
+      await fetchComentarios();
+      await fetchComentariosByVideojuegos(videojuegoId);
     } catch (error) {
       console.error(error);
     }
@@ -52,6 +82,8 @@ export const useCommentsStore = defineStore("comments", () => {
     comentariosByVideojuego,
     fetchComentarios,
     fetchComentariosByVideojuegos,
-    postComentario
+    postComentario,
+    likeComentario,
+    dislikeComentario
   };
 });
