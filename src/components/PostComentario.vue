@@ -1,45 +1,47 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useCommentsStore } from "@/stores/Comentarios";
-import { useUsersStore } from "@/stores/users";
-import type { ComentarioDto } from "@/stores/dtos/Comentario.dto";
+import { ref, computed } from 'vue'
+import { useCommentsStore } from '@/stores/Comentarios'
+import { useUsersStore } from '@/stores/users'
+import type { ComentarioDto } from '@/stores/dtos/Comentario.dto'
 
 const props = defineProps({
   gameId: {
     type: Number,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const commentsStore = useCommentsStore();
-const usersStore = useUsersStore();
+const commentsStore = useCommentsStore()
+const usersStore = useUsersStore()
+const mostrarFormulario = ref(false)
 
 const comentario = ref<ComentarioDto>({
   id: 0,
   fkIdUsuario: usersStore.currentUser?.id ?? 0,
   fkIdVideojuego: props.gameId,
-  titulo: "",
-  texto: "",
+  titulo: '',
+  texto: '',
   fecha: new Date(),
   valoracion: 5,
   likes: 0,
-  dislikes: 0
-});
+  dislikes: 0,
+})
 
-const usuarioLogueado = computed(() => usersStore.currentUser);
+const usuarioLogueado = computed(() => usersStore.currentUser)
 
 async function enviarComentario() {
-  if (!usuarioLogueado.value) return;
+  if (!usuarioLogueado.value) return
 
-  comentario.value.fkIdUsuario = usuarioLogueado.value.id ?? 0;
+  comentario.value.fkIdUsuario = usuarioLogueado.value.id ?? 0
 
   try {
-    await commentsStore.postComentario(comentario.value);
-    comentario.value.titulo = "";
-    comentario.value.texto = "";
-    comentario.value.valoracion = 5;
+    await commentsStore.postComentario(comentario.value)
+    comentario.value.titulo = ''
+    comentario.value.texto = ''
+    comentario.value.valoracion = 5
+    mostrarFormulario.value = false
   } catch (error) {
-    console.error("Error al enviar comentario", error);
+    console.error('Error al enviar comentario', error)
   }
 }
 </script>
@@ -48,11 +50,24 @@ async function enviarComentario() {
   <div class="comentarios">
     <h2 class="comentarios__titulo">Deja un comentario</h2>
 
-    <div v-if="!usuarioLogueado" class="comentarios__bloqueado">
+    <v-btn
+      v-if="!mostrarFormulario"
+      color="primary"
+      class="comentarios__boton"
+      @click="mostrarFormulario = true"
+    >
+      Añadir Comentario
+    </v-btn>
+
+    <div v-if="!usuarioLogueado && mostrarFormulario" class="comentarios__bloqueado">
       <p>Para comentar debes estar logueado</p>
     </div>
 
-    <v-form v-else class="comentarios__formulario" @submit.prevent="enviarComentario">
+    <v-form
+      v-else-if="mostrarFormulario"
+      class="comentarios__formulario"
+      @submit.prevent="enviarComentario"
+    >
       <v-text-field
         v-model="comentario.titulo"
         label="Título"
@@ -81,13 +96,18 @@ async function enviarComentario() {
         class="comentarios__input"
       ></v-text-field>
 
-      <v-btn color="primary" type="submit" class="comentarios__boton">Publicar</v-btn>
+      <div class="comentarios__acciones">
+        <v-btn color="primary" type="submit" class="comentarios__boton">Publicar</v-btn>
+        <v-btn color="secondary" class="comentarios__boton" @click="mostrarFormulario = false"
+          >Cancelar</v-btn
+        >
+      </div>
     </v-form>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/variables.scss";
+@import '@/assets/styles/variables.scss';
 
 .comentarios {
   width: 100%;
@@ -105,7 +125,7 @@ async function enviarComentario() {
     background: #f8d7da;
     color: #721c24;
     padding: 12px;
-    border-radius: 8px;
+    border-radius: $border-radius;
     text-align: center;
     font-weight: bold;
   }
@@ -113,10 +133,10 @@ async function enviarComentario() {
   &__formulario {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: $spacing-small;
+    padding: $spacing-medium;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     background: #fff;
   }
 
@@ -129,6 +149,14 @@ async function enviarComentario() {
     align-self: center;
     padding: 8px 24px;
     font-size: 1rem;
+    background: $primary-gradient;
+    color: $text-color;
+  }
+
+  &__acciones {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-medium;
   }
 }
 </style>
