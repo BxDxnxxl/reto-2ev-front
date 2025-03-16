@@ -77,6 +77,42 @@ export const useCommentsStore = defineStore("comments", () => {
     }
   }
 
+  async function deleteComentario(comentarioId: number, videojuegoId: number) {
+    try {
+      const response = await fetch(`http://localhost:4444/api/Comentario/${comentarioId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error al eliminar el comentario: ${await response.text()}`);
+      }
+
+      comentariosByVideojuego.value = comentariosByVideojuego.value.filter(comentario => comentario.id !== comentarioId);
+      await fetchComentarios();
+      await fetchComentariosByVideojuegos(videojuegoId);
+      console.log(`Comentario ${comentarioId} eliminado correctamente`);
+    } catch (error) {
+      console.error("Error al eliminar el comentario:", error);
+    }
+  }
+
+  async function fetchComentarioById(comentarioId: number) {
+    try {
+        const response = await fetch(`http://localhost:4444/api/Comentario/${comentarioId}`);
+        if (!response.ok) throw new Error('Error al obtener el comentario');
+
+        const comentario = await response.json();
+        return comentario;
+    } catch (error) {
+        console.error("Error al obtener comentario:", error);
+        return null;
+    }
+}
+
+
   return {
     comentarios,
     comentariosByVideojuego,
@@ -84,6 +120,8 @@ export const useCommentsStore = defineStore("comments", () => {
     fetchComentariosByVideojuegos,
     postComentario,
     likeComentario,
-    dislikeComentario
+    dislikeComentario,
+    deleteComentario,
+    fetchComentarioById
   };
 });
