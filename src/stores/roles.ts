@@ -19,5 +19,9 @@ export const useRolesStore = defineStore("roles", () => {
   return {
     roles,
     fetchRoles,
+    ADMIN: 2,
+    DESARROLLADOR: 3,
+    EXPERTO: 4,
+    USUARIO_BASE: 1,
   };
 });

@@ -1,14 +1,23 @@
 <script setup>
-import { useUsersStore } from '@/stores/users';
-import { useRouter } from 'vue-router';
+import { defineEmits, computed } from "vue";
+import { useUsersStore } from "@/stores/users";
+import { useRolesStore } from "@/stores/roles";
+import { useRouter } from "vue-router";
 
 const userStore = useUsersStore();
+const rolesStore = useRolesStore();
 const router = useRouter();
 
 const logout = () => {
   userStore.logout();
-  router.push('/');
+  router.push("/");
 };
+
+const emit = defineEmits(["change-view"]);
+
+const isAdmin = computed(() =>
+  userStore.currentUser?.roles?.some((role) => role.id === rolesStore.ADMIN) || false
+);
 </script>
 
 <template>
@@ -17,29 +26,22 @@ const logout = () => {
       <img src="https://via.placeholder.com/80" alt="Perfil" class="sidebar__profile-img" />
     </div>
     <nav class="sidebar__nav">
-      <router-link
-        to="/usuarios"
-        :class="{ 'sidebar__link--active': $route.path === '/usuarios' }"
-        class="sidebar__link"
-      >
+      <button v-if="isAdmin" class="sidebar__link" @click="emit('change-view', 'usuarios')">
         Usuarios
-      </router-link>
+      </button>
       <hr />
-      <router-link
-        to="/catalog"
-        :class="{ 'sidebar__link--active': $route.path === '/catalogo' }"
-        class="sidebar__link"
-      >
-        Catálogo
-      </router-link>
+      <button class="sidebar__link" @click="emit('change-view', 'dashboard')">
+        Mi Perfil
+      </button>
+      <button class="sidebar__link">
+        <router-link to="/" class="sidebar__link">
+          Inicio
+        </router-link>
+      </button>
     </nav>
-    <router-link 
-      to="/" 
-      class="sidebar__logout" 
-      @click="logout"
-    >
+    <button class="sidebar__logout" @click="logout">
       Cerrar Sesión
-    </router-link>
+    </button>
   </div>
 </template>
 
@@ -80,9 +82,13 @@ const logout = () => {
     color: white;
     text-decoration: none;
     text-align: center;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
     transition: background 0.3s;
 
-    &--active {
+    &:hover {
       background: #7f8c8d;
     }
   }
@@ -95,9 +101,7 @@ const logout = () => {
     width: 100%;
     cursor: pointer;
     text-align: center;
-    text-decoration: none;
     transition: background 0.3s;
-    display: block;
 
     &:hover {
       background: #d64321;

@@ -1,63 +1,100 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useGamesStore } from '@/stores/games'
 
 const currentSlide = ref(0)
 const store = useGamesStore()
+let interval: number | null = null
 
-// Llamamos a la función de la store para obtener los videojuegos
 onMounted(() => {
   store.fetchTop5Videojuegos()
+  startAutoPlay()
 })
 
-// Función para mostrar el slide actual
-function showSlide(index: number) {
-  currentSlide.value = index
-  const mainImage = document.querySelector('.carousel__image') as HTMLImageElement
-  mainImage.src = `${store.top5Videojuegos[index].caratula}`
-  updateActiveThumbnail()
+const startAutoPlay = () => {
+  interval = setInterval(() => {
+    nextSlide()
+  }, 7000)
 }
 
-// Función para actualizar la miniatura activa
-function updateActiveThumbnail() {
-  const thumbnails = document.querySelectorAll('.carousel__thumbnail')
-  thumbnails.forEach((thumb, index) => {
-    thumb.classList.toggle('active', index === currentSlide.value)
-  })
+onUnmounted(() => {
+  if (interval) clearInterval(interval)
+})
+
+function showSlide(index: number) {
+  currentSlide.value = index
+}
+
+function nextSlide() {
+  if (store.top5Videojuegos.length > 0) {
+    currentSlide.value = (currentSlide.value + 1) % store.top5Videojuegos.length
+  }
 }
 </script>
 
-
-
 <template>
+  <h2 class="carousel__heading">Los mejor valorados</h2>
   <section class="carousel">
     <div class="carousel__main">
       <img
-        :src="`${store.top5Videojuegos[0]?.caratula}`"
+        :src="store.top5Videojuegos[currentSlide]?.caratula"
         alt="Imagen principal"
         class="carousel__image"
       />
+
+      <div class="carousel__info">
+        <h3 class="carousel__title">{{ store.top5Videojuegos[currentSlide]?.titulo }}</h3>
+        <router-link
+          v-if="store.top5Videojuegos.length"
+          :to="`/detalleVideojuego?id=${store.top5Videojuegos[currentSlide]?.id}`"
+          class="carousel__button"
+        >
+          Ver Más
+        </router-link>
+      </div>
     </div>
 
-    <!-- Miniaturas debajo de la imagen principal -->
     <div class="carousel__thumbnails">
       <div class="carousel__thumbnail-container">
         <img
           v-for="(videojuego, index) in store.top5Videojuegos"
           :key="index"
-          :src="`${videojuego.caratula}`"
+          :src="videojuego.caratula"
           :alt="videojuego.titulo"
           @click="showSlide(index)"
           class="carousel__thumbnail"
+          :class="{ active: index === currentSlide }"
         />
       </div>
     </div>
   </section>
 </template>
 
-
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+.carousel__heading {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: $primary-color;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
+  position: relative;
+  
+  &::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: $primary-color;
+    margin: 8px auto 0;
+    border-radius: 2px;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
+}
 .carousel {
   display: flex;
   flex-direction: column;
@@ -83,6 +120,46 @@ function updateActiveThumbnail() {
   object-fit: fill;
   border-radius: 15px;
   transition: opacity 0.5s ease;
+}
+
+.carousel__info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 35%;
+  background: linear-gradient(to top, rgba(30, 30, 30, 0.9), rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.4));  ;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.carousel__title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.carousel__button {
+  background: $primary-color;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: darken($primary-color, 10%);
+    transform: scale(1.05);
+  }
 }
 
 .carousel__thumbnails {
@@ -121,7 +198,6 @@ function updateActiveThumbnail() {
   transform: scale(1.1);
 }
 
-/* Mobile First */
 @media (min-width: 768px) {
   .carousel__main {
     height: 50vh;

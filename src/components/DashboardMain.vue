@@ -199,28 +199,28 @@ const updateProfile = async () => {
   </v-container>
 </template>
 
-<style scoped>
-.profile-edit-container {
-  background: none;
-  min-height: 100vh;
+<style scoped lang="scss">
+.profile {
   display: flex;
+  flex-direction: column;
   align-items: center;
-}
-
-.profile-card {
+  min-height: 100vh;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-}
+  padding: 1rem;
 
-@media (max-width: 600px) {
-  .profile-card {
-    margin: 0;
-    border-radius: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  &__container {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    flex-direction: row;
     justify-content: center;
+    padding: 2rem;
   }
 }
 </style>

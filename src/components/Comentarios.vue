@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useCommentsStore } from '@/stores/Comentarios'
+import { ref, onMounted } from 'vue';
+import { useCommentsStore } from '@/stores/Comentarios';
+import { useUsersStore } from '@/stores/users';
+import { useRolesStore } from '@/stores/roles';
+import type { ComentarioDto } from '@/stores/dtos/Comentario.dto';
 
 const props = defineProps({
   gameId: {
@@ -8,13 +11,44 @@ const props = defineProps({
     default: null,
   },
 })
+
 const commentsStore = useCommentsStore()
+const usersStore = useUsersStore()
+const rolesStore = useRolesStore()
+
+const puedenEliminar = ref<{ [key: number]: boolean }>({});
+
+const verificarPermisoEliminar = async (comentarioId: number): Promise<boolean> => {
+  const comentario = await commentsStore.fetchComentarioById(comentarioId);
+  if (!comentario) return false;
+
+  return (
+    comentario.fkIdUsuario === usersStore.currentUser?.id ||
+    (usersStore.currentUser?.roles?.some(role => role.id === rolesStore.ADMIN) ?? false)
+  );
+};
+
+onMounted(async () => {
+  if (props.gameId) {
+    await commentsStore.fetchComentariosByVideojuegos(props.gameId);
+    
+    for (const comentario of commentsStore.comentariosByVideojuego) {
+      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id);
+    }
+  }
+});
+
+const eliminarComentario = async (comentarioId: number) => {
+  await commentsStore.deleteComentario(comentarioId, props.gameId);
+};
 
 const formatearFechaEspañola = (fecha: string | number | Date) => {
+  // Si es un año, lo devolvemos como string
   if (typeof fecha === 'number') {
     return fecha.toString()
   }
 
+  // Si es fecha completa, la formateamos como DD/MM/AAAA
   const fechaObj = new Date(fecha)
   const dia = fechaObj.getDate().toString().padStart(2, '0')
   const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
@@ -22,12 +56,6 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
 
   return `${dia}/${mes}/${anio}`
 }
-
-onMounted(async () => {
-  if (props.gameId) {
-    await commentsStore.fetchComentariosByVideojuegos(props.gameId)
-  }
-})
 </script>
 
 <template>
@@ -52,18 +80,29 @@ onMounted(async () => {
 
         <div class="comentarios__acciones">
           <div class="comentarios__like">
-            <v-btn icon variant="text" size="small">
+            <v-btn icon variant="text" size="small" @click="commentsStore.likeComentario(comentario.id, props.gameId)">
               <v-icon>mdi-thumb-up</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.likes }}</span>
           </div>
 
           <div class="comentarios__dislike">
-            <v-btn icon variant="text" size="small">
+            <v-btn icon variant="text" size="small" @click="commentsStore.dislikeComentario(comentario.id, props.gameId)">
               <v-icon>mdi-thumb-down</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.dislikes }}</span>
           </div>
+
+          <v-btn 
+            v-if="puedenEliminar[comentario.id]" 
+            icon 
+            color="error" 
+            variant="text" 
+            size="small" 
+            @click="eliminarComentario(comentario.id)"
+          >
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
         </div>
       </div>
 
@@ -73,6 +112,7 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
