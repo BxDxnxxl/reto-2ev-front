@@ -33,6 +33,7 @@ function nextSlide() {
 </script>
 
 <template>
+  <h2 class="carousel__heading">Los mejor valorados</h2>
   <section class="carousel">
     <div class="carousel__main">
       <img
@@ -71,7 +72,29 @@ function nextSlide() {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+.carousel__heading {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: $primary-color;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
+  position: relative;
+  
+  &::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: $primary-color;
+    margin: 8px auto 0;
+    border-radius: 2px;
+  }
 
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
+}
 .carousel {
   display: flex;
   flex-direction: column;

@@ -41,6 +41,21 @@ onMounted(async () => {
 const eliminarComentario = async (comentarioId: number) => {
   await commentsStore.deleteComentario(comentarioId, props.gameId);
 };
+
+const formatearFechaEspañola = (fecha: string | number | Date) => {
+  // Si es un año, lo devolvemos como string
+  if (typeof fecha === 'number') {
+    return fecha.toString()
+  }
+
+  // Si es fecha completa, la formateamos como DD/MM/AAAA
+  const fechaObj = new Date(fecha)
+  const dia = fechaObj.getDate().toString().padStart(2, '0')
+  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
+  const anio = fechaObj.getFullYear()
+
+  return `${dia}/${mes}/${anio}`
+}
 </script>
 
 <template>
@@ -55,7 +70,7 @@ const eliminarComentario = async (comentarioId: number) => {
       >
         <div class="comentarios__cabecera">
           <h3 class="comentarios__nombre">{{ comentario.usuarioNombre }}</h3>
-          <span class="comentarios__fecha">{{ comentario.fecha }}</span>
+          <span class="comentarios__fecha">{{ formatearFechaEspañola(comentario.fecha) }}</span>
         </div>
 
         <h4 class="comentarios__titulo-texto">{{ comentario.titulo }}</h4>
