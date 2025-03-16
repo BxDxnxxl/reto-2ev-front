@@ -64,12 +64,14 @@ body {
   flex-direction: column;
   gap: $spacing-large;
   padding: $spacing-medium;
+  width: 100%;
 }
 
 .section {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .section__title {
@@ -82,22 +84,29 @@ body {
 }
 
 .cards {
-  display: column;
-  justify-content: center;
+  display: grid;
   grid-template-columns: repeat(1, 1fr);
-  flex-wrap: nowrap;
-  overflow-x: auto;
   gap: $spacing-medium;
-  padding-bottom: $spacing-small;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+  }
 }
 
 .card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2%;
+  justify-content: center;
   background: $background-color;
   border-radius: $border-radius;
   padding: $spacing-medium;
@@ -106,15 +115,16 @@ body {
   color: $text-color;
   text-decoration: none;
   box-shadow: $box-shadow;
-  min-width: 160px;
-  max-width: 200px;
-  height: auto;
-  scroll-snap-align: start;
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 1/1;
+  justify-self: center;
+  min-height: 180px;
 }
 
 .card__image {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 50%;
   border: 4px solid $text-color;
@@ -126,25 +136,28 @@ body {
   font-weight: 600;
   color: $text-color;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  max-width: 90%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
 }
 
-@media (min-width: $desktop) {
+@media (min-width: 768px) {
   .cards {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-large;
-    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards {
+    grid-template-columns: repeat(5, 1fr);
+    width: 100%;
   }
 
   .card {
-    min-width: auto;
-    max-width: 250px;
+    max-width: 180px;
   }
 }
 
-@media (min-width: $laptop) {
-  .cards {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
 </style>

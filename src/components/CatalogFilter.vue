@@ -113,7 +113,6 @@ function clearFilters() {
   align-items: center;
   width: 100%;
   padding: 1rem;
-  margin-top: 200px;
 }
 
 .catalog__search {
