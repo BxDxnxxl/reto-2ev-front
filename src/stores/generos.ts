@@ -9,7 +9,7 @@ export const useGenresStore = defineStore("genres", () => {
 
   async function fetchGenres() {
     try {
-      const response = await fetch("http://localhost:4444/api/Genero");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Genero");
       if (!response.ok) throw new Error("Error al cargar géneros");
       generos.value = await response.json();
     } catch (error) {
@@ -19,7 +19,7 @@ export const useGenresStore = defineStore("genres", () => {
 
   async function fetchTop5Genres() {
     try {
-      const response = await fetch("http://localhost:4444/api/Genero/top5");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Genero/top5");
       if (!response.ok) throw new Error("Error al cargar los géneros más populares");
       top5Generos.value = await response.json();
     } catch (error) {
