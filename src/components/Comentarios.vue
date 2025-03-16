@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useCommentsStore } from '@/stores/Comentarios'
+import { ref, onMounted } from 'vue';
+import { useCommentsStore } from '@/stores/Comentarios';
+import { useUsersStore } from '@/stores/users';
+import { useRolesStore } from '@/stores/roles';
+import type { ComentarioDto } from '@/stores/dtos/Comentario.dto';
 
 const props = defineProps({
   gameId: {
@@ -8,26 +11,36 @@ const props = defineProps({
     default: null,
   },
 })
+
 const commentsStore = useCommentsStore()
+const usersStore = useUsersStore()
+const rolesStore = useRolesStore()
 
-const formatearFechaEspañola = (fecha: string | number | Date) => {
-  if (typeof fecha === 'number') {
-    return fecha.toString()
-  }
+const puedenEliminar = ref<{ [key: number]: boolean }>({});
 
-  const fechaObj = new Date(fecha)
-  const dia = fechaObj.getDate().toString().padStart(2, '0')
-  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
-  const anio = fechaObj.getFullYear()
+const verificarPermisoEliminar = async (comentarioId: number): Promise<boolean> => {
+  const comentario = await commentsStore.fetchComentarioById(comentarioId);
+  if (!comentario) return false;
 
-  return `${dia}/${mes}/${anio}`
-}
+  return (
+    comentario.fkIdUsuario === usersStore.currentUser?.id ||
+    (usersStore.currentUser?.roles?.some(role => role.id === rolesStore.ADMIN) ?? false)
+  );
+};
 
 onMounted(async () => {
   if (props.gameId) {
-    await commentsStore.fetchComentariosByVideojuegos(props.gameId)
+    await commentsStore.fetchComentariosByVideojuegos(props.gameId);
+    
+    for (const comentario of commentsStore.comentariosByVideojuego) {
+      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id);
+    }
   }
-})
+});
+
+const eliminarComentario = async (comentarioId: number) => {
+  await commentsStore.deleteComentario(comentarioId, props.gameId);
+};
 </script>
 
 <template>
@@ -42,7 +55,7 @@ onMounted(async () => {
       >
         <div class="comentarios__cabecera">
           <h3 class="comentarios__nombre">{{ comentario.usuarioNombre }}</h3>
-          <span class="comentarios__fecha">{{ formatearFechaEspañola(comentario.fecha) }}</span>
+          <span class="comentarios__fecha">{{ comentario.fecha }}</span>
         </div>
 
         <h4 class="comentarios__titulo-texto">{{ comentario.titulo }}</h4>
@@ -64,6 +77,17 @@ onMounted(async () => {
             </v-btn>
             <span class="comentarios__contador">{{ comentario.dislikes }}</span>
           </div>
+
+          <v-btn 
+            v-if="puedenEliminar[comentario.id]" 
+            icon 
+            color="error" 
+            variant="text" 
+            size="small" 
+            @click="eliminarComentario(comentario.id)"
+          >
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
         </div>
       </div>
 
@@ -73,6 +97,7 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
