@@ -6,6 +6,7 @@ import ContactForm from '@/components/ContactForm.vue'
 import Dashboard from '@/views/DashboardView.vue'
 import Catalog from '@/views/CatalogView.vue'
 import DetalleVideojuego from '@/views/DetalleVideojuegoView.vue'
+import ReviewsView from '@/views/ReviewsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ const router = createRouter({
       path: '/detalleVideojuego',
       name: 'detalleVideojuego',
       component: DetalleVideojuego,
+    },
+    {
+      path: '/reviewVideojuego',
+      name: 'reviewVideojuego',
+      component: ReviewsView,
     },
   ],
 })
