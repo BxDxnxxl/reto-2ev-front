@@ -3,7 +3,6 @@ import ReviewPrincipal from '@/components/ReviewPrincipal.vue'
 import GameDetails from '@/components/GameDetails.vue'
 import PersonalExperience from '@/components/PersonalExperience.vue'
 import RatingBox from '@/components/RatingBox.vue'
-import ScreenshotsGallery from '@/components/ScreenshotsGallery.vue'
 </script>
 
 <template>
@@ -12,7 +11,6 @@ import ScreenshotsGallery from '@/components/ScreenshotsGallery.vue'
     <GameDetails />
     <PersonalExperience />
     <RatingBox />
-    <ScreenshotsGallery />
   </div>
 </template>
 
@@ -27,5 +25,4 @@ import ScreenshotsGallery from '@/components/ScreenshotsGallery.vue'
   gap: $spacing-large;
   background-color: $background-color;
 }
-
 </style>
