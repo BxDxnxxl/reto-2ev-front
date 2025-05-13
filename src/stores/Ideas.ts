@@ -44,6 +44,25 @@ export const useIdeasStore = defineStore("ideas", () => {
     }
   }
 
+  async function verificarSiUsuarioApuntado(fkIdIdea: number, fkIdUsuario: number): Promise<boolean> {
+    try {
+      const response = await fetch("http://localhost:4444/api/usuariosapuntados/existe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ fkIdIdea, fkIdUsuario })
+      });
+  
+      if (!response.ok) throw new Error("Error al verificar si está apuntado");
+  
+      return await response.json(); // Devuelve true o false
+    } catch (error) {
+      console.error("Error en verificarSiUsuarioApuntado:", error);
+      return false;
+    }
+  }  
+
   async function publicarIdea(nuevaIdea: Ideas) {
     try {
       const response = await fetch("http://localhost:4444/api/ideas", {
@@ -71,6 +90,7 @@ export const useIdeasStore = defineStore("ideas", () => {
     fetchIdeasBase,
     fetchIdeasConPlazas,
     unirseAIdea,
-    publicarIdea
+    publicarIdea,
+    verificarSiUsuarioApuntado
   };
 });

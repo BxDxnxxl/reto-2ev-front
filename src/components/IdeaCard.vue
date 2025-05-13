@@ -7,9 +7,13 @@ import FormularioIdea from "@/components/FormularioIdea.vue";
 const ideasStore = useIdeasStore();
 const usersStore = useUsersStore();
 const mostrarFormulario = ref(false);
+const ideasApuntadasIds = ref<number[]>([]); // Solo se usa para precarga
+
+const estadoApuntado = ref<{ [key: number]: boolean }>({}); // idea.id -> true/false
 
 onMounted(async () => {
   await ideasStore.fetchIdeasConPlazas();
+  await verificarApuntados();
 });
 
 const toggleFormulario = () => {
@@ -19,6 +23,17 @@ const toggleFormulario = () => {
 const onIdeaPublicada = async () => {
   mostrarFormulario.value = false;
   await ideasStore.fetchIdeasConPlazas();
+  await verificarApuntados();
+};
+
+const verificarApuntados = async () => {
+  const userId = usersStore.currentUser?.id;
+  if (!userId) return;
+
+  for (const idea of ideasStore.ideasConPlazas) {
+    const esta = await ideasStore.verificarSiUsuarioApuntado(idea.id, userId);
+    estadoApuntado.value[idea.id] = esta;
+  }
 };
 
 const handleUnirse = async (idIdea: number, creadorId: number) => {
@@ -34,7 +49,14 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     return;
   }
 
+  if (estadoApuntado.value[idIdea]) {
+    alert("Ya estás apuntado a esta idea.");
+    return;
+  }
+
   await ideasStore.unirseAIdea(idIdea, userId);
+  await ideasStore.fetchIdeasConPlazas();
+  await verificarApuntados();
 };
 </script>
 
@@ -72,13 +94,24 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
           </div>
         </div>
 
-        <button
-          class="idea-card__boton"
-          v-if="usersStore.currentUser?.id !== idea.fkIdUsuario"
-          @click="handleUnirse(idea.id, idea.fkIdUsuario)"
-        >
-          ¡Me uno!
-        </button>
+        <div class="idea-card__acciones">
+          <template v-if="usersStore.currentUser">
+            <template v-if="usersStore.currentUser.id === idea.fkIdUsuario">
+              <p class="idea-card__mensaje">Eres el creador</p>
+            </template>
+            <template v-else-if="estadoApuntado[idea.id]">
+              <p class="idea-card__mensaje">Ya estás apuntado</p>
+            </template>
+            <template v-else>
+              <button
+                class="idea-card__boton"
+                @click="handleUnirse(idea.id, idea.fkIdUsuario)"
+              >
+                ¡Me uno!
+              </button>
+            </template>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -168,6 +201,16 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
       background-color: #ccc;
       text-decoration: line-through;
     }
+  }
+
+  &__acciones {
+    margin-top: 10px;
+  }
+
+  &__mensaje {
+    font-size: 0.95rem;
+    color: #28a745;
+    font-weight: 600;
   }
 
   &__boton {
