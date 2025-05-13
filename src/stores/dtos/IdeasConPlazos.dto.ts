@@ -5,6 +5,7 @@ export interface IdeaConPlazasDto {
     descripcion: string;
     plazasDisponibles: number;
     plazasLibres: number;
+    plazasTotales: number;
     fkIdRedSocial: number;
     contacto: string;
     fechaPublicacion: Date;

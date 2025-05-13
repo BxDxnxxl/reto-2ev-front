@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
-import Ideas from "@/components/Ideas.vue";
+import Ideas from "@/components/IdeaCard.vue";
 </script>
 
 <template>

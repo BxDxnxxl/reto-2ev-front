@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
-
 import FormularioIdea from "@/components/FormularioIdea.vue";
 
 const ideasStore = useIdeasStore();
@@ -22,15 +21,21 @@ const onIdeaPublicada = async () => {
   await ideasStore.fetchIdeasConPlazas();
 };
 
-const handleUnirse = async (idIdea: number) => {
+const handleUnirse = async (idIdea: number, creadorId: number) => {
   const userId = usersStore.currentUser?.id;
+
   if (!userId) {
     alert("Para realizar esta acción debes iniciar sesión.");
     return;
   }
+
+  if (userId === creadorId) {
+    alert("No puedes unirte a tu propia idea.");
+    return;
+  }
+
   await ideasStore.unirseAIdea(idIdea, userId);
 };
-
 </script>
 
 <template>
@@ -39,10 +44,7 @@ const handleUnirse = async (idIdea: number) => {
       {{ mostrarFormulario ? "Cancelar" : "➕ Añadir idea" }}
     </button>
 
-    <FormularioIdea
-      v-if="mostrarFormulario"
-      @ideaPublicada="onIdeaPublicada"
-    />
+    <FormularioIdea v-if="mostrarFormulario" @ideaPublicada="onIdeaPublicada" />
 
     <div class="ideas__lista">
       <div
@@ -53,14 +55,27 @@ const handleUnirse = async (idIdea: number) => {
         <div class="idea-card__contenido">
           <h3 class="idea-card__titulo">{{ idea.titulo }}</h3>
           <p class="idea-card__descripcion">{{ idea.descripcion }}</p>
+
           <p class="idea-card__plazas">
-            {{ idea.plazasLibres }} plazas libres
+            {{ idea.plazasLibres }} de {{ idea.plazasTotales }} plazas libres
           </p>
+
+          <div class="idea-card__barra-plazas">
+            <div
+              v-for="index in idea.plazasTotales"
+              :key="index"
+              :class="[
+                'idea-card__plaza',
+                index > idea.plazasLibres ? 'idea-card__plaza--ocupada' : ''
+              ]"
+            ></div>
+          </div>
         </div>
 
         <button
           class="idea-card__boton"
-          @click="handleUnirse(idea.id)"
+          v-if="usersStore.currentUser?.id !== idea.fkIdUsuario"
+          @click="handleUnirse(idea.id, idea.fkIdUsuario)"
         >
           ¡Me uno!
         </button>
@@ -93,18 +108,11 @@ const handleUnirse = async (idIdea: number) => {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
 
-  @media (min-width: 768px) {
-    &__lista {
+    @media (min-width: 768px) {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1.5rem;
-    }
-
-    &__boton {
-      font-size: 1.1rem;
-      padding: 12px 18px;
     }
   }
 }
@@ -140,6 +148,26 @@ const handleUnirse = async (idIdea: number) => {
     font-size: 0.95rem;
     font-weight: 600;
     color: #007bff;
+  }
+
+  &__barra-plazas {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__plaza {
+    flex: 1;
+    min-width: 20px;
+    height: 16px;
+    background-color: #d1e8ff;
+    border-radius: 4px;
+
+    &--ocupada {
+      background-color: #ccc;
+      text-decoration: line-through;
+    }
   }
 
   &__boton {
