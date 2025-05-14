@@ -54,6 +54,11 @@ export default {
           Catálogo
         </router-link>
       </li>
+      <li>
+        <router-link to="/ideas" class="header__nav-item header__nav-item--active">
+          Ideas
+        </router-link>
+      </li>
     </ul>
 
     <section class="header__main">

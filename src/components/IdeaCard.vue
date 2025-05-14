@@ -117,129 +117,206 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
   </div>
 </template>
 
+```scss
 <style lang="scss" scoped>
+// Variables para reutilización
+$color-primary: #1e40af; // Azul más oscuro y serio
+$color-primary-light: #3b82f6; // Variante más clara
+$color-light: #f8fafc; // Fondo claro
+$color-dark: #1e293b; // Texto oscuro
+$color-gray: #64748b; // Gris medio para textos secundarios
+$color-gray-light: #e2e8f0; // Gris claro para bordes y elementos secundarios
+$color-success: #10b981; // Verde para mensajes positivos
+$color-disabled: #94a3b8; // Gris para elementos deshabilitados
+$border-radius: 8px;
+$box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$transition: all 0.2s ease-in-out;
+
+// Mixins para reutilización
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+// Estilos principales del componente
 .ideas {
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   width: 100%;
-
+  max-width: 1200px;
+  margin: 0 auto;
+  
   &__boton {
-    background-color: #007bff;
+    @include button-reset;
+    background-color: $color-primary;
     color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    cursor: pointer;
-
+    border-radius: $border-radius;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    box-shadow: $box-shadow;
+    transition: $transition;
+    
     &:hover {
-      background-color: #0056b3;
+      background-color: darken($color-primary, 8%);
+      transform: translateY(-2px);
+    }
+    
+    &:active {
+      transform: translateY(0);
     }
   }
-
+  
   &__lista {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
+    @include flex-column;
+    gap: 1.25rem;
+    
     @media (min-width: 768px) {
-      flex-direction: row;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
+    }
+    
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
     }
   }
 }
 
 .idea-card {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
+  @include flex-column;
+  background-color: $color-light;
+  border-radius: $border-radius;
+  border: 1px solid $color-gray-light;
+  padding: 1.5rem;
+  box-shadow: $box-shadow;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
   &__contenido {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    @include flex-column;
+    gap: 0.75rem;
+    flex: 1;
   }
-
+  
   &__titulo {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-dark;
     margin: 0;
+    line-height: 1.3;
+    position: relative;
+    padding-bottom: 0.75rem;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 2.5rem;
+      background-color: $color-primary-light;
+    }
   }
-
+  
   &__descripcion {
-    font-size: 1rem;
-    line-height: 1.4;
-    color: #333;
-  }
-
-  &__plazas {
     font-size: 0.95rem;
-    font-weight: 600;
-    color: #007bff;
+    line-height: 1.5;
+    color: $color-gray;
+    margin: 0;
+    flex-grow: 1;
   }
-
+  
+  &__plazas {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-primary;
+    margin: 0.5rem 0 0.25rem;
+  }
+  
   &__barra-plazas {
     display: flex;
-    gap: 4px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 0.5rem;
     flex-wrap: wrap;
   }
-
+  
   &__plaza {
+    height: 8px;
     flex: 1;
-    min-width: 20px;
-    height: 16px;
-    background-color: #d1e8ff;
+    min-width: 16px;
+    background-color: lighten($color-primary-light, 30%);
     border-radius: 4px;
-
+    transition: $transition;
+    
     &--ocupada {
-      background-color: #ccc;
-      text-decoration: line-through;
+      background-color: $color-disabled;
     }
   }
-
+  
   &__acciones {
-    margin-top: 10px;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid $color-gray-light;
+    display: flex;
+    justify-content: flex-end;
   }
-
+  
   &__mensaje {
-    font-size: 0.95rem;
-    color: #28a745;
+    font-size: 0.875rem;
     font-weight: 600;
+    color: $color-success;
+    margin: 0;
+    padding: 0.5rem 0;
   }
-
+  
   &__boton {
-    align-self: flex-start;
-    background-color: #007bff;
+    @include button-reset;
+    background-color: $color-primary;
     color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s ease-in-out;
-
+    padding: 0.75rem 1.25rem;
+    border-radius: $border-radius;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: $transition;
+    
     &:hover {
-      background-color: #0056b3;
+      background-color: darken($color-primary, 8%);
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.3);
+    }
+    
+    &:active {
+      transform: scale(0.98);
     }
   }
-
+  
+  // Adaptación responsive
   @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    &__contenido {
-      flex: 1;
-    }
-
-    &__boton {
-      align-self: center;
+    height: 100%; // Para asegurar que todas las cards tengan la misma altura
+    
+    &__acciones {
+      justify-content: flex-end;
     }
   }
 }
