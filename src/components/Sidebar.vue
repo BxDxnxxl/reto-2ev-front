@@ -33,11 +33,15 @@ const isAdmin = computed(() =>
       <button class="sidebar__link" @click="emit('change-view', 'dashboard')">
         Mi Perfil
       </button>
+      <button class="sidebar__link" @click="$emit('change-view', 'solicitudes')">
+  📩    Solicitudes
+      </button>
       <button class="sidebar__link">
         <router-link to="/" class="sidebar__link">
           Inicio
         </router-link>
       </button>
+
     </nav>
     <button class="sidebar__logout" @click="logout">
       Cerrar Sesión
