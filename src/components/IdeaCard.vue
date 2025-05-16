@@ -15,7 +15,7 @@ const estadoAceptado = ref<{ [key: number]: boolean }>({});
 
 onMounted(async () => {
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntadosYAceptados();
+  await verificarEstados();
 });
 
 const toggleFormulario = () => {
@@ -25,23 +25,32 @@ const toggleFormulario = () => {
 const onIdeaPublicada = async () => {
   mostrarFormulario.value = false;
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntadosYAceptados();
+  await verificarEstados();
 };
 
-const verificarApuntadosYAceptados = async () => {
+const verificarEstados = async () => {
   const userId = usersStore.currentUser?.id;
   if (!userId) return;
 
   for (const idea of ideasStore.ideasConPlazas) {
-    const resultado = await usuariosApuntadosStore.verificarEstadoApuntadoYAceptado(idea.id, userId);
-    estadoApuntado.value[idea.id] = resultado.apuntado;
-    estadoAceptado.value[idea.id] = resultado.aceptado;
+    const apuntado = await usuariosApuntadosStore.verificarSiUsuarioApuntado(
+      idea.id,
+      userId
+    );
+    const aceptado = await usuariosApuntadosStore.verificarEstadoApuntadoYAceptado(
+      idea.id,
+      userId
+    );
+
+    console.log(`Idea ${idea.id} => Apuntado: ${apuntado}, Aceptado: ${aceptado}`);
+
+    estadoApuntado.value[idea.id] = apuntado;
+    estadoAceptado.value[idea.id] = aceptado;
   }
 };
 
 const handleUnirse = async (idIdea: number, creadorId: number) => {
   const userId = usersStore.currentUser?.id;
-
   if (!userId) {
     alert("Para realizar esta acción debes iniciar sesión.");
     return;
@@ -59,7 +68,7 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
 
   await usuariosApuntadosStore.unirseAIdea(idIdea, userId);
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntadosYAceptados();
+  await verificarEstados();
 };
 </script>
 
@@ -95,6 +104,21 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
               ]"
             ></div>
           </div>
+
+          <div v-if="usersStore.currentUser">
+            <!-- Mostrar instrucciones y datos si aceptado -->
+            <template v-if="estadoAceptado[idea.id]">
+              <div class="idea-card__extra">
+                <p class="idea-card__instrucciones"><strong>Instrucciones:</strong> {{ idea.instrucciones }}</p>
+                <p class="idea-card__contacto"><strong>Contacto:</strong> {{ idea.contacto }}</p>
+                <p class="idea-card__red"><strong>Red Social:</strong> {{ idea.redSocialNombre }}</p>
+              </div>
+            </template>
+            <!-- Mostrar pendiente si apuntado pero no aceptado -->
+            <template v-else-if="estadoApuntado[idea.id]">
+              <p class="idea-card__mensaje">Pendiente de ser aceptado</p>
+            </template>
+          </div>
         </div>
 
         <div class="idea-card__acciones">
@@ -103,16 +127,7 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
               <p class="idea-card__mensaje">Eres el creador</p>
             </template>
             <template v-else-if="estadoApuntado[idea.id]">
-              <template v-if="estadoAceptado[idea.id]">
-                <div class="idea-card__extra">
-                  <p class="idea-card__instrucciones"><strong>Instrucciones:</strong> {{ idea.instrucciones }}</p>
-                  <p class="idea-card__contacto"><strong>Contacto:</strong> {{ idea.contacto }}</p>
-                  <p class="idea-card__red"><strong>Red Social:</strong> {{ idea.nombreRedSocial }}</p>
-                </div>
-              </template>
-              <template v-else>
-                <p class="idea-card__mensaje">Pendiente de ser aceptado</p>
-              </template>
+              <p class="idea-card__mensaje">Ya estás apuntado</p>
             </template>
             <template v-else>
               <button
@@ -128,6 +143,7 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     </div>
   </div>
 </template>
+
 
 <style lang="scss" scoped>
 // Variables para reutilización

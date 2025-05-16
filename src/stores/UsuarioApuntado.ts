@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import type { AceptarUsuarioDto } from "@/stores/dtos/AceptarUsuario.dto";
+import type { SolicitudRecibidaDto } from "@/stores/dtos/SolicitudRecibida.dto";
 
 export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => {
 
@@ -51,21 +53,31 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
 
   async function aceptarUsuarioApuntado(idIdea: number, idUsuario: number) {
     try {
+      console.log(idIdea);
+      console.log(idUsuario);
+      
+      const dto: AceptarUsuarioDto = {
+        fkIdIdea: idIdea,
+        fkIdUsuario: idUsuario
+      };
+      
+      console.log(dto);
+      
       const response = await fetch("http://localhost:4444/api/usuariosapuntados/aceptar", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idIdea, idUsuario })
+        body: JSON.stringify(dto) // <-- CORREGIDO
       });
-
+  
       if (!response.ok) throw new Error("Error al aceptar al usuario apuntado");
     } catch (error) {
       console.error("Error al aceptar usuario:", error);
     }
   }
 
-  async function fetchSolicitudesRecibidas(idCreador: number): Promise<any[]> {
+  async function fetchSolicitudesRecibidas(idCreador: number): Promise<SolicitudRecibidaDto[]> {
     try {
-      const response = await fetch(`http://localhost:4444/api/usuariosapuntados/solicitudes-recibidas/${idCreador}`);
+      const response = await fetch(`http://localhost:4444/api/UsuariosApuntados/solicitudes-recibidas/${idCreador}`);
       if (!response.ok) throw new Error("Error al cargar solicitudes recibidas");
       return await response.json();
     } catch (error) {
