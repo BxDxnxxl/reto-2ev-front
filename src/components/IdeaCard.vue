@@ -2,18 +2,20 @@
 import { onMounted, ref } from "vue";
 import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
+import { useUsuariosApuntadosStore } from "@/stores/UsuarioApuntado";
 import FormularioIdea from "@/components/FormularioIdea.vue";
 
 const ideasStore = useIdeasStore();
 const usersStore = useUsersStore();
-const mostrarFormulario = ref(false);
-const ideasApuntadasIds = ref<number[]>([]); // Solo se usa para precarga
+const usuariosApuntadosStore = useUsuariosApuntadosStore();
 
-const estadoApuntado = ref<{ [key: number]: boolean }>({}); // idea.id -> true/false
+const mostrarFormulario = ref(false);
+const estadoApuntado = ref<{ [key: number]: boolean }>({});
+const estadoAceptado = ref<{ [key: number]: boolean }>({});
 
 onMounted(async () => {
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntados();
+  await verificarApuntadosYAceptados();
 });
 
 const toggleFormulario = () => {
@@ -23,16 +25,17 @@ const toggleFormulario = () => {
 const onIdeaPublicada = async () => {
   mostrarFormulario.value = false;
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntados();
+  await verificarApuntadosYAceptados();
 };
 
-const verificarApuntados = async () => {
+const verificarApuntadosYAceptados = async () => {
   const userId = usersStore.currentUser?.id;
   if (!userId) return;
 
   for (const idea of ideasStore.ideasConPlazas) {
-    const esta = await ideasStore.verificarSiUsuarioApuntado(idea.id, userId);
-    estadoApuntado.value[idea.id] = esta;
+    const resultado = await usuariosApuntadosStore.verificarEstadoApuntadoYAceptado(idea.id, userId);
+    estadoApuntado.value[idea.id] = resultado.apuntado;
+    estadoAceptado.value[idea.id] = resultado.aceptado;
   }
 };
 
@@ -54,9 +57,9 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     return;
   }
 
-  await ideasStore.unirseAIdea(idIdea, userId);
+  await usuariosApuntadosStore.unirseAIdea(idIdea, userId);
   await ideasStore.fetchIdeasConPlazas();
-  await verificarApuntados();
+  await verificarApuntadosYAceptados();
 };
 </script>
 
@@ -100,7 +103,16 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
               <p class="idea-card__mensaje">Eres el creador</p>
             </template>
             <template v-else-if="estadoApuntado[idea.id]">
-              <p class="idea-card__mensaje">Ya estás apuntado</p>
+              <template v-if="estadoAceptado[idea.id]">
+                <div class="idea-card__extra">
+                  <p class="idea-card__instrucciones"><strong>Instrucciones:</strong> {{ idea.instrucciones }}</p>
+                  <p class="idea-card__contacto"><strong>Contacto:</strong> {{ idea.contacto }}</p>
+                  <p class="idea-card__red"><strong>Red Social:</strong> {{ idea.nombreRedSocial }}</p>
+                </div>
+              </template>
+              <template v-else>
+                <p class="idea-card__mensaje">Pendiente de ser aceptado</p>
+              </template>
             </template>
             <template v-else>
               <button
@@ -117,7 +129,6 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
   </div>
 </template>
 
-```scss
 <style lang="scss" scoped>
 // Variables para reutilización
 $color-primary: #1e40af; // Azul más oscuro y serio
@@ -310,7 +321,18 @@ $transition: all 0.2s ease-in-out;
       transform: scale(0.98);
     }
   }
-  
+  .idea-card__extra {
+  margin-top: 1rem;
+  background: #f0f4ff;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+
+  p {
+    margin: 0.3rem 0;
+  }
+}
+
   // Adaptación responsive
   @media (min-width: 768px) {
     height: 100%; // Para asegurar que todas las cards tengan la misma altura

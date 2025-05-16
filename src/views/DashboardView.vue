@@ -2,6 +2,7 @@
 import Sidebar from '@/components/Sidebar.vue'
 import DashboardMain from '@/components/DashboardMain.vue'
 import ListaUsuarios from '@/components/ListaUsuarios.vue'
+import SolicitudesRecibidas from '@/components/GestionIdeasPropias.vue'
 import { ref, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRouter } from 'vue-router'
@@ -10,10 +11,10 @@ const userStore = useUsersStore()
 const router = useRouter()
 const isLoggedIn = computed(() => !!userStore.currentUser)
 
-// Estado para manejar qué vista se muestra
-const currentView = ref<'dashboard' | 'usuarios'>('dashboard')
+// Añadimos 'solicitudes' como opción válida
+const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes'>('dashboard')
 
-const changeView = (view: 'dashboard' | 'usuarios') => {
+const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes') => {
   currentView.value = view
 }
 </script>
@@ -35,8 +36,13 @@ const changeView = (view: 'dashboard' | 'usuarios') => {
           <div v-if="currentView === 'dashboard'" class="dashboard__panel">
             <DashboardMain />
           </div>
-          <div v-else class="dashboard__panel">
+
+          <div v-else-if="currentView === 'usuarios'" class="dashboard__panel">
             <ListaUsuarios />
+          </div>
+
+          <div v-else-if="currentView === 'solicitudes'" class="dashboard__panel">
+            <SolicitudesRecibidas />
           </div>
         </div>
       </div>

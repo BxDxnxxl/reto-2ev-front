@@ -19,6 +19,7 @@ const nuevaIdea = ref<Ideas>({
   plazasDisponibles: 1,
   fkIdRedSocial: 1,
   contacto: "",
+  instrucciones: "",
   fechaPublicacion: new Date()
 });
 
@@ -41,6 +42,7 @@ const publicar = async () => {
     plazasDisponibles: 1,
     fkIdRedSocial: 1,
     contacto: "",
+    instrucciones: "",
     fechaPublicacion: new Date()
   };
 };
@@ -64,6 +66,13 @@ onMounted(async () => {
       class="formulario-idea__textarea"
       placeholder="Descripción"
       v-model="nuevaIdea.descripcion"
+      required
+    />
+
+    <textarea
+      class="formulario-idea__textarea"
+      placeholder="Instrucciones para los participantes"
+      v-model="nuevaIdea.instrucciones"
       required
     />
 
@@ -100,22 +109,19 @@ onMounted(async () => {
   </form>
 </template>
 
-```scss
 <style lang="scss" scoped>
-// Variables para reutilización - mantengo consistencia con el estilo anterior
-$color-primary: #1e40af; // Azul más oscuro y serio
-$color-primary-light: #3b82f6; // Variante más clara
-$color-light: #f8fafc; // Fondo claro
-$color-dark: #1e293b; // Texto oscuro
-$color-gray: #64748b; // Gris medio para textos secundarios
-$color-gray-light: #e2e8f0; // Gris claro para bordes y elementos secundarios
-$color-success: #10b981; // Verde para botones de acción positiva
-$color-error: #ef4444; // Rojo para errores y validaciones
+$color-primary: #1e40af;
+$color-primary-light: #3b82f6;
+$color-light: #f8fafc;
+$color-dark: #1e293b; 
+$color-gray: #64748b;
+$color-gray-light: #e2e8f0;
+$color-success: #10b981;
+$color-error: #ef4444;
 $border-radius: 8px;
 $box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 $transition: all 0.2s ease-in-out;
 
-// Mixins para reutilización
 @mixin input-base {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -161,7 +167,6 @@ $transition: all 0.2s ease-in-out;
   }
 }
 
-// Estilos del formulario
 .formulario-idea {
   background-color: white;
   border-radius: $border-radius;
@@ -174,7 +179,6 @@ $transition: all 0.2s ease-in-out;
   margin-bottom: 2rem;
   position: relative;
   
-  // Encabezado visual para el formulario
   &::before {
     content: '';
     position: absolute;
@@ -190,9 +194,8 @@ $transition: all 0.2s ease-in-out;
     @include input-base;
     height: 3rem;
     
-    // Estilos específicos para input tipo number
     &[type="number"] {
-      -moz-appearance: textfield; // Firefox
+      -moz-appearance: textfield;
       
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {

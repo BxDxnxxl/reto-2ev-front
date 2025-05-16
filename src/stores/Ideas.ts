@@ -27,58 +27,20 @@ export const useIdeasStore = defineStore("ideas", () => {
     }
   }
 
-  async function unirseAIdea(idIdea: number, idUsuario: number) {
-    try {
-      const response = await fetch(`http://localhost:4444/api/usuariosapuntados/apuntarse?idIdea=${idIdea}&idUsuario=${idUsuario}`, {
-        method: "POST"
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
-
-      await fetchIdeasConPlazas();
-    } catch (error) {
-      console.error("Error al unirse a la idea:", error);
-    }
-  }
-
-  async function verificarSiUsuarioApuntado(fkIdIdea: number, fkIdUsuario: number): Promise<boolean> {
-    try {
-      const response = await fetch("http://localhost:4444/api/usuariosapuntados/existe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ fkIdIdea, fkIdUsuario })
-      });
-  
-      if (!response.ok) throw new Error("Error al verificar si está apuntado");
-  
-      return await response.json(); // Devuelve true o false
-    } catch (error) {
-      console.error("Error en verificarSiUsuarioApuntado:", error);
-      return false;
-    }
-  }  
-
   async function publicarIdea(nuevaIdea: Ideas) {
     try {
       const response = await fetch("http://localhost:4444/api/ideas", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaIdea)
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al publicar la idea: ${errorText}`);
       }
-  
-      await fetchIdeasConPlazas(); // Recargar tras publicar
+
+      await fetchIdeasConPlazas();
     } catch (error) {
       console.error("Error al publicar idea:", error);
     }
@@ -89,8 +51,6 @@ export const useIdeasStore = defineStore("ideas", () => {
     ideasConPlazas,
     fetchIdeasBase,
     fetchIdeasConPlazas,
-    unirseAIdea,
-    publicarIdea,
-    verificarSiUsuarioApuntado
+    publicarIdea
   };
 });
