@@ -56,7 +56,7 @@ export default {
       </li>
       <li>
         <router-link to="/ideas" class="header__nav-item header__nav-item--active">
-          Ideas
+          WannaShare
         </router-link>
       </li>
     </ul>

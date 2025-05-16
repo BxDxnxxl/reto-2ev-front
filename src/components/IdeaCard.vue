@@ -90,33 +90,34 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
           <h3 class="idea-card__titulo">{{ idea.titulo }}</h3>
           <p class="idea-card__descripcion">{{ idea.descripcion }}</p>
 
-          <p class="idea-card__plazas">
-            {{ idea.plazasLibres }} de {{ idea.plazasTotales }} plazas libres
-          </p>
+          <!-- Contenedor fijo para plazas -->
+          <div class="idea-card__plazas-container">
+            <p class="idea-card__plazas">
+              {{ idea.plazasLibres }} de {{ idea.plazasTotales }} plazas libres
+            </p>
 
-          <div class="idea-card__barra-plazas">
-            <div
-              v-for="index in idea.plazasTotales"
-              :key="index"
-              :class="[
-                'idea-card__plaza',
-                index > idea.plazasLibres ? 'idea-card__plaza--ocupada' : ''
-              ]"
-            ></div>
+            <div class="idea-card__barra-plazas">
+              <div
+                v-for="index in idea.plazasTotales"
+                :key="index"
+                :class="[
+                  'idea-card__plaza',
+                  index > idea.plazasLibres ? 'idea-card__plaza--ocupada' : ''
+                ]"
+              ></div>
+            </div>
           </div>
 
           <div v-if="usersStore.currentUser">
-            <!-- Mostrar instrucciones y datos si aceptado -->
             <template v-if="estadoAceptado[idea.id]">
               <div class="idea-card__extra">
-                <p class="idea-card__instrucciones"><strong>Instrucciones:</strong> {{ idea.instrucciones }}</p>
-                <p class="idea-card__contacto"><strong>Contacto:</strong> {{ idea.contacto }}</p>
-                <p class="idea-card__red"><strong>Red Social:</strong> {{ idea.redSocialNombre }}</p>
+                <p><strong>Instrucciones:</strong> {{ idea.instrucciones }}</p>
+                <p><strong>Contacto:</strong> {{ idea.contacto }}</p>
+                <p><strong>Red Social:</strong> {{ idea.redSocialNombre }}</p>
               </div>
             </template>
-            <!-- Mostrar pendiente si apuntado pero no aceptado -->
             <template v-else-if="estadoApuntado[idea.id]">
-              <p class="idea-card__mensaje">Pendiente de ser aceptado</p>
+              <p class="idea-card__pendiente">Pendiente de ser aceptado</p>
             </template>
           </div>
         </div>
@@ -143,23 +144,20 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     </div>
   </div>
 </template>
-
-
 <style lang="scss" scoped>
-// Variables para reutilización
-$color-primary: #1e40af; // Azul más oscuro y serio
-$color-primary-light: #3b82f6; // Variante más clara
-$color-light: #f8fafc; // Fondo claro
-$color-dark: #1e293b; // Texto oscuro
-$color-gray: #64748b; // Gris medio para textos secundarios
-$color-gray-light: #e2e8f0; // Gris claro para bordes y elementos secundarios
-$color-success: #10b981; // Verde para mensajes positivos
-$color-disabled: #94a3b8; // Gris para elementos deshabilitados
+$color-primary: #1e40af;
+$color-primary-light: #3b82f6;
+$color-light: #f8fafc;
+$color-dark: #1e293b;
+$color-gray: #64748b;
+$color-gray-light: #e2e8f0;
+$color-success: #10b981;
+$color-warning: #facc15;
+$color-disabled: #94a3b8;
 $border-radius: 8px;
 $box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 $transition: all 0.2s ease-in-out;
 
-// Mixins para reutilización
 @mixin flex-column {
   display: flex;
   flex-direction: column;
@@ -175,13 +173,12 @@ $transition: all 0.2s ease-in-out;
   margin: 0;
 }
 
-// Estilos principales del componente
 .ideas {
   padding: 1.25rem 1rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  
+
   &__boton {
     @include button-reset;
     background-color: $color-primary;
@@ -193,27 +190,27 @@ $transition: all 0.2s ease-in-out;
     margin-bottom: 1.5rem;
     box-shadow: $box-shadow;
     transition: $transition;
-    
+
     &:hover {
       background-color: darken($color-primary, 8%);
       transform: translateY(-2px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }
   }
-  
+
   &__lista {
     @include flex-column;
     gap: 1.25rem;
-    
+
     @media (min-width: 768px) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
     }
-    
+
     @media (min-width: 1024px) {
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 2rem;
@@ -222,27 +219,28 @@ $transition: all 0.2s ease-in-out;
 }
 
 .idea-card {
-  @include flex-column;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: $color-light;
   border-radius: $border-radius;
   border: 1px solid $color-gray-light;
   padding: 1.5rem;
   box-shadow: $box-shadow;
   transition: $transition;
-  position: relative;
-  overflow: hidden;
-  
+  height: 100%;
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
-  
+
   &__contenido {
-    @include flex-column;
-    gap: 0.75rem;
-    flex: 1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
-  
+
   &__titulo {
     font-size: 1.25rem;
     font-weight: 700;
@@ -251,7 +249,7 @@ $transition: all 0.2s ease-in-out;
     line-height: 1.3;
     position: relative;
     padding-bottom: 0.75rem;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -262,7 +260,7 @@ $transition: all 0.2s ease-in-out;
       background-color: $color-primary-light;
     }
   }
-  
+
   &__descripcion {
     font-size: 0.95rem;
     line-height: 1.5;
@@ -270,21 +268,25 @@ $transition: all 0.2s ease-in-out;
     margin: 0;
     flex-grow: 1;
   }
-  
+
+  &__plazas-container {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
   &__plazas {
     font-size: 0.875rem;
     font-weight: 600;
     color: $color-primary;
-    margin: 0.5rem 0 0.25rem;
+    margin: 0 0 0.25rem;
   }
-  
+
   &__barra-plazas {
     display: flex;
     gap: 6px;
-    margin-top: 0.5rem;
     flex-wrap: wrap;
   }
-  
+
   &__plaza {
     height: 8px;
     flex: 1;
@@ -292,20 +294,20 @@ $transition: all 0.2s ease-in-out;
     background-color: lighten($color-primary-light, 30%);
     border-radius: 4px;
     transition: $transition;
-    
+
     &--ocupada {
       background-color: $color-disabled;
     }
   }
-  
+
   &__acciones {
-    margin-top: 1.5rem;
     padding-top: 1.25rem;
     border-top: 1px solid $color-gray-light;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
   }
-  
+
   &__mensaje {
     font-size: 0.875rem;
     font-weight: 600;
@@ -313,7 +315,7 @@ $transition: all 0.2s ease-in-out;
     margin: 0;
     padding: 0.5rem 0;
   }
-  
+
   &__boton {
     @include button-reset;
     background-color: $color-primary;
@@ -323,39 +325,48 @@ $transition: all 0.2s ease-in-out;
     font-weight: 600;
     font-size: 0.9rem;
     transition: $transition;
-    
+
     &:hover {
       background-color: darken($color-primary, 8%);
     }
-    
+
     &:focus {
       outline: none;
       box-shadow: 0 0 0 3px rgba($color-primary, 0.3);
     }
-    
+
     &:active {
       transform: scale(0.98);
     }
   }
-  .idea-card__extra {
-  margin-top: 1rem;
-  background: #f0f4ff;
-  padding: 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
 
-  p {
-    margin: 0.3rem 0;
-  }
-}
+  &__extra {
+    margin-top: 1rem;
+    background: #eff6ff;
+    padding: 1rem;
+    border-left: 4px solid $color-primary;
+    border-radius: 6px;
+    font-size: 0.9rem;
 
-  // Adaptación responsive
-  @media (min-width: 768px) {
-    height: 100%; // Para asegurar que todas las cards tengan la misma altura
-    
-    &__acciones {
-      justify-content: flex-end;
+    p {
+      margin: 0.3rem 0;
+      color: $color-dark;
+
+      strong {
+        color: $color-primary;
+      }
     }
+  }
+
+  &__pendiente {
+    font-size: 0.875rem;
+    color: $color-warning;
+    font-weight: 600;
+    background: #fef9c3;
+    border-left: 4px solid $color-warning;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.75rem;
   }
 }
 </style>
