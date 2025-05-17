@@ -3,6 +3,7 @@ import Sidebar from '@/components/Sidebar.vue'
 import DashboardMain from '@/components/DashboardMain.vue'
 import ListaUsuarios from '@/components/ListaUsuarios.vue'
 import SolicitudesRecibidas from '@/components/GestionIdeasPropias.vue'
+import Empresas from '@/components/VerEmpresas.vue'
 import { ref, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRouter } from 'vue-router'
@@ -10,11 +11,12 @@ import { useRouter } from 'vue-router'
 const userStore = useUsersStore()
 const router = useRouter()
 const isLoggedIn = computed(() => !!userStore.currentUser)
+console.log(isLoggedIn);
 
 // Añadimos 'solicitudes' como opción válida
-const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes'>('dashboard')
+const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'>('dashboard')
 
-const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes') => {
+const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas') => {
   currentView.value = view
 }
 </script>
@@ -43,6 +45,10 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes') => {
 
           <div v-else-if="currentView === 'solicitudes'" class="dashboard__panel">
             <SolicitudesRecibidas />
+          </div>
+
+          <div v-else-if="currentView === 'empresas'" class="dashboard__panel">
+            <Empresas />
           </div>
         </div>
       </div>
