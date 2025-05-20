@@ -1,9 +1,13 @@
 export interface Review {
-    id: number
-    fkIdVideojuego: number
-    contenido: string
-    puntuacion: number
-    opinionPersonal: string  
-    trailer: string          
-    fecha: string 
+  id: number
+  contenido: string
+  sitioOficial: string
+  sitioCompra: string
+  metacritic: string
+  trailer: string
+  opinionPersonal: string
+  puntuacion: number
+  duracionJuego: number
+  fkIdVideojuego: number
 }
+

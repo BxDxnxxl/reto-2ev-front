@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Review } from '@/stores/dtos/Review.dto'
 
-const API_URL = 'http://localhost:5000/api/Review'
+const API_URL = 'http://localhost:4444/api/Review'
 
 export const useReviewStore = defineStore('review', () => {
   // Estado
