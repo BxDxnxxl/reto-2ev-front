@@ -36,6 +36,9 @@ const isAdmin = computed(() =>
       <button class="sidebar__link" @click="$emit('change-view', 'solicitudes')">
   📩    Solicitudes
       </button>
+      <button v-if="isAdmin" class="sidebar__link" @click="emit('change-view', 'empresas')">
+        Empresas
+      </button>
       <button class="sidebar__link">
         <router-link to="/" class="sidebar__link">
           Inicio
