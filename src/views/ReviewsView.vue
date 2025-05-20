@@ -10,7 +10,6 @@ import RatingBox from '@/components/RatingBox.vue'
     <ReviewPrincipal />
     <GameDetails />
     <PersonalExperience />
-    <RatingBox />
   </div>
 </template>
 
