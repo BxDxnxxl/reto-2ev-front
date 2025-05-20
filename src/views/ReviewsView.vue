@@ -2,7 +2,7 @@
 import ReviewPrincipal from '@/components/ReviewPrincipal.vue'
 import GameDetails from '@/components/GameDetails.vue'
 import PersonalExperience from '@/components/PersonalExperience.vue'
-import RatingBox from '@/components/RatingBox.vue'
+
 </script>
 
 <template>
