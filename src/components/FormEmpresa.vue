@@ -14,7 +14,7 @@ const empresa = ref<EmpresaDto>({
   fechaAlta: new Date(),
   activa: true,
   acuerdo: 0,
-  limiteDestacadasMensual: null
+  limiteDestacadasMensual: 0
 });
 
 function submitForm() {

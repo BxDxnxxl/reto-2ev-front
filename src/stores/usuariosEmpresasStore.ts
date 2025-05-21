@@ -40,10 +40,23 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
     }
   }
 
+  async function getEmpresasDeUsuario(idUsuario: number): Promise<number[]> {
+    try {
+      const res = await fetch(`http://localhost:4444/api/UsuariosEmpresas/usuario/${idUsuario}`);
+      if (!res.ok) throw new Error('Error al obtener empresas del usuario');
+      return await res.json();
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  }  
+  
+
   return {
     relaciones,
     fetchRelaciones,
     addRelacion,
     deleteRelacion,
+    getEmpresasDeUsuario
   };
 });
