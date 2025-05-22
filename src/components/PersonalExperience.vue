@@ -6,7 +6,7 @@ const review = useReviewStore().review
 
 <template>
     <div class="experience">
-        <h3>Mi experiencia personal</h3>
+        <h3>Opinion Personal</h3>
         <p>{{ review?.opinionPersonal }}</p>
     </div>
 </template>
