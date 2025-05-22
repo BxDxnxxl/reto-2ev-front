@@ -1,10 +1,7 @@
-export interface PublicacionEmpresaDto {
+export interface PublicacionTablaEmpresaDto {
   id: number;
-  idEmpresa: number;
-  idUsuario: number;
   titulo: string;
   contenido?: string;
-  imagen?: string;
   fechaPublicacion: Date;
   esDestacada: boolean;
 }

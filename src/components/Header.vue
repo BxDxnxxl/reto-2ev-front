@@ -1,36 +1,25 @@
-<script>
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useUsersStore } from '@/stores/users';
-import { computed } from 'vue';
-import PerfilAnimado from './PerfilAnimado.vue'
-import LogoCanvasAnimation from './LogoCanvasAnimation.vue'
+import { useRolesStore } from '@/stores/roles';
+import PerfilAnimado from './PerfilAnimado.vue';
+import LogoCanvasAnimation from './LogoCanvasAnimation.vue';
 
-export default {
-  components: {
-    PerfilAnimado,
-    LogoCanvasAnimation,
-  },
-  setup() {
-    const userStore = useUsersStore();
-    
-    const isLoggedIn = computed(() => !!userStore.currentUser);
-    const username = computed(() => userStore.currentUser?.username || 'Iniciar Sesión');
+const userStore = useUsersStore();
+const rolesStore = useRolesStore();
+const menuOpen = ref(false);
 
-    return {
-      userStore,
-      isLoggedIn,
-      username
-    }
-  },
-  data() {
-    return {
-      menuOpen: false,
-    }
-  },
-  methods: {
-    toggleMenu() {
-      this.menuOpen = !this.menuOpen;
-    },
-  },
+const isLoggedIn = computed(() => !!userStore.currentUser);
+const username = computed(() => userStore.currentUser?.username || 'Iniciar Sesión');
+
+// Roles permitidos para mostrar el enlace
+const puedeVerNoticiasAfiliado = computed(() => {
+  const rolesUsuario = userStore.currentUser?.roles.map(r => r.id) || [];
+  return rolesUsuario.includes(rolesStore.ADMIN) || rolesUsuario.includes(rolesStore.USUARIO_AFILIADO);
+});
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value;
 }
 </script>
 
@@ -57,6 +46,11 @@ export default {
       <li>
         <router-link to="/ideas" class="header__nav-item header__nav-item--active">
           WannaShare
+        </router-link>
+      </li>
+      <li v-if="puedeVerNoticiasAfiliado">
+        <router-link to="/noticiasafiliado" class="header__nav-item header__nav-item--active">
+          Noticias Afiliado
         </router-link>
       </li>
     </ul>

@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { PublicacionEmpresaDto } from "@/stores/dtos/PublicacionEmpresa.dto";
+import type { PublicacionTablaEmpresaDto } from "@/stores/dtos/PublicacionTablaEmpresa.dto";
 
 export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas", () => {
   const publicaciones = ref<PublicacionEmpresaDto[]>([]);
   const destacadasNoLeidas = ref<PublicacionEmpresaDto[]>([]);
+  const noticiasEmpresaAfiliada = ref<PublicacionTablaEmpresaDto[]>([]);
 
   async function fetchPublicaciones() {
     try {
@@ -18,9 +20,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function fetchPublicacionesDestacadasNoLeidas(idUsuario: number) {
     try {
-      const res = await fetch(
-        `http://localhost:4444/api/PublicacionesEmpresas/destacadas-no-leidas/${idUsuario}`
-      );
+      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/destacadas-no-leidas/${idUsuario}`);
       if (!res.ok) throw new Error("Error al cargar destacadas no leídas");
       destacadasNoLeidas.value = await res.json();
     } catch (err) {
@@ -28,10 +28,64 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     }
   }
 
+  async function fetchNoticiasEmpresaAfiliada(idUsuario: number) {
+    try {
+      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/noticias-afiliado/${idUsuario}`);
+      if (!res.ok) throw new Error('Error al cargar noticias de empresa afiliada');
+      noticiasEmpresaAfiliada.value = await res.json();
+    } catch (error) {
+      console.error('Error en fetchNoticiasEmpresaAfiliada:', error);
+    }
+  }
+
+  async function addPublicacion(publicacion: PublicacionEmpresaDto) {
+    try {
+      publicacion.fechaPublicacion = new Date(publicacion.fechaPublicacion).toISOString();
+
+      await fetch("http://localhost:4444/api/PublicacionesEmpresas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(publicacion),
+      });
+      await fetchPublicaciones();
+    } catch (err) {
+      console.error("Error al añadir publicación:", err);
+    }
+  }
+
+  async function updatePublicacion(publicacion: PublicacionEmpresaDto) {
+    try {
+      await fetch(`http://localhost:4444/api/PublicacionesEmpresas/${publicacion.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(publicacion),
+      });
+      await fetchPublicaciones();
+    } catch (err) {
+      console.error("Error al actualizar publicación:", err);
+    }
+  }
+
+  async function deletePublicacion(id: number) {
+    try {
+      await fetch(`http://localhost:4444/api/PublicacionesEmpresas/${id}`, {
+        method: "DELETE",
+      });
+      await fetchPublicaciones();
+    } catch (err) {
+      console.error("Error al eliminar publicación:", err);
+    }
+  }
+
   return {
     publicaciones,
     destacadasNoLeidas,
+    noticiasEmpresaAfiliada,
     fetchPublicaciones,
     fetchPublicacionesDestacadasNoLeidas,
+    fetchNoticiasEmpresaAfiliada,
+    addPublicacion,
+    updatePublicacion,
+    deletePublicacion,
   };
 });
