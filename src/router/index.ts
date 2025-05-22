@@ -7,6 +7,7 @@ import Dashboard from '@/views/DashboardView.vue'
 import Catalog from '@/views/CatalogView.vue'
 import DetalleVideojuego from '@/views/DetalleVideojuegoView.vue'
 import ReviewsView from '@/views/ReviewsView.vue'
+import IdeasView from '@/views/IdeasView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/reviewVideojuego',
       name: 'reviewVideojuego',
       component: ReviewsView,
+    },
+    {
+      path: '/ideas',
+      name: 'ideas',
+      component: IdeasView,
     },
   ],
 })
