@@ -1,7 +1,7 @@
 export interface PublicacionEmpresaDto {
   id: number;
-  idEmpresa: number;
-  idUsuario: number;
+  FkIdEmpresa: number;
+  FkIdUsuario: number;
   titulo: string;
   contenido?: string;
   imagen?: string;

@@ -38,7 +38,7 @@ async function guardarPublicacion(pub: PublicacionEmpresaDto) {
     }
 
     // Asignar empresa afiliada
-    pub.idEmpresa = empresasAfiliadas[0];
+    pub.FkIdEmpresa = empresasAfiliadas[0];
 
     // Guardar
     if (pub.id && pub.id > 0) {
