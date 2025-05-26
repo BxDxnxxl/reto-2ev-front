@@ -48,6 +48,11 @@ function toggleMenu() {
           WannaShare
         </router-link>
       </li>
+      <li>
+        <router-link to="/novedades" class="header__nav-item header__nav-item--active">
+          Novedades
+        </router-link>
+      </li>
       <li v-if="puedeVerNoticiasAfiliado">
         <router-link to="/noticiasafiliado" class="header__nav-item header__nav-item--active">
           Noticias Afiliado

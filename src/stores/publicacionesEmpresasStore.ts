@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { PublicacionEmpresaDto } from "@/stores/dtos/PublicacionEmpresa.dto";
 import type { PublicacionTablaEmpresaDto } from "@/stores/dtos/PublicacionTablaEmpresa.dto";
+import type { NovedadesDto } from "@/stores/dtos/Novedades.dto";
 
 export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas", () => {
   const publicaciones = ref<PublicacionEmpresaDto[]>([]);
   const destacadasNoLeidas = ref<PublicacionEmpresaDto[]>([]);
   const noticiasEmpresaAfiliada = ref<PublicacionTablaEmpresaDto[]>([]);
+  const novedades = ref<NovedadesDto[]>([]);
 
   async function fetchPublicaciones() {
     try {
@@ -77,7 +79,14 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     }
   }
 
+  async function fetchNovedades() {
+    const res = await fetch("http://localhost:4444/api/PublicacionesEmpresas/novedades");
+    if (!res.ok) throw new Error("Error al cargar novedades");
+    novedades.value = await res.json();
+  }
+
   return {
+    novedades,
     publicaciones,
     destacadasNoLeidas,
     noticiasEmpresaAfiliada,
@@ -87,5 +96,6 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     addPublicacion,
     updatePublicacion,
     deletePublicacion,
+    fetchNovedades
   };
 });
