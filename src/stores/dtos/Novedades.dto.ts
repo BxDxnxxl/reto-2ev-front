@@ -7,7 +7,7 @@ export interface NovedadesDto {
     imagen: string;
     nombreEmpresa: string;
     logoEmpresa: string;
-    emailAutor: string;
+    emailUsuario: string;
     acuerdoEmpresa: number;
     idUsuario: number;
   }

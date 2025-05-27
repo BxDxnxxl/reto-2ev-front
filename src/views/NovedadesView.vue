@@ -22,14 +22,6 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
 
   &__contenido {
     flex: 1;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 2rem;
-
-    @media (min-width: 768px) {
-      padding-left: 5%;
-      padding-right: 5%;
-    }
   }
 }
 </style>

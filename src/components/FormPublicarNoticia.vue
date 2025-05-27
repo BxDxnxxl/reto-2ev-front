@@ -32,9 +32,7 @@ onMounted(async () => {
   const empresas = await usuariosEmpresasStore.getEmpresasDeUsuario(userId);
   if (empresas.length > 0) {
     publicacion.value.FkIdEmpresa = empresas[0];
-    const puedeDestacar = await usuariosEmpresasStore.checkLimiteDestacadas(empresas[0]);
-  } else {
-    puedeDestacar.value = false;
+    puedeDestacar.value = await usuariosEmpresasStore.checkLimiteDestacadas(empresas[0]);
   }
 });
 

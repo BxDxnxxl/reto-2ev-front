@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useEmpresasStore } from '@/stores/empresasStore';
+import type { ActualizarAcuerdoDto } from '@/stores/dtos/ActualizarAcuerdo.dto';
 import FormEmpresa from '@/components/FormEmpresa.vue';
 import Swal from 'sweetalert2';
 
@@ -38,6 +39,28 @@ async function guardarEmpresa(empresa: any) {
   await store.fetchEmpresasConAfiliados();
   mostrarFormulario.value = false;
 }
+
+async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
+  const dto: ActualizarAcuerdoDto = {
+    idEmpresa,
+    nuevoAcuerdo
+  };
+
+  try {
+    const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/actualizar-acuerdo/${idEmpresa}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dto)
+    });
+
+    if (!res.ok) throw new Error('Error al actualizar el acuerdo');
+    const data = await res.json();
+    Swal.fire('Actualizado', data.mensaje, 'success');
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire('Error', 'No se pudo actualizar el acuerdo.', 'error');
+  }
+}
 </script>
 
 <template>
@@ -73,7 +96,18 @@ async function guardarEmpresa(empresa: any) {
             <tr v-for="empresa in store.empresasConAfiliados" :key="empresa.id" class="empresas__fila">
               <td class="text-center">{{ empresa.nombre }}</td>
               <td class="text-center">{{ empresa.web }}</td>
-              <td class="text-center">{{ empresa.acuerdo }}</td>
+              <td class="text-center">
+                <select
+                  v-model.number="empresa.acuerdo"
+                  @change="actualizarAcuerdo(empresa.id, empresa.acuerdo)"
+                  class="empresa__select-acuerdo"
+                >
+                  <option :value="0">Sin acuerdo</option>
+                  <option :value="1">Plan Básico</option>
+                  <option :value="2">Plan Avanzado</option>
+                  <option :value="3">Plan Premium</option>
+                </select>
+              </td>
               <td class="text-center">{{ empresa.limiteDestacadasMensual }}</td>
               <td class="text-center">{{ empresa.numeroAfiliados }}</td>
               <td class="text-center">
@@ -169,6 +203,27 @@ async function guardarEmpresa(empresa: any) {
 
     tr:hover {
       background-color: #f9fafb;
+    }
+  }
+
+  &__select-acuerdo {
+    width: 100%;
+    max-width: 160px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border: 1px solid $color-border;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: $color-text-secondary;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    option {
+      color: $color-text;
     }
   }
 }

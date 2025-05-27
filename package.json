@@ -17,10 +17,10 @@
     "idb-keyval": "^6.2.2",
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^4.2.0",
-    "sweetalert2": "^11.21.2",
+    "sweetalert2": "^11.22.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vuetify": "^3.8.6"
+    "vuetify": "^3.8.7"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

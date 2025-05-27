@@ -3,12 +3,14 @@ import { ref } from "vue";
 import type { PublicacionEmpresaDto } from "@/stores/dtos/PublicacionEmpresa.dto";
 import type { PublicacionTablaEmpresaDto } from "@/stores/dtos/PublicacionTablaEmpresa.dto";
 import type { NovedadesDto } from "@/stores/dtos/Novedades.dto";
+import type { ActualizarAcuerdoDto } from '@/stores/dtos/ActualizarAcuerdo.dto';
 
 export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas", () => {
   const publicaciones = ref<PublicacionEmpresaDto[]>([]);
   const destacadasNoLeidas = ref<PublicacionEmpresaDto[]>([]);
   const noticiasEmpresaAfiliada = ref<PublicacionTablaEmpresaDto[]>([]);
   const novedades = ref<NovedadesDto[]>([]);
+  
 
   async function fetchPublicaciones() {
     try {
@@ -85,6 +87,26 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     novedades.value = await res.json();
   }
 
+  async function actualizarAcuerdo(dto: ActualizarAcuerdoDto) {
+    try {
+      const res = await fetch(`http://localhost:4444/api/Empresas/actualizar-acuerdo/${dto.idEmpresa}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dto)
+      });
+  
+      if (!res.ok) throw new Error("Error al actualizar el acuerdo");
+  
+      const data = await res.json();
+      console.log(data.mensaje);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+  
+
   return {
     novedades,
     publicaciones,
@@ -96,6 +118,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     addPublicacion,
     updatePublicacion,
     deletePublicacion,
-    fetchNovedades
+    fetchNovedades,
+    actualizarAcuerdo
   };
 });
