@@ -2,6 +2,8 @@
 import Sidebar from '@/components/Sidebar.vue'
 import DashboardMain from '@/components/DashboardMain.vue'
 import ListaUsuarios from '@/components/ListaUsuarios.vue'
+import SolicitudesRecibidas from '@/components/GestionIdeasPropias.vue'
+import Empresas from '@/components/VerEmpresas.vue'
 import { ref, computed } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRouter } from 'vue-router'
@@ -9,11 +11,12 @@ import { useRouter } from 'vue-router'
 const userStore = useUsersStore()
 const router = useRouter()
 const isLoggedIn = computed(() => !!userStore.currentUser)
+console.log(isLoggedIn);
 
-// Estado para manejar qué vista se muestra
-const currentView = ref<'dashboard' | 'usuarios'>('dashboard')
+// Añadimos 'solicitudes' como opción válida
+const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'>('dashboard')
 
-const changeView = (view: 'dashboard' | 'usuarios') => {
+const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas') => {
   currentView.value = view
 }
 </script>
@@ -35,8 +38,17 @@ const changeView = (view: 'dashboard' | 'usuarios') => {
           <div v-if="currentView === 'dashboard'" class="dashboard__panel">
             <DashboardMain />
           </div>
-          <div v-else class="dashboard__panel">
+
+          <div v-else-if="currentView === 'usuarios'" class="dashboard__panel">
             <ListaUsuarios />
+          </div>
+
+          <div v-else-if="currentView === 'solicitudes'" class="dashboard__panel">
+            <SolicitudesRecibidas />
+          </div>
+
+          <div v-else-if="currentView === 'empresas'" class="dashboard__panel">
+            <Empresas />
           </div>
         </div>
       </div>
