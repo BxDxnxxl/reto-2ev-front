@@ -8,7 +8,7 @@ const router = useRouter()
 
 const irAReview = () => {
   if (props.gameId) {
-    router.push(`/reviewVideojuego/${props.gameId}`)
+    router.push(`/reviewVideojuego?id=${props.gameId}`)
   }
 }
 
@@ -125,7 +125,7 @@ onMounted(async () => {
             </span>
           </div>
         </div>
-        <button class="boton-review" @click="irAReview">Ver Review Completa</button>
+        <button class="boton-review" @click="irAReview()">Ver Review Completa</button>
       </div>
     </div>
 

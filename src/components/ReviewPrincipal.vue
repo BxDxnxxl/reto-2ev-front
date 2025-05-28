@@ -7,10 +7,23 @@ import { useGamesStore } from '@/stores/games'
 const route = useRoute()
 const games = useGamesStore()
 const reviewStore = useReviewStore()
-
 const id = Number(route.params.id)
 
+const props = defineProps({
+  gameId: {
+    type: Number,
+    default: null,
+  },
+})
+
 onMounted(() => {
+  const id = props.gameId || Number(route.params.id)
+
+  if (!id || isNaN(id)) {
+    console.error('ID inválido o no encontrado en la ruta')
+    return
+  }
+
   games.verDetalleVideojuego(id)
   reviewStore.getReviewByVideojuego(id)
 })
