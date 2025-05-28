@@ -4,7 +4,7 @@ import type { UsuarioEmpresaDto } from "@/stores/dtos/UsuarioEmpresa.dto";
 
 export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
   const relaciones = ref<UsuarioEmpresaDto[]>([]);
-
+  const puedePublicarDestacada = ref<boolean>(true);
   async function fetchRelaciones() {
     try {
       const res = await fetch("http://localhost:4444/api/UsuariosEmpresas");
@@ -40,10 +40,36 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
     }
   }
 
+  async function getEmpresasDeUsuario(idUsuario: number): Promise<number[]> {
+    try {
+      const res = await fetch(`http://localhost:4444/api/UsuariosEmpresas/usuario/${idUsuario}`);
+      if (!res.ok) throw new Error('Error al obtener empresas del usuario');
+      return await res.json();
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  }  
+
+  async function checkLimiteDestacadas(idEmpresa: number) {
+    try {
+      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/puede-publicar-destacada/${idEmpresa}`);
+      if (!res.ok) throw new Error("Error al comprobar si puede publicar destacada");
+      return await res.json();
+    } catch (err) {
+      console.error("Error en puedePublicarDestacada:", err);
+      return false;
+    }
+  }
+  
+
   return {
     relaciones,
+    puedePublicarDestacada,
     fetchRelaciones,
     addRelacion,
     deleteRelacion,
+    getEmpresasDeUsuario,
+    checkLimiteDestacadas
   };
 });
