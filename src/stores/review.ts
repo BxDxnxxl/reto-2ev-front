@@ -13,7 +13,7 @@ export const useReviewStore = defineStore('review', () => {
   const getReviewByVideojuego = async (id: number) => {
     isLoading.value = true
     try {
-      const response = await fetch(`${API_URL}/videojuego/${id}`)
+      const response = await fetch(`http://localhost:4444/api/videojuego/${id}`)
       if (!response.ok) throw new Error('Error al obtener la review')
       const data = await response.json()
       review.value = data

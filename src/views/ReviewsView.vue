@@ -2,13 +2,18 @@
 import ReviewPrincipal from '@/components/ReviewPrincipal.vue'
 import GameDetails from '@/components/GameDetails.vue'
 import PersonalExperience from '@/components/PersonalExperience.vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const gameId = route.query.id ? Number(route.query.id) : 0
 </script>
 
 <template>
   <div class="review-page">
-    <ReviewPrincipal />
-    <GameDetails />
-    <PersonalExperience />
+    <ReviewPrincipal :gameId="gameId"/>
+    <GameDetails :gameId="gameId"/>
+    <PersonalExperience :gameId="gameId"/>
   </div>
 </template>
 

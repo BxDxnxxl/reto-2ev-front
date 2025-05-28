@@ -122,6 +122,7 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
   margin-top: 0;
   padding-bottom: 32px;
 
+
   &__titulo {
     font-size: 1.5rem;
     margin-bottom: 1rem;

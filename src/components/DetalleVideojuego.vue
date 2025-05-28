@@ -2,6 +2,16 @@
 import { ref, onMounted, computed, defineProps } from 'vue'
 import { useGamesStore } from '@/stores/games'
 import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const irAReview = () => {
+  if (props.gameId) {
+    router.push(`/reviewVideojuego/${props.gameId}`)
+  }
+}
+
 
 const props = defineProps({
   gameId: {
@@ -115,6 +125,7 @@ onMounted(async () => {
             </span>
           </div>
         </div>
+        <button class="boton-review" @click="irAReview">Ver Review Completa</button>
       </div>
     </div>
 
@@ -126,6 +137,7 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+
 .detalle-videojuego {
   width: 100%;
   margin-top: 0;
@@ -288,6 +300,30 @@ onMounted(async () => {
     }
   }
 
+  .boton-review {
+    margin-top: 16px;
+    align-self: flex-start;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    background-color: #f25421;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      background-color: #e04a17;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
   &__error {
     display: flex;
     justify-content: center;
@@ -368,6 +404,10 @@ onMounted(async () => {
     .tag {
       font-size: 15px;
     }
+
+    .boton-review {
+      font-size: 17px;
+    }
   }
 
   @media (min-width: 1200px) {
@@ -434,6 +474,11 @@ onMounted(async () => {
     .tag {
       font-size: 16px;
       padding: 8px 14px;
+    }
+
+    .boton-review {
+      font-size: 18px;
+      padding: 12px 24px;
     }
   }
 }
