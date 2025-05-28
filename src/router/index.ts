@@ -51,6 +51,7 @@ const router = createRouter({
       path: '/reviewVideojuego',
       name: 'reviewVideojuego',
       component: ReviewsView,
+      props: true,
     },
     {
       path: '/ideas',
