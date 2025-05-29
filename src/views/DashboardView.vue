@@ -2,6 +2,7 @@
 import Sidebar from '@/components/Sidebar.vue'
 import DashboardMain from '@/components/DashboardMain.vue'
 import ListaUsuarios from '@/components/ListaUsuarios.vue'
+import ListaVideojuegos from '@/components/VerVideojuegos.vue'
 import SolicitudesRecibidas from '@/components/GestionIdeasPropias.vue'
 import Empresas from '@/components/VerEmpresas.vue'
 import { ref, computed } from 'vue'
@@ -14,9 +15,9 @@ const isLoggedIn = computed(() => !!userStore.currentUser)
 console.log(isLoggedIn);
 
 // Añadimos 'solicitudes' como opción válida
-const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'>('dashboard')
+const currentView = ref<'dashboard' | 'usuarios' | 'solicitudes' | 'empresas' | 'videojuegos'>('dashboard')
 
-const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas') => {
+const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'| 'videojuegos') => {
   currentView.value = view
 }
 </script>
@@ -41,6 +42,10 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas')
 
           <div v-else-if="currentView === 'usuarios'" class="dashboard__panel">
             <ListaUsuarios />
+          </div>
+
+          <div v-else-if="currentView === 'videojuegos'" class="dashboard__panel">
+            <ListaVideojuegos />
           </div>
 
           <div v-else-if="currentView === 'solicitudes'" class="dashboard__panel">
