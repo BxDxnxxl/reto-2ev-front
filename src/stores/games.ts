@@ -13,7 +13,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function fetchVideojuegos() {
     try {
-      const response = await fetch('http://localhost:4444/api/videojuegos')
+      const response = await fetch('https://wannagamesapi.retocsv.es/api/videojuegos')
       games.value = await response.json()
       if (!filtroActivo.value) {
         juegosFiltrados.value = games.value
@@ -25,7 +25,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function fetchVideojuegoById(id: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/videojuegos/${id}`)
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/videojuegos/${id}`)
       const game = await response.json()
 
       games.value = games.value.filter((g) => g.id !== id)
@@ -38,8 +38,7 @@ export const useGamesStore = defineStore('games', () => {
   async function createVideojuegos(formData: FormData) {
     try {
       console.log(formData);
-      
-      await fetch('http://localhost:4444/api/videojuegos', {
+      await fetch('https://wannagamesapi.retocsv.es/api/videojuegos', {
         method: 'POST',
         body: formData
       });
@@ -51,7 +50,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function updateVideojuego(id: number, videojuegoActualizado: GameDto) {
     try {
-      await fetch(`http://localhost:4444/api/videojuegos/${id}`, {
+      await fetch(`https://wannagamesapi.retocsv.es/api/videojuegos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(videojuegoActualizado),
@@ -64,7 +63,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function deleteVideojuego(id: number) {
     try {
-      await fetch(`http://localhost:4444/api/videojuegos/${id}`, { method: 'DELETE' })
+      await fetch(`https://wannagamesapi.retocsv.es/api/videojuegos/${id}`, { method: 'DELETE' })
       games.value = games.value.filter((g) => g.id !== id)
     } catch (error) {
       console.error('Error al eliminar videojuego:', error)
@@ -73,7 +72,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function fetchTop5Videojuegos() {
     try {
-      const response = await fetch('http://localhost:4444/api/Videojuegos/top5')
+      const response = await fetch('https://wannagamesapi.retocsv.es/api/Videojuegos/top5')
       if (!response.ok) {
         throw new Error('Error al obtener el top 5 de videojuegos')
       }
@@ -85,7 +84,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function verDetalleVideojuego(id: number) {
     try {
-        const response = await fetch(`http://localhost:4444/api/Videojuegos/${id}/detalle`);
+        const response = await fetch(`https://wannagamesapi.retocsv.es/api/Videojuegos/${id}/detalle`);
         if (!response.ok) {
             throw new Error('Error al obtener el detalle del videojuego');
         }
@@ -98,7 +97,7 @@ export const useGamesStore = defineStore('games', () => {
 
   async function filtrarVideojuegos(compania: string | null = null, genero: string | null = null, plataforma: string | null = null) {
     try {
-      let url = 'http://localhost:4444/api/videojuegos/filtrar?'
+      let url = 'https://wannagamesapi.retocsv.es/api/videojuegos/filtrar?'
       const params = []
       
       if (compania) params.push(`compania=${encodeURIComponent(compania)}`)

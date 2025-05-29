@@ -9,7 +9,7 @@ export const useCompaniesStore = defineStore("companies", () => {
 
   async function fetchCompanies() {
     try {
-      const response = await fetch("http://localhost:4444/api/Compania");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Compania");
       if (!response.ok) throw new Error("Error al cargar compañías");
       companias.value = await response.json();
     } catch (error) {
@@ -19,7 +19,7 @@ export const useCompaniesStore = defineStore("companies", () => {
 
   async function fetchTop5Companies() {
     try {
-      const response = await fetch("http://localhost:4444/api/Compania/top5");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Compania/top5");
       if (!response.ok) throw new Error("Error al cargar las compañías más populares");
       top5Companias.value = await response.json();
     } catch (error) {
