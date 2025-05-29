@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { GameDto } from '@/stores/dtos/game.dto'
 import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto';
+import type { GameCreateDto } from '@/stores/dtos/GameCreateDto';
 
 export const useGamesStore = defineStore('games', () => {
   const games = ref<GameDto[]>([])
@@ -34,16 +35,16 @@ export const useGamesStore = defineStore('games', () => {
     }
   }
 
-  async function createVideojuegos(nuevoVideojuego: GameDto) {
+  async function createVideojuegos(formData: FormData) {
     try {
+      console.log(formData);
       await fetch('https://wannagamesapi.retocsv.es/api/videojuegos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoVideojuego),
-      })
-      await fetchVideojuegos()
+        body: formData
+      });
+      await fetchVideojuegos();
     } catch (error) {
-      console.error('Error al crear videojuego:', error)
+      console.error('Error al crear videojuego:', error);
     }
   }
 

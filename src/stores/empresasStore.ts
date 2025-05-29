@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { EmpresaDto } from "@/stores/dtos/Empresa.dto";
+import type { EmpresasAfiliadosDTO } from "./dtos/EmpresasAfiliados.dto";
 
 export const useEmpresasStore = defineStore("empresas", () => {
   const empresas = ref<EmpresaDto[]>([]);
+  const empresasConAfiliados = ref<EmpresasAfiliadosDTO[]>([]);
 
   async function fetchEmpresas() {
     try {
@@ -51,10 +53,22 @@ export const useEmpresasStore = defineStore("empresas", () => {
     }
   }
 
+  async function fetchEmpresasConAfiliados() {
+    try {
+      const res = await fetch('http://localhost:4444/api/Empresas/conAfiliados');
+      if (!res.ok) throw new Error('Error al cargar empresas con afiliados');
+      empresasConAfiliados.value = await res.json();
+    } catch (err) {
+      console.error('Error en fetchEmpresasConAfiliados:', err);
+    }
+  }
+
   return {
     empresas,
+    empresasConAfiliados,
     fetchEmpresas,
     addEmpresa,
-    deleteEmpresa
+    deleteEmpresa,
+    fetchEmpresasConAfiliados
   };
 });

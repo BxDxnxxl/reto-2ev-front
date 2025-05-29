@@ -23,5 +23,6 @@ export const useRolesStore = defineStore("roles", () => {
     DESARROLLADOR: 3,
     EXPERTO: 4,
     USUARIO_BASE: 1,
+    USUARIO_AFILIADO: 5,
   };
 });
