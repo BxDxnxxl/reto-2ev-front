@@ -73,12 +73,6 @@ function cambiarItemsPorPagina(newItemsPerPage: number) {
   currentPage.value = 1; // Resetear a la primera página
 }
 
-function toggleDestacado(videojuego: any) {
-  videojuego.destacado = !videojuego.destacado;
-  console.log('Toggle destacado videojuego', videojuego.id, videojuego.destacado);
-  // Aquí podrías hacer una llamada al backend para actualizar el estado
-}
-
 async function borrarVideojuego(id: number) {
   const confirm = await Swal.fire({
     title: '¿Estás seguro?',
@@ -87,7 +81,8 @@ async function borrarVideojuego(id: number) {
     showCancelButton: true,
     confirmButtonText: 'Sí, eliminar',
     cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#d33',
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280'
   });
 
   if (confirm.isConfirmed) {
@@ -99,7 +94,12 @@ async function borrarVideojuego(id: number) {
       currentPage.value = currentPage.value - 1;
     }
     
-    Swal.fire('Eliminado', 'El videojuego ha sido eliminado.', 'success');
+    Swal.fire({
+      title: 'Eliminado',
+      text: 'El videojuego ha sido eliminado.',
+      icon: 'success',
+      confirmButtonColor: '#10b981'
+    });
   }
 }
 
@@ -114,12 +114,13 @@ async function guardarVideojuego(videojuego: any) {
 <template>
   <div class="videojuegos">
     <v-container class="videojuegos__contenedor" fluid>
+      <!-- Título y botón en columna -->
       <div class="videojuegos__header">
-        <h2 class="videojuegos__titulo">Gestión de Videojuegos</h2>
+        <h2 class="videojuegos__titulo">🎮 Gestión de Videojuegos</h2>
         <v-btn 
           class="videojuegos__btn-crear" 
           color="primary" 
-          elevation="2"
+          size="large"
           prepend-icon="mdi-plus-circle-outline"
           @click="mostrarFormulario = true"
         >
@@ -127,12 +128,12 @@ async function guardarVideojuego(videojuego: any) {
         </v-btn>
       </div>
 
-      <!-- Controles de paginación superior -->
+      <!-- Controles simples -->
       <div class="videojuegos__controles">
         <div class="videojuegos__info">
-          Mostrando {{ ((currentPage - 1) * itemsPerPage) + 1 }} - {{ Math.min(currentPage * itemsPerPage, store.games?.length || 0) }} 
-          de {{ store.games?.length || 0 }} videojuegos
+          Mostrando {{ videojuegosPaginados.length }} de {{ store.games?.length || 0 }} videojuegos
         </div>
+        
         <div class="videojuegos__items-por-pagina">
           <label>Mostrar:</label>
           <select 
@@ -148,122 +149,143 @@ async function guardarVideojuego(videojuego: any) {
         </div>
       </div>
 
+      <!-- Tabla simple -->
       <div class="videojuegos__tabla-contenedor">
-        <v-table class="videojuegos__tabla" density="comfortable">
-          <thead><tr>
-          <th>Título</th>
-          <th>Descripción</th>
-          <th>Año de salida</th>
-          <th>PEGI</th>
-          <th>Acciones</th></tr>
+        <v-table class="videojuegos__tabla">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Descripción</th>
+              <th>Año</th>
+              <th>PEGI</th>
+              <th>Acciones</th>
+            </tr>
           </thead>
-          <tbody><tr v-for="v in store.games" :key="v.id">
-          <td>{{ v.titulo }}</td>
-          <td>{{ v.descripcion }}</td>
-          <td>{{ v.anioSalida }}</td>
-          <td>{{ v.pegi }}</td>
-          <td>
-            <button class="ver-empresas__boton--eliminar" @click="store.deleteVideojuego(v.id)">
-              Eliminar
-            </button>
-          </td></tr>
+          <tbody>
+            <tr v-for="v in videojuegosPaginados" :key="v.id">
+              <td>{{ v.titulo }}</td>
+              <td>{{ v.descripcion || 'Sin descripción' }}</td>
+              <td>{{ v.anioSalida }}</td>
+              <td>
+                <span v-if="v.pegi" class="pegi-badge">PEGI {{ v.pegi }}</span>
+                <span v-else>-</span>
+              </td>
+              <td>
+                <v-btn 
+                  color="error" 
+                  size="small"
+                  variant="outlined"
+                  @click="borrarVideojuego(v.id)"
+                >
+                  Eliminar
+                </v-btn>
+              </td>
+            </tr>
           </tbody>
         </v-table>
+
+        <!-- Estado vacío -->
+        <div v-if="store.games?.length === 0" class="estado-vacio">
+          <p>No hay videojuegos disponibles</p>
+          <v-btn 
+            color="primary" 
+            @click="mostrarFormulario = true"
+          >
+            Añadir primer videojuego
+          </v-btn>
+        </div>
       </div>
 
-      <!-- Paginación -->
+      <!-- Paginación simple -->
       <div class="videojuegos__paginacion" v-if="totalPages > 1">
         <v-btn 
-          icon 
-          size="small" 
-          variant="text"
           :disabled="currentPage === 1"
           @click="cambiarPagina(currentPage - 1)"
+          size="small"
         >
-          <v-icon>mdi-chevron-left</v-icon>
+          Anterior
         </v-btn>
 
-        <template v-for="page in paginasVisibles" :key="page">
-          <span v-if="page === '...'" class="videojuegos__paginacion-puntos">...</span>
-          <v-btn 
-            v-else
-            size="small"
-            :variant="page === currentPage ? 'elevated' : 'text'"
-            :color="page === currentPage ? 'primary' : 'default'"
-            @click="cambiarPagina(page)"
-            class="videojuegos__paginacion-btn"
-          >
-            {{ page }}
-          </v-btn>
-        </template>
+        <span class="pagina-info">
+          Página {{ currentPage }} de {{ totalPages }}
+        </span>
 
         <v-btn 
-          icon 
-          size="small" 
-          variant="text"
           :disabled="currentPage === totalPages"
           @click="cambiarPagina(currentPage + 1)"
+          size="small"
         >
-          <v-icon>mdi-chevron-right</v-icon>
+          Siguiente
         </v-btn>
       </div>
     </v-container>
 
-    <v-dialog v-model="mostrarFormulario" max-width="600">
-      <FormVideojuego @guardarVideojuego="guardarVideojuego" />
+    <!-- Modal del formulario -->
+    <v-dialog 
+      v-model="mostrarFormulario" 
+      max-width="900"
+      persistent
+    >
+      <FormVideojuego @creado="guardarVideojuego" />
+      <v-btn 
+        @click="mostrarFormulario = false"
+        style="position: absolute; top: 10px; right: 10px;"
+        icon="mdi-close"
+        size="small"
+      />
     </v-dialog>
   </div>
 </template>
 
 <style scoped lang="scss">
 .videojuegos {
-  $color-text: #374151;
-  $color-text-secondary: #6b7280;
-  $color-border: #e5e7eb;
+  padding: 2rem;
 
   &__contenedor {
-    padding: 2rem 1rem;
-    max-width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
   &__header {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1rem;
     align-items: center;
+  }
 
-    .videojuegos__titulo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin: 0;
-    }
+  &__titulo {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0;
+  }
 
-    .videojuegos__btn-crear {
-      font-weight: bold;
-      height: 42px;
-      font-size: 0.95rem;
-    }
+  &__btn-crear {
+    font-weight: 600;
   }
 
   &__controles {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     flex-wrap: wrap;
     gap: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 8px;
-    border: 1px solid $color-border;
   }
 
   &__info {
-    font-size: 0.9rem;
-    color: $color-text-secondary;
+    color: #4a5568;
     font-weight: 500;
   }
 
@@ -271,144 +293,100 @@ async function guardarVideojuego(videojuego: any) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
-    color: $color-text-secondary;
-
+    
     label {
+      color: #4a5568;
       font-weight: 500;
     }
   }
 
   &__select-items {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-    border: 1px solid $color-border;
-    border-radius: 6px;
-    background-color: #ffffff;
-    color: $color-text-secondary;
-    transition: border-color 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-    }
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: white;
   }
 
   &__tabla-contenedor {
-    overflow-x: auto;
-    overflow-y: hidden;
-    width: 100%;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
   }
 
   &__tabla {
-    width: 100%;
-    min-width: 1200px;
-    border-collapse: collapse;
-
     th {
-      background-color: #f3f4f6;
+      background: #f8fafc;
       font-weight: 600;
+      color: #1a202c;
       padding: 1rem;
-      color: $color-text;
-      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     td {
-      padding: 0.9rem;
-      color: $color-text-secondary;
-      text-align: center;
-      border-bottom: 1px solid $color-border;
+      padding: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
     }
 
     tr:hover {
-      background-color: #f9fafb;
+      background: #f8fafc;
     }
   }
 
-  &__titulo-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
+  .pegi-badge {
+    background: #e2e8f0;
+    color: #4a5568;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
   }
 
-  &__desarrollador {
-    font-size: 0.8rem;
-    color: $color-text-secondary;
-    opacity: 0.8;
-  }
-
-  &__plataforma-text {
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
-  }
-
-  &__precio {
-    font-weight: 600;
-    color: #059669;
-  }
-
-  &__rating {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  &__rating-text {
-    font-size: 0.8rem;
-    color: $color-text-secondary;
+  .estado-vacio {
+    text-align: center;
+    padding: 3rem;
+    color: #718096;
   }
 
   &__paginacion {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
     padding: 1rem;
-    flex-wrap: wrap;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  &__paginacion-btn {
-    min-width: 40px;
-    height: 40px;
-  }
-
-  &__paginacion-puntos {
-    color: $color-text-secondary;
+  .pagina-info {
+    color: #4a5568;
     font-weight: 500;
-    padding: 0 0.5rem;
   }
 
   @media (max-width: 768px) {
-    &__controles {
-      flex-direction: column;
-      align-items: stretch;
-      
-      .videojuegos__info {
-        text-align: center;
-      }
-      
-      .videojuegos__items-por-pagina {
-        justify-content: center;
-      }
-    }
-    
-    &__paginacion {
-      gap: 0.25rem;
-      
-      .videojuegos__paginacion-btn {
-        min-width: 36px;
-        height: 36px;
-        font-size: 0.85rem;
-      }
+    padding: 1rem;
+
+    &__header {
+      padding: 1.5rem;
     }
 
-    &__tabla {
-      min-width: 1000px;
+    &__titulo {
+      font-size: 1.5rem;
+    }
+
+    &__controles {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    &__tabla-contenedor {
+      overflow-x: auto;
+    }
+
+    &__paginacion {
+      flex-wrap: wrap;
     }
   }
 }
