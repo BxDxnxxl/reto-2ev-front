@@ -29,6 +29,9 @@ const isAdmin = computed(() =>
       <button v-if="isAdmin" class="sidebar__link" @click="emit('change-view', 'usuarios')">
         Usuarios
       </button>
+      <button v-if="isAdmin" class="sidebar__link" @click="emit('change-view', 'videojuegos')">
+        Videojuegos
+      </button>
       <hr />
       <button class="sidebar__link" @click="emit('change-view', 'dashboard')">
         Mi Perfil
