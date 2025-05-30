@@ -34,7 +34,7 @@ async function borrarEmpresa(id: number) {
   }
 }
 
-async function guardarEmpresa(empresa: any) {
+async function guardarEmpresa(empresa: FormData) {
   await store.addEmpresa(empresa);
   await store.fetchEmpresasConAfiliados();
   mostrarFormulario.value = false;
