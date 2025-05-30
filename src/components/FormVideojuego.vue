@@ -244,112 +244,108 @@ watch(() => form.value.caratula, (newValue) => {
     </form>
   </div>
 </template>
-
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .form-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 16px;
+  padding: $spacing-xxl;
+  background: linear-gradient(135deg, lighten($background-color, 4%) 0%, lighten($background-color, 10%) 100%);
+  border-radius: calc($border-radius * 2);
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.1),
     0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   overflow-y: auto;
+  color: $text-color;
 }
 
 .form-header {
   text-align: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: $spacing-xxl;
+  padding-bottom: $spacing-large;
+  border-bottom: 2px solid lighten($dark-color, 15%);
 }
 
 .form-title {
-  font-size: 2rem;
+  font-size: $font-size-xlarge;
   font-weight: 800;
-  color: #1a202c;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: $primary-gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin-bottom: $spacing-small;
 }
 
 .form-subtitle {
-  color: #64748b;
-  font-size: 1rem;
-  margin: 0;
+  color: lighten($text-color, 20%);
+  font-size: $font-size-base;
   font-weight: 500;
+  margin: 0;
 }
 
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: $spacing-xxl;
 
   &__fila {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
+    gap: $spacing-large;
 
-    @media (max-width: 768px) {
+    @media (max-width: $desktop) {
       grid-template-columns: 1fr;
-      gap: 1rem;
+      gap: $spacing-medium;
     }
   }
 
   &__grupo {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: $spacing-small;
 
-    &--flex-1 {
-      flex: 1;
-    }
-
-    &--flex-2 {
-      flex: 2;
-    }
+    &--flex-1 { flex: 1; }
+    &--flex-2 { flex: 2; }
   }
 
   &__label {
     font-weight: 600;
-    color: #374151;
-    font-size: 0.95rem;
-    margin-bottom: 0.5rem;
+    color: $text-color;
+    font-size: $font-size-base;
+    margin-bottom: $spacing-small;
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: $spacing-extra-small;
   }
 
   &__input,
   &__textarea,
   &__select {
-    padding: 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #ffffff;
-    color: #374151;
+    padding: $spacing-medium;
+    border: 2px solid $color-disabled;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    background-color: white;
+    color: $dark-color;
+    transition: $transition;
     font-family: inherit;
 
     &::placeholder {
-      color: #9ca3af;
+      color: lighten($dark-color, 35%);
     }
 
     &:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
       transform: translateY(-1px);
     }
 
     &:hover:not(:focus) {
-      border-color: #d1d5db;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-color: lighten($color-disabled, 15%);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
   }
 
@@ -359,27 +355,15 @@ watch(() => form.value.caratula, (newValue) => {
     line-height: 1.6;
   }
 
-  &__select {
-    cursor: pointer;
-    
-    &:focus {
-      cursor: pointer;
-    }
-  }
-
-  &__file-input {
-    display: none;
-  }
-
   &__acciones {
     display: flex;
-    gap: 1rem;
+    gap: $spacing-medium;
     justify-content: flex-end;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    margin-top: $spacing-large;
+    padding-top: $spacing-large;
+    border-top: 1px solid lighten($dark-color, 15%);
 
-    @media (max-width: 768px) {
+    @media (max-width: $desktop) {
       flex-direction: column;
     }
   }
@@ -387,33 +371,30 @@ watch(() => form.value.caratula, (newValue) => {
   &__boton {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
+    justify-content: center;
+    gap: $spacing-small;
+    padding: $spacing-medium $spacing-xlarge;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: none;
+    transition: $transition;
     min-width: 160px;
-    justify-content: center;
+    border: none;
 
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none !important;
     }
 
     &--primario {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: $primary-gradient;
       color: white;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
       }
 
       &:active:not(:disabled) {
@@ -422,151 +403,101 @@ watch(() => form.value.caratula, (newValue) => {
     }
 
     &--secundario {
-      background-color: #f8fafc;
-      color: #64748b;
-      border: 2px solid #e2e8f0;
+      background-color: lighten($background-color, 8%);
+      color: lighten($text-color, 20%);
+      border: 2px solid $color-disabled;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
       &:hover {
-        background-color: #f1f5f9;
-        border-color: #cbd5e0;
+        background-color: lighten($background-color, 12%);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     }
   }
 }
 
-.boton-icon {
-  font-size: 1.1rem;
-}
-
-// Upload section styles
 .upload-section {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 1.5rem;
+  gap: $spacing-large;
   align-items: start;
 
-  @media (max-width: 768px) {
+  @media (max-width: $desktop) {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
-}
-
-.file-input-container {
-  flex: 1;
-}
-
-.file-input-label {
-  display: block;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .file-input-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  border: 2px dashed #cbd5e0;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  transition: all 0.3s ease;
+  gap: $spacing-medium;
+  padding: $spacing-large;
+  border: 2px dashed $color-disabled;
+  border-radius: $border-radius;
+  background: linear-gradient(135deg, lighten($background-color, 8%), lighten($background-color, 15%));
+  transition: $transition;
 
   &:hover {
-    border-color: #667eea;
-    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+    border-color: $primary-color;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.2);
   }
-}
-
-.file-icon {
-  font-size: 1.5rem;
-  opacity: 0.7;
-}
-
-.file-text-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.file-text {
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.95rem;
-}
-
-.file-hint {
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.image-preview-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .image-preview {
   width: 140px;
   height: 140px;
-  border-radius: 12px;
+  border-radius: $border-radius;
   overflow: hidden;
-  border: 3px solid #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border: 3px solid $color-disabled;
+  box-shadow: $box-shadow;
+  transition: $transition;
 
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
-}
 
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.file-info {
-  text-align: center;
-  
-  small {
-    color: #6b7280;
-    font-size: 0.8rem;
-    font-weight: 500;
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
+}
+
+.file-text {
+  font-weight: 600;
+  color: $dark-color;
+}
+
+.file-hint {
+  font-size: $font-size-small;
+  color: lighten($dark-color, 30%);
+}
+
+.file-info small {
+  color: lighten($dark-color, 30%);
+  font-size: $font-size-small;
+  font-weight: 500;
 }
 
 // Responsive
-@media (max-width: 768px) {
+@media (max-width: $desktop) {
   .form-container {
-    padding: 1.5rem;
-    margin: 1rem;
+    padding: $spacing-large;
+    margin: $spacing-medium;
   }
 
   .form-title {
-    font-size: 1.6rem;
+    font-size: $font-size-large;
   }
 
   .formulario {
-    gap: 1.5rem;
-
-    &__acciones {
-      flex-direction: column;
-    }
+    gap: $spacing-large;
 
     &__boton {
       width: 100%;
     }
-  }
-
-  .upload-section {
-    grid-template-columns: 1fr;
   }
 
   .image-preview {

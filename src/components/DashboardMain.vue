@@ -115,7 +115,6 @@ const updateProfile = async () => {
 };
 </script>
 
-
 <template>
   <v-container fluid class="profile-edit-container px-0">
     <v-row justify="center" align="center" class="ma-0 h-100">
@@ -233,29 +232,81 @@ const updateProfile = async () => {
     </v-snackbar>
   </v-container>
 </template>
-
 <style scoped lang="scss">
-.profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  padding: 1rem;
+@import "@/assets/styles/variables.scss";
 
-  &__container {
+.profile-edit-container {
+  background-color: $card-background;
+  color: $text-color;
+  min-height: 100vh;
+  padding: $spacing-large;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .profile-card {
+    background-color: $dark-color; // fondo claro para contraste con la vista oscura
+    color: $dark-color;
+    padding: $spacing-large;
+    border-radius: calc($border-radius * 4); // borde más redondeado
+    box-shadow: $box-shadow;
     width: 100%;
-    max-width: 900px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
+    max-width: 800px;
+
+    border: 3px;
+    border-color: $primary-gradient;
+
+    .v-card-title {
+      font-size: $font-size-xlarge;
+      font-weight: bold;
+      color: $dark-color;
+      text-align: center;
+    }
+
+    .v-text-field,
+    .v-file-input {
+      .v-input__control {
+        background-color: white !important;
+        color: $dark-color !important;
+        border-radius: calc($border-radius * 1.2);
+        border: 1px solid $color-disabled;
+
+        input {
+          color: $dark-color !important;
+          font-size: $font-size-base;
+        }
+      }
+
+      .v-label {
+        color: $dark-color !important;
+        font-weight: 500;
+        font-size: $font-size-base;
+      }
+    }
+
+    .v-btn {
+      background-color: $btn-color !important;
+      color: white !important;
+      font-weight: bold;
+      border-radius: $border-radius;
+      padding: $spacing-small $spacing-large;
+      font-size: $font-size-base;
+      transition: $transition;
+
+      &:hover {
+        background-color: darken($btn-color, 10%) !important;
+      }
+    }
+
+    .v-avatar img {
+      border: 2px solid $accent-color;
+    }
   }
 
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: center;
-    padding: 2rem;
+  .v-snackbar {
+    font-size: $font-size-base;
+    font-weight: 500;
   }
 }
 </style>

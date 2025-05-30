@@ -53,16 +53,10 @@ console.log(publicacionesStore.novedades);
           <!-- Contenido principal -->
           <div class="novedades-blog__content">
             <h3 class="novedades-blog__titulo-noticia">{{ novedad.titulo }}</h3>
-            <p class="novedades-blog__resumen">{{ novedad.contenido }}</p>
-          </div>
-
-          <!-- Imagen destacada -->
-          <div v-if="novedad.imagen" class="novedades-blog__media">
-            <img
-              :src="novedad.imagen"
-              :alt="`Imagen de ${novedad.titulo}`"
-              class="novedades-blog__imagen"
-            />
+            <div class="novedades-blog__media">
+              <img :src="novedad.imagen" alt="Imagen noticia" class="novedades-blog__imagen" />
+              <p class="novedades-blog__resumen">{{ novedad.contenido }}</p>
+            </div>
           </div>
 
           <!-- Footer -->
@@ -93,37 +87,25 @@ console.log(publicacionesStore.novedades);
       </div>
     </div>
   </section>
-</template>
+</template><style scoped lang="scss">
+@import "@/assets/styles/variables.scss";
 
-<style scoped lang="scss">
-// Variables
-$primary-color: #2563eb;
-$secondary-color: #64748b;
-$text-dark: #1e293b;
-$text-light: #64748b;
-$background-light: #f8fafc;
-$border-color: #e2e8f0;
-$shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-// Mixins
 @mixin card-hover {
   transform: translateY(-4px);
-  box-shadow: $shadow-large;
+  box-shadow: $box-shadow;
 }
 
 @mixin text-gradient {
-  background: linear-gradient(135deg, $primary-color, #3b82f6);
+  background: $primary-gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .novedades-blog {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: $background-color;
   min-height: 100vh;
-  padding: 1.5rem 1rem;
+  padding: $spacing-large $spacing-medium;
 
   &__container {
     max-width: 1200px;
@@ -132,37 +114,35 @@ $shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0,
 
   &__header {
     text-align: center;
-    margin-bottom: 3rem;
-    padding: 0 1rem;
+    margin-bottom: $spacing-large;
+    padding: 0 $spacing-medium;
   }
 
   &__titulo {
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    font-size: $font-size-xlarge;
+    font-weight: 900;
     @include text-gradient;
-    letter-spacing: -0.025em;
+    margin-bottom: $spacing-small;
   }
 
   &__subtitulo {
-    font-size: 1.125rem;
-    color: $text-light;
-    font-weight: 400;
+    font-size: $font-size-base;
+    color: $primary-color;
   }
 
   &__grid {
     display: grid;
-    gap: 2rem;
+    gap: $spacing-large;
     grid-template-columns: 1fr;
   }
 
   &__card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: $shadow-medium;
+    background: $background-color;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    border: 1px solid lighten($dark-color, 40%);
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid $border-color;
+    transition: all 0.3s ease;
 
     &:hover {
       @include card-hover;
@@ -170,131 +150,111 @@ $shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0,
   }
 
   &__card-header {
-    padding: 1.5rem 1.5rem 0;
+    padding: $spacing-large $spacing-large 0;
   }
 
   &__empresa-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: $spacing-medium;
   }
 
   &__logo-container {
-    flex-shrink: 0;
     width: 56px;
     height: 56px;
-    background: $background-light;
-    border-radius: 12px;
+    background: lighten($background-color, 10%);
+    border-radius: $border-radius;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid $border-color;
+    border: 1px solid lighten($dark-color, 40%);
   }
 
   &__logo {
     width: 40px;
     height: 40px;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: calc($border-radius / 2);
   }
 
   &__empresa-details {
-    flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   &__empresa-nombre {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin: 0 0 0.25rem 0;
-    line-height: 1.4;
+    font-size: $font-size-large;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: $spacing-extra-small;
   }
 
   &__fecha {
-    font-size: 0.875rem;
-    color: $text-light;
-    font-weight: 500;
+    font-size: $font-size-small;
+    color: lighten($primary-color, 10%);
   }
 
   &__content {
-    padding: 1.5rem;
-    padding-bottom: 1rem;
+    padding: $spacing-large;
+    padding-bottom: $spacing-medium;
   }
 
   &__titulo-noticia {
-    font-size: 1.375rem;
-    font-weight: 700;
-    color: $text-dark;
-    line-height: 1.3;
-    margin: 0 0 1rem 0;
-    letter-spacing: -0.01em;
-  }
-
-  &__resumen {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: $secondary-color;
-    margin: 0;
+    font-size: $font-size-xlarge;
+    font-weight: 800;
+    color: $primary-color;
+    margin-bottom: $spacing-medium;
   }
 
   &__media {
-    margin: 0 1.5rem 1.5rem;
-    border-radius: 12px;
-    overflow: hidden;
-    background: $background-light;
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-medium;
   }
 
   &__imagen {
-    width: 100%;
+    width: 120px;
     height: auto;
-    display: block;
-    transition: transform 0.3s ease;
+    object-fit: cover;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    flex-shrink: 0;
+  }
 
-    .novedades-blog__card:hover & {
-      transform: scale(1.02);
-    }
+  &__resumen {
+    font-size: $font-size-base;
+    line-height: 1.6;
+    color: lighten($primary-color, 10%);
+    margin: 0;
+    flex: 1;
   }
 
   &__card-footer {
-    padding: 1rem 1.5rem 1.5rem;
-    border-top: 1px solid $border-color;
+    padding: $spacing-medium $spacing-large $spacing-large;
+    border-top: 1px solid lighten($dark-color, 40%);
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  &__contacto {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__contacto-label {
-    font-size: 0.875rem;
-    color: $text-light;
-    font-weight: 500;
+    font-size: $font-size-small;
+    color: lighten($primary-color, 10%);
+    margin-right: $spacing-small;
   }
 
   &__contacto-email {
-    font-size: 0.875rem;
-    color: $primary-color;
+    font-size: $font-size-small;
     font-weight: 600;
+    color: $primary-color;
     text-decoration: none;
-    transition: color 0.2s ease;
 
     &:hover {
-      color: #1d4ed8;
       text-decoration: underline;
     }
   }
 
-  &__btn-eliminar {
-    align-self: flex-start;
-  }
-
-  // Responsive Design - Desktop
-  @media (min-width: 768px) {
+  @media (min-width: $desktop) {
     padding: 3rem 2rem;
 
     &__titulo {
@@ -307,72 +267,10 @@ $shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0,
 
     &__grid {
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 2.5rem;
     }
 
-    &__card {
-      border-radius: 20px;
-    }
-
-    &__card-header {
-      padding: 2rem 2rem 0;
-    }
-
-    &__logo-container {
-      width: 64px;
-      height: 64px;
-    }
-
-    &__logo {
-      width: 48px;
-      height: 48px;
-    }
-
-    &__empresa-nome {
-      font-size: 1.25rem;
-    }
-
-    &__content {
-      padding: 2rem;
-      padding-bottom: 1.5rem;
-    }
-
-    &__titulo-noticia {
-      font-size: 1.5rem;
-    }
-
-    &__resumen {
-      font-size: 1.0625rem;
-    }
-
-    &__media {
-      margin: 0 2rem 2rem;
-      border-radius: 16px;
-    }
-
-    &__card-footer {
-      padding: 1.5rem 2rem 2rem;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    &__contacto {
-      flex-direction: row;
-      align-items: center;
-      gap: 0.5rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    padding: 4rem 2rem;
-
-    &__header {
-      margin-bottom: 4rem;
-    }
-
-    &__grid {
-      gap: 3rem;
+    &__imagen {
+      width: 160px;
     }
   }
 }

@@ -236,158 +236,358 @@ async function guardarVideojuego(videojuego: any) {
     </v-dialog>
   </div>
 </template>
-
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .videojuegos {
-  padding: 2rem;
+  padding: $spacing-large;
+  background-color: $background-color;
+  color: $text-color;
+  min-height: 100vh;
 
   &__contenedor {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: $spacing-large;
   }
 
   &__header {
     text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: $spacing-xl;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: $spacing-medium;
     align-items: center;
+    border: 1px solid rgba($primary-color, 0.2);
   }
 
   &__titulo {
-    font-size: 2rem;
+    font-size: $font-size-xlarge;
     font-weight: 700;
-    color: #1a202c;
+    color: $text-color;
     margin: 0;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   &__btn-crear {
     font-weight: 600;
+    background: $primary-gradient;
+    color: $text-color;
+    border-radius: $border-radius;
+    padding: $spacing-medium $spacing-large;
+    font-size: $font-size-base;
+    border: none;
+    cursor: pointer;
+    transition: $transition;
+    box-shadow: $box-shadow;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0px 4px 8px rgba($primary-color, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   &__controles {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: $spacing-medium;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: $spacing-medium;
+    border: 1px solid rgba($primary-color, 0.1);
+    text-align: center;
   }
 
   &__info {
-    color: #4a5568;
+    color: rgba($text-color, 0.8);
     font-weight: 500;
+    font-size: $font-size-small;
   }
 
   &__items-por-pagina {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    
-    label {
-      color: #4a5568;
-      font-weight: 500;
-    }
-  }
+    gap: $spacing-small;
 
-  &__select-items {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    background: white;
+    label {
+      color: rgba($text-color, 0.8);
+      font-weight: 500;
+      font-size: $font-size-small;
+    }
+
+    select {
+      padding: $spacing-small $spacing-medium;
+      border-radius: $border-radius;
+      border: 1px solid $color-disabled;
+      background-color: $card-background;
+      color: $text-color;
+      font-size: $font-size-small;
+      transition: $transition;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      }
+    }
   }
 
   &__tabla-contenedor {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    overflow-x: auto;
+    border: 1px solid rgba($primary-color, 0.1);
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba($primary-color, 0.1);
+      border-radius: $border-radius;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba($primary-color, 0.5);
+      border-radius: $border-radius;
+
+      &:hover {
+        background: rgba($primary-color, 0.7);
+      }
+    }
   }
 
   &__tabla {
+    width: 100%;
+    border-collapse: collapse;
+
     th {
-      background: #f8fafc;
+      background: #e5e5e5;
       font-weight: 600;
-      color: #1a202c;
-      padding: 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      color: $primary-color;
+      padding: $spacing-medium;
+      font-size: $font-size-small;
+      text-align: center;
+      border-bottom: 2px solid #d0d0d0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     td {
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
+      padding: $spacing-medium;
+      font-size: $font-size-base;
+      color: $primary-color;
+      background-color: #f8f8f8;
+      border-bottom: 1px solid #e0e0e0;
+      transition: $transition;
+      text-align: center;
     }
 
-    tr:hover {
-      background: #f8fafc;
+    tr:hover td {
+      background-color: #f0f0f0;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f5f5f5;
     }
   }
 
   .pegi-badge {
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    background: rgba($primary-color, 0.2);
+    color: $primary-color;
+    padding: $spacing-extra-small $spacing-small;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba($primary-color, 0.3);
   }
 
   .estado-vacio {
     text-align: center;
-    padding: 3rem;
-    color: #718096;
+    padding: $spacing-xxl;
+    color: rgba($text-color, 0.6);
+    font-size: $font-size-large;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+      content: "🎮";
+      display: block;
+      font-size: 3rem;
+      margin-bottom: $spacing-medium;
+      opacity: 0.5;
+    }
   }
 
   &__paginacion {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: $spacing-small;
+    padding: $spacing-medium;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    border: 1px solid rgba($primary-color, 0.1);
+    flex-wrap: wrap;
+
+    button {
+      background: $primary-gradient;
+      color: $text-color;
+      border: none;
+      padding: $spacing-small $spacing-large;
+      border-radius: $border-radius;
+      font-weight: 700;
+      font-size: $font-size-base;
+      cursor: pointer;
+      transition: $transition;
+      min-width: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba($primary-color, 0.3);
+
+      &:hover:not(.disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0px 4px 8px rgba($primary-color, 0.4);
+      }
+
+      &.disabled {
+        background: $color-disabled;
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+
+        &:hover {
+          transform: none;
+        }
+      }
+
+      &.current {
+        background: $text-color;
+        color: $primary-color;
+        font-weight: 800;
+        border: 2px solid $primary-color;
+      }
+    }
+
+    .pagina-info {
+      color: rgba($text-color, 0.9);
+      font-weight: 500;
+      font-size: $font-size-base;
+      padding: 0 $spacing-medium;
+      min-width: 120px;
+      text-align: center;
+    }
   }
 
-  .pagina-info {
-    color: #4a5568;
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-xxl;
+    color: rgba($text-color, 0.7);
+    font-size: $font-size-base;
+  }
+
+  &__error {
+    background: rgba($color-error, 0.1);
+    border: 1px solid rgba($color-error, 0.3);
+    color: $color-error;
+    padding: $spacing-medium;
+    border-radius: $border-radius;
+    text-align: center;
     font-weight: 500;
   }
 
-  @media (max-width: 768px) {
-    padding: 1rem;
+  @media (max-width: $desktop) {
+    padding: $spacing-medium;
 
     &__header {
-      padding: 1.5rem;
+      padding: $spacing-large;
     }
 
     &__titulo {
-      font-size: 1.5rem;
+      font-size: $font-size-large;
     }
 
     &__controles {
       flex-direction: column;
       text-align: center;
-    }
-
-    &__tabla-contenedor {
-      overflow-x: auto;
+      gap: $spacing-medium;
     }
 
     &__paginacion {
       flex-wrap: wrap;
+      gap: $spacing-extra-small;
+
+      button {
+        min-width: 35px;
+        height: 35px;
+        font-size: $font-size-small;
+      }
     }
+
+    &__tabla-contenedor {
+      font-size: $font-size-small;
+    }
+
+    &__tabla {
+      th, td {
+        padding: $spacing-small;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: $spacing-small;
+
+    &__header {
+      padding: $spacing-medium;
+    }
+
+    &__titulo {
+      font-size: $font-size-base;
+    }
+
+    &__btn-crear {
+      padding: $spacing-small $spacing-medium;
+      font-size: $font-size-small;
+    }
+
+    &__tabla {
+      font-size: $font-size-small;
+
+      th, td {
+        padding: $spacing-extra-small $spacing-small;
+      }
+    }
+  }
+
+  * {
+    transition: $transition;
   }
 }
 </style>

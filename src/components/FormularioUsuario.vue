@@ -216,50 +216,69 @@ async function saveUser() {
     </v-card>
   </v-container>
 </template>
-
 <style lang="scss">
 @import '@/assets/styles/variables.scss';
 
 .v-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
-  padding: 20px;
+  padding: $spacing-xxl $spacing-large $spacing-large;
+  background-color: $background-color;
 }
 
 .v-card {
   width: 100%;
   max-width: 900px;
-  padding: 20px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: $spacing-large;
+  border-radius: $border-radius;
+  background: $card-background;
+  box-shadow: $box-shadow;
+  color: $dark-color;
   transition: transform 0.3s ease-in-out;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 }
 
 .v-text-field,
-.v-select {
-  background: white !important;
-  border-radius: 8px !important;
+.v-select,
+.v-file-input {
+  .v-input__control {
+    background: white !important;
+    border-radius: $border-radius !important;
+    border: 1px solid $color-disabled !important;
+    color: $dark-color !important;
+
+    input,
+    .v-field__input {
+      color: $dark-color !important;
+      font-size: $font-size-base;
+    }
+  }
+
+  .v-label {
+    color: $dark-color !important;
+    font-weight: 500;
+    font-size: $font-size-base;
+  }
 }
 
 .v-btn {
-  background-color: $primary-color !important;
+  background-color: $btn-color !important;
   color: white !important;
   font-weight: bold;
   text-transform: uppercase;
-  padding: 12px;
-  border-radius: 8px;
-  transition: background 0.3s ease-in-out;
+  padding: $spacing-small $spacing-large;
+  border-radius: $border-radius;
+  transition: $transition;
   width: 100%;
 
   &:hover {
-    background-color: darken($primary-color, 10%) !important;
+    background-color: darken($btn-color, 10%) !important;
   }
 }
 </style>
