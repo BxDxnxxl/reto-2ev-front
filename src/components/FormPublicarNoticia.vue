@@ -1,29 +1,24 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
-import { usePublicacionesEmpresasStore } from '@/stores/publicacionesEmpresasStore';
-import type { PublicacionEmpresaDto } from '@/stores/dtos/PublicacionEmpresa.dto';
+import { ref, onMounted } from 'vue';
 import { useUsersStore } from '@/stores/users';
 import { useUsuariosEmpresasStore } from '@/stores/usuariosEmpresasStore';
+import type { PublicacionEmpresaCreateDto } from '@/stores/dtos/PublicacionEmpresaCreateDto';
 
 const emit = defineEmits(['guardar']);
-const props = defineProps<{ publicacion?: PublicacionEmpresaDto }>();
-
 const usersStore = useUsersStore();
-const publicacionesStore = usePublicacionesEmpresasStore();
 const usuariosEmpresasStore = useUsuariosEmpresasStore();
 
-const publicacion = ref<PublicacionEmpresaDto>({
-  id: props.publicacion?.id ?? 0,
-  FkIdEmpresa: props.publicacion?.FkIdEmpresa ?? 0,
-  FkIdUsuario: usersStore.currentUser?.id ?? 0,
-  titulo: props.publicacion?.titulo ?? '',
-  contenido: props.publicacion?.contenido ?? '',
-  imagen: props.publicacion?.imagen ?? '',
-  esDestacada: props.publicacion?.esDestacada ?? false,
-  fechaPublicacion: props.publicacion?.fechaPublicacion ? new Date(props.publicacion.fechaPublicacion) : new Date(),
-});
-
+const imagenFile = ref<File | null>(null);
 const puedeDestacar = ref(true);
+
+const publicacion = ref<PublicacionEmpresaCreateDto>({
+  fkIdEmpresa: 0,
+  fkIdUsuario: usersStore.currentUser?.id ?? 0,
+  titulo: '',
+  contenido: '',
+  imagen: null,
+  esDestacada: false,
+});
 
 onMounted(async () => {
   const userId = usersStore.currentUser?.id;
@@ -31,41 +26,43 @@ onMounted(async () => {
 
   const empresas = await usuariosEmpresasStore.getEmpresasDeUsuario(userId);
   if (empresas.length > 0) {
-    publicacion.value.FkIdEmpresa = empresas[0];
+    publicacion.value.fkIdEmpresa = empresas[0];
     puedeDestacar.value = await usuariosEmpresasStore.checkLimiteDestacadas(empresas[0]);
   }
 });
 
-const fechaInput = ref(formatFechaInput(publicacion.value.fechaPublicacion));
-watch(fechaInput, (val) => {
-  publicacion.value.fechaPublicacion = new Date(val);
-});
-
-function formatFechaInput(fecha: Date): string {
-  return new Date(fecha).toISOString().slice(0, 16);
+function handleFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    imagenFile.value = input.files[0];
+  }
 }
 
 function submitForm() {
-  emit('guardar', publicacion.value);
+  const formData = new FormData();
+  formData.append('FkIdEmpresa', publicacion.value.fkIdEmpresa.toString());
+  formData.append('FkIdUsuario', publicacion.value.fkIdUsuario.toString());
+  formData.append('Titulo', publicacion.value.titulo);
+  formData.append('Contenido', publicacion.value.contenido ?? '');
+  formData.append('EsDestacada', publicacion.value.esDestacada.toString());
+  if (imagenFile.value) {
+    formData.append('Imagen', imagenFile.value);
+  }
+
+  emit('guardar', formData);
 }
 </script>
 
 <template>
   <v-card class="form-publicacion">
     <v-card-title class="form-publicacion__titulo">
-      {{ publicacion.id ? 'Editar Publicación' : 'Nueva Publicación' }}
+      Nueva Publicación
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitForm" class="form-publicacion__formulario">
         <v-text-field v-model="publicacion.titulo" label="Título" required />
         <v-textarea v-model="publicacion.contenido" label="Contenido" rows="4" />
-        <v-text-field v-model="publicacion.imagen" label="URL de la Imagen" />
-        <v-text-field
-          v-model="fechaInput"
-          label="Fecha de Publicación"
-          type="datetime-local"
-          required
-        />
+        <input type="file" @change="handleFileUpload" accept="image/*" required />
         <v-switch
           v-model="publicacion.esDestacada"
           :disabled="!puedeDestacar"
@@ -82,6 +79,7 @@ function submitForm() {
     </v-card-text>
   </v-card>
 </template>
+
 
 <style scoped lang="scss">
 .form-publicacion {

@@ -42,20 +42,25 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     }
   }
 
-  async function addPublicacion(publicacion: PublicacionEmpresaDto) {
+  async function addPublicacion(formData: FormData) {
     try {
-      publicacion.fechaPublicacion = new Date(publicacion.fechaPublicacion).toISOString();
-
-      await fetch("http://localhost:4444/api/PublicacionesEmpresas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(publicacion),
+      const response = await fetch('http://localhost:4444/api/PublicacionesEmpresas', {
+        method: 'POST',
+        body: formData,
       });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al crear publicación: ${errorText}`);
+      }
+  
       await fetchPublicaciones();
-    } catch (err) {
-      console.error("Error al añadir publicación:", err);
+    } catch (error) {
+      console.error("Error al crear publicación:", error);
+      throw error;
     }
   }
+
 
   async function updatePublicacion(publicacion: PublicacionEmpresaDto) {
     try {
