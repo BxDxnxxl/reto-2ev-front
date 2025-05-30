@@ -27,7 +27,7 @@ function editarPublicacion(publicacion: PublicacionEmpresaDto) {
   mostrarFormulario.value = true;
 }
 
-async function guardarPublicacion(pub: PublicacionEmpresaDto) {
+async function guardarPublicacion(formData: FormData) {
   try {
     const userId = usersStore.currentUser?.id;
     if (!userId) throw new Error('Usuario no logeado');
@@ -37,22 +37,15 @@ async function guardarPublicacion(pub: PublicacionEmpresaDto) {
       throw new Error('Este usuario no está afiliado a ninguna empresa.');
     }
 
-    // Asignar empresa afiliada
-    pub.FkIdEmpresa = empresasAfiliadas[0];
+    formData.set("FkIdEmpresa", empresasAfiliadas[0].toString());
+    formData.set("FkIdUsuario", userId.toString());
 
-    // Guardar
-    if (pub.id && pub.id > 0) {
-      await store.updatePublicacion(pub);
-    } else {
-      await store.addPublicacion(pub);
-    }
-
+    await store.addPublicacion(formData);
     mostrarFormulario.value = false;
   } catch (error) {
     console.error('Error al guardar publicación:', error);
   }
 }
-
 
 async function borrarPublicacion(id: number) {
   const confirmar = confirm('¿Estás seguro de eliminar esta publicación?');
@@ -61,6 +54,7 @@ async function borrarPublicacion(id: number) {
   }
 }
 </script>
+
 
 <template>
   <div class="publicaciones">

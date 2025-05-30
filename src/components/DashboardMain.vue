@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import type { UserDto } from "@/stores/dtos/user.dto";
+import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
 import PerfilAnimado from './PerfilAnimado.vue';
 
 const usersStore = useUsersStore();
-console.log(usersStore.currentUser)
+
 // Estado del formulario
 const editedUser = ref<UserDto>({
   username: "",
@@ -17,15 +18,16 @@ const editedUser = ref<UserDto>({
   profilePic: ""
 });
 
+const profilePicFile = ref<File | null>(null);
 const valid = ref(false);
+const isUpdating = ref(false);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 const snackbarColor = ref("success");
 const editProfileForm = ref<any>(null);
 const showPassword = ref(false);
-const isUpdating = ref(false);
 
-// Reglas de validación para la contraseña
+// Reglas de validación
 const passwordRules = [
   (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
   (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
@@ -33,59 +35,86 @@ const passwordRules = [
   (v: string) => !v || /[0-9]/.test(v) || "Password must contain a number"
 ];
 
-// Cargar datos del usuario al montar el componente
 onMounted(() => {
   if (usersStore.currentUser) {
-    editedUser.value = { 
-      ...usersStore.currentUser, 
-      contrasenia: "" 
+    editedUser.value = {
+      ...usersStore.currentUser,
+      contrasenia: ""
     };
   }
 });
 
-// Manejar subida de imagen de perfil
+// Manejar subida de imagen
 const handleProfilePicUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      editedUser.value.profilePic = e.target?.result as string;
-    };
-    reader.readAsDataURL(input.files[0]);
+  if (input.files && input.files.length > 0) {
+    profilePicFile.value = input.files[0];
   }
 };
 
+// Login tras actualizar
+async function relogin(username: string, password: string) {
+  const loginDto: UserLoginDto = { username, password };
+  return await usersStore.login(loginDto);
+}
+
+// Actualizar perfil
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
-  const { valid } = await editProfileForm.value.validate();
-  if (!valid) return;
+  const { valid: formValido } = await editProfileForm.value.validate();
+  if (!formValido) return;
+
+  isUpdating.value = true;
 
   try {
-    if (usersStore.currentUser?.id) {
-      const userToUpdate: UserDto = {
-        ...editedUser.value,
-        contrasenia: editedUser.value.contrasenia && editedUser.value.contrasenia.trim() !== "" 
-          ? editedUser.value.contrasenia 
-          : usersStore.currentUser.contrasenia
-      };
+    const usuario = usersStore.currentUser;
+    if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-      const updatedUser = await usersStore.updateCurrentUser(userToUpdate);
+    const formData = new FormData();
+    formData.append("Username", editedUser.value.username);
+    formData.append("Email", editedUser.value.email);
+    formData.append("Nombre", editedUser.value.nombre ?? "");
+    formData.append("Apellido1", editedUser.value.apellido1 ?? "");
+    formData.append("Apellido2", editedUser.value.apellido2 ?? "");
 
-      if (updatedUser) {
-        snackbarMessage.value = "Profile updated successfully!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
+    const finalPassword = editedUser.value.contrasenia?.trim() || usuario.contrasenia || "";
+    formData.append("Contrasenia", finalPassword);
 
-        editedUser.value.contrasenia = "";
-      } else {
-        throw new Error("Failed to update profile");
-      }
+    if (profilePicFile.value) {
+      formData.append("ProfilePic", profilePicFile.value);
     }
+
+    const response = await fetch(`http://localhost:4444/api/usuario/${usuario.id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${usersStore.tokenLogin}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    const loginExito = await relogin(editedUser.value.username, finalPassword);
+    if (!loginExito) throw new Error("Error al reloguear.");
+
+    snackbarMessage.value = "Perfil actualizado correctamente";
+    snackbarColor.value = "success";
+    snackbar.value = true;
+    editedUser.value.contrasenia = "";
   } catch (error) {
+    console.error("Error actualizando usuario:", error);
+    snackbarMessage.value = "Error al actualizar perfil";
+    snackbarColor.value = "error";
+    snackbar.value = true;
+  } finally {
+    isUpdating.value = false;
   }
 };
 </script>
+
 
 <template>
   <v-container fluid class="profile-edit-container px-0">
@@ -93,8 +122,14 @@ const updateProfile = async () => {
       <v-col cols="12" md="12" lg="10" xl="8">
         <v-card class="elevation-6 profile-card">
           <div class="d-flex justify-center mb-4">
-            <PerfilAnimado />
+            <v-avatar size="100">
+              <img
+                :src="usersStore.currentUser?.profilePic || 'https://via.placeholder.com/100'"
+                alt="Foto de perfil"
+              />
+            </v-avatar>
           </div>
+
           
           <v-card-title class="text-h5 text-center pb-4">
             Edit Profile

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { EmpresaDto } from "@/stores/dtos/Empresa.dto";
 import type { EmpresasAfiliadosDTO } from "./dtos/EmpresasAfiliados.dto";
+import type { EmpresaCreateDto } from "./dtos/EmpresaCreateDto";
 
 export const useEmpresasStore = defineStore("empresas", () => {
   const empresas = ref<EmpresaDto[]>([]);
@@ -17,20 +18,26 @@ export const useEmpresasStore = defineStore("empresas", () => {
     }
   }
 
-  async function addEmpresa(nuevaEmpresa: EmpresaDto) {
+  async function addEmpresa(formData: FormData) {
     try {
-      const res = await fetch("http://localhost:4444/api/Empresas", {
+      const response = await fetch("http://localhost:4444/api/empresas", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevaEmpresa)
+        body: formData
       });
-
-      if (!res.ok) throw new Error("Error al guardar empresa");
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al crear empresa: ${errorText}`);
+      }
+  
       await fetchEmpresas();
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Error al crear empresa:", error);
+      throw error;
     }
   }
+  
+  
 
   async function deleteEmpresa(empresaId : number) {
     try {
