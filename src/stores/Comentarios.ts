@@ -10,7 +10,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function fetchComentarios() {
     try {
-      const response = await fetch("http://localhost:4444/api/Comentario");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Comentario");
       if (!response.ok) throw new Error("Error al cargar todos los comentarios");
       comentarios.value = await response.json();
     } catch (error) {
@@ -20,7 +20,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function fetchComentariosByVideojuegos(videojuegoId: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/Comentario/videojuego/${videojuegoId}`);
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/Comentario/videojuego/${videojuegoId}`);
       if (!response.ok) throw new Error("Error al cargar los comentarios");
       comentariosByVideojuego.value = await response.json();
     } catch (error) {
@@ -30,7 +30,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function postComentario(nuevoComentario: ComentarioDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/Comentario", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/Comentario", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -50,7 +50,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function likeComentario(comentarioId: number, videojuegoId: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/comentario/like/${comentarioId}`, {
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/comentario/like/${comentarioId}`, {
         method: "PUT"
       });
 
@@ -64,7 +64,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function dislikeComentario(comentarioId: number, videojuegoId: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/comentario/dislike/${comentarioId}`, {
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/comentario/dislike/${comentarioId}`, {
         method: "PUT"
       });
 
@@ -79,7 +79,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function deleteComentario(comentarioId: number, videojuegoId: number) {
     try {
-      const response = await fetch(`http://localhost:4444/api/Comentario/${comentarioId}`, {
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/Comentario/${comentarioId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json"
@@ -101,7 +101,7 @@ export const useCommentsStore = defineStore("comments", () => {
 
   async function fetchComentarioById(comentarioId: number) {
     try {
-        const response = await fetch(`http://localhost:4444/api/Comentario/${comentarioId}`);
+        const response = await fetch(`https://wannagamesapi.retocsv.es/api/Comentario/${comentarioId}`);
         if (!response.ok) throw new Error('Error al obtener el comentario');
 
         const comentario = await response.json();
