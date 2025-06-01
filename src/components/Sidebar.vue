@@ -54,20 +54,21 @@ const isAdmin = computed(() =>
     </button>
   </div>
 </template>
-
 <style lang="scss" scoped>
+@import "@/assets/styles/variables.scss";
+
 .sidebar {
   width: 100%;
-  background: #272727;
-  color: white;
+  background: $background-color;
+  color: $text-color;
   height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: $spacing-large;
   position: relative;
 
-  @media (min-width: 768px) {
+  @media (min-width: $desktop) {
     width: 250px;
     height: 100vh;
     position: fixed;
@@ -77,7 +78,11 @@ const isAdmin = computed(() =>
 
   &__profile-img {
     border-radius: 50%;
-    margin-bottom: 20px;
+    margin-bottom: $spacing-medium;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 2px solid $primary-color;
   }
 
   &__nav {
@@ -88,33 +93,35 @@ const isAdmin = computed(() =>
   }
 
   &__link {
-    padding: 10px;
-    color: white;
+    padding: $spacing-small;
+    color: $text-color;
     text-decoration: none;
     text-align: center;
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: $font-size-base;
     cursor: pointer;
     transition: background 0.3s;
+    border-radius: $border-radius;
 
     &:hover {
-      background: #7f8c8d;
+      background: lighten($background-color, 10%);
     }
   }
 
   &__logout {
-    background: #f25421;
+    background: $primary-color;
     border: none;
-    padding: 10px;
-    color: white;
+    padding: $spacing-small;
+    color: $text-color;
     width: 100%;
     cursor: pointer;
     text-align: center;
+    border-radius: $border-radius;
     transition: background 0.3s;
 
     &:hover {
-      background: #d64321;
+      background: darken($primary-color, 5%);
     }
   }
 }

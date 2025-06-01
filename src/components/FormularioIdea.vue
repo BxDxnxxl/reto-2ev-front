@@ -109,43 +109,33 @@ onMounted(async () => {
   </form>
 </template>
 
-<style lang="scss" scoped>
-$color-primary: #1e40af;
-$color-primary-light: #3b82f6;
-$color-light: #f8fafc;
-$color-dark: #1e293b; 
-$color-gray: #64748b;
-$color-gray-light: #e2e8f0;
-$color-success: #10b981;
-$color-error: #ef4444;
-$border-radius: 8px;
-$box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$transition: all 0.2s ease-in-out;
+<style scoped lang="scss">
+@import "@/assets/styles/variables.scss";
 
 @mixin input-base {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid $color-gray-light;
+  padding: $spacing-medium $spacing-large;
+  border: 1px solid lighten($secondary-color, 40%);
   border-radius: $border-radius;
-  font-size: 0.95rem;
+  font-size: $font-size-base;
   font-family: inherit;
-  color: $color-dark;
-  background-color: $color-light;
+  color: $dark-color;
+  background-color: $text-color;
   transition: $transition;
   outline: none;
-  
+
   &:focus {
-    border-color: $color-primary-light;
-    box-shadow: 0 0 0 3px rgba($color-primary-light, 0.2);
+    border-color: $accent-color;
+    box-shadow: 0 0 0 3px rgba($accent-color, 0.2);
   }
-  
+
   &:hover:not(:focus) {
-    border-color: darken($color-gray-light, 10%);
+    border-color: lighten($secondary-color, 20%);
   }
-  
+
   &::placeholder {
-    color: lighten($color-gray, 15%);
-    font-size: 0.9rem;
+    color: lighten($secondary-color, 25%);
+    font-size: $font-size-small;
   }
 }
 
@@ -157,28 +147,28 @@ $transition: all 0.2s ease-in-out;
   border: none;
   cursor: pointer;
   transition: $transition;
-  
+
   &:focus {
     outline: none;
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
 }
 
 .formulario-idea {
-  background-color: white;
+  background-color: $background-color;
   border-radius: $border-radius;
-  border: 1px solid $color-gray-light;
-  padding: 1.5rem;
+  border: 1px solid lighten($dark-color, 40%);
+  padding: $spacing-large;
   box-shadow: $box-shadow;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: $spacing-large;
   margin-bottom: 2rem;
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -186,17 +176,17 @@ $transition: all 0.2s ease-in-out;
     left: 0;
     right: 0;
     height: 0.25rem;
-    background-color: $color-primary;
+    background-color: $primary-color;
     border-radius: $border-radius $border-radius 0 0;
   }
-  
+
   &__input {
     @include input-base;
     height: 3rem;
-    
+
     &[type="number"] {
       -moz-appearance: textfield;
-      
+
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -204,84 +194,83 @@ $transition: all 0.2s ease-in-out;
       }
     }
   }
-  
+
   &__textarea {
     @include input-base;
     resize: vertical;
     min-height: 100px;
     line-height: 1.5;
   }
-  
+
   &__select {
     @include input-base;
     appearance: none;
     padding-right: 2.5rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23272727' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1rem;
-    
+
     &:invalid {
       border-color: $color-error;
     }
   }
-  
+
   &__label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
+    margin-bottom: $spacing-small;
+    font-size: $font-size-small;
     font-weight: 600;
-    color: $color-dark;
+    color: $text-color;
   }
-  
+
   &__grupo {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: $spacing-small;
   }
-  
+
   &__boton {
     @include button-base;
-    background-color: $color-success;
-    color: white;
-    padding: 0.75rem 1.5rem;
+    background-color: $btn-color;
+    color: $text-color;
+    padding: $spacing-medium $spacing-large;
     border-radius: $border-radius;
-    font-size: 1rem;
-    margin-top: 1rem;
+    font-size: $font-size-base;
+    margin-top: $spacing-medium;
     align-self: flex-end;
-    
+
     &:hover {
-      background-color: darken($color-success, 8%);
+      background-color: darken($btn-color, 8%);
     }
-    
+
     &:focus {
-      box-shadow: 0 0 0 3px rgba($color-success, 0.3);
+      box-shadow: 0 0 0 3px rgba($btn-color, 0.3);
     }
   }
-  
+
   &__mensaje-error {
     color: $color-error;
-    font-size: 0.85rem;
+    font-size: $font-size-small;
     font-weight: 500;
-    margin-top: 0.25rem;
+    margin-top: $spacing-extra-small;
   }
-  
-  // Adaptación responsive
-  @media (min-width: 768px) {
-    padding: 2rem;
-    
+
+  @media (min-width: $desktop) {
+    padding: $spacing-large * 1.5;
+
     &__grupo-flex {
       display: flex;
-      gap: 1rem;
-      
+      gap: $spacing-medium;
+
       > * {
         flex: 1;
       }
     }
-    
+
     &__boton {
-      font-size: 1.05rem;
-      padding: 0.75rem 2rem;
+      font-size: $font-size-large;
+      padding: $spacing-medium $spacing-large * 1.25;
     }
   }
 }

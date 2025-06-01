@@ -55,68 +55,90 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
 </template>
 
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .solicitudes {
-  padding: 1rem;
+  padding: $spacing-medium;
 
   &__titulo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-size: $font-size-large;
+    font-weight: 700;
+    margin-bottom: $spacing-medium;
+    color: $primary-color;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   &__vacio {
     text-align: center;
-    color: #64748b;
-    font-size: 1rem;
-    padding: 2rem;
+    color: rgba($text-color, 0.6);
+    font-size: $font-size-base;
+    padding: $spacing-large;
   }
 
   &__lista {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: $spacing-medium;
   }
 
   &__card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 1rem;
-    border: 1px solid #e2e8f0;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    padding: $spacing-medium;
+    border: 1px solid $primary-color;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: $box-shadow;
+    transition: $transition;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($primary-color, 0.15);
+    }
   }
 
   &__info {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: $spacing-extra-small;
+    color: $text-color;
   }
 
   &__usuario-nombre {
-    font-weight: bold;
+    font-weight: 600;
+    font-size: $font-size-base;
+    color: $primary-color;
   }
 
   &__usuario-email {
-    font-size: 0.9rem;
-    color: #64748b;
+    font-size: $font-size-small;
+    color: rgba($text-color, 0.7);
   }
 
   &__fecha {
-    font-size: 0.85rem;
-    color: #94a3b8;
+    font-size: $font-size-small;
+    color: rgba($text-color, 0.5);
   }
 
   &__boton {
-    background-color: #1e40af;
+    background-color: $btn-color;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
+    border-radius: $border-radius;
+    padding: $spacing-small $spacing-medium;
+    font-size: $font-size-small;
+    font-weight: 600;
     cursor: pointer;
+    transition: $transition;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 
     &:hover {
-      background-color: #1e3a8a;
+      background-color: darken($btn-color, 10%);
     }
   }
 }

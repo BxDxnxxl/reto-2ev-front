@@ -143,20 +143,8 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
       </div>
     </div>
   </div>
-</template>
-<style lang="scss" scoped>
-$color-primary: #1e40af;
-$color-primary-light: #3b82f6;
-$color-light: #f8fafc;
-$color-dark: #1e293b;
-$color-gray: #64748b;
-$color-gray-light: #e2e8f0;
-$color-success: #10b981;
-$color-warning: #facc15;
-$color-disabled: #94a3b8;
-$border-radius: 8px;
-$box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$transition: all 0.2s ease-in-out;
+</template><style scoped lang="scss">
+@import "@/assets/styles/variables.scss";
 
 @mixin flex-column {
   display: flex;
@@ -174,25 +162,25 @@ $transition: all 0.2s ease-in-out;
 }
 
 .ideas {
-  padding: 1.25rem 1rem;
+  padding: $spacing-large $spacing-medium;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 
   &__boton {
     @include button-reset;
-    background-color: $color-primary;
-    color: white;
+    background-color: $btn-color;
+    color: $text-color;
     border-radius: $border-radius;
-    padding: 0.75rem 1.25rem;
-    font-size: 0.95rem;
+    padding: $spacing-medium $spacing-large;
+    font-size: $font-size-base;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-large;
     box-shadow: $box-shadow;
     transition: $transition;
 
     &:hover {
-      background-color: darken($color-primary, 8%);
+      background-color: darken($btn-color, 8%);
       transform: translateY(-2px);
     }
 
@@ -203,17 +191,17 @@ $transition: all 0.2s ease-in-out;
 
   &__lista {
     @include flex-column;
-    gap: 1.25rem;
+    gap: $spacing-large;
 
-    @media (min-width: 768px) {
+    @media (min-width: $desktop) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      gap: $spacing-large;
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: $laptop) {
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2rem;
+      gap: $spacing-large * 1.25;
     }
   }
 }
@@ -222,10 +210,10 @@ $transition: all 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: $color-light;
+  background-color: $background-color;
   border-radius: $border-radius;
-  border: 1px solid $color-gray-light;
-  padding: 1.5rem;
+  border: 1px solid lighten($dark-color, 30%);
+  padding: $spacing-large;
   box-shadow: $box-shadow;
   transition: $transition;
   height: 100%;
@@ -242,13 +230,13 @@ $transition: all 0.2s ease-in-out;
   }
 
   &__titulo {
-    font-size: 1.25rem;
+    font-size: $font-size-xlarge;
     font-weight: 700;
-    color: $color-dark;
+    color: $text-color;
     margin: 0;
     line-height: 1.3;
     position: relative;
-    padding-bottom: 0.75rem;
+    padding-bottom: $spacing-medium;
 
     &::after {
       content: '';
@@ -257,28 +245,28 @@ $transition: all 0.2s ease-in-out;
       left: 0;
       height: 2px;
       width: 2.5rem;
-      background-color: $color-primary-light;
+      background-color: $accent-color;
     }
   }
 
   &__descripcion {
-    font-size: 0.95rem;
+    font-size: $font-size-base;
     line-height: 1.5;
-    color: $color-gray;
+    color: lighten($text-color, 25%);
     margin: 0;
     flex-grow: 1;
   }
 
   &__plazas-container {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: $spacing-medium;
+    margin-bottom: $spacing-medium;
   }
 
   &__plazas {
-    font-size: 0.875rem;
+    font-size: $font-size-small;
     font-weight: 600;
-    color: $color-primary;
-    margin: 0 0 0.25rem;
+    color: $btn-color;
+    margin: 0 0 $spacing-small;
   }
 
   &__barra-plazas {
@@ -291,7 +279,7 @@ $transition: all 0.2s ease-in-out;
     height: 8px;
     flex: 1;
     min-width: 16px;
-    background-color: lighten($color-primary-light, 30%);
+    background-color: lighten($btn-color, 25%);
     border-radius: 4px;
     transition: $transition;
 
@@ -301,38 +289,37 @@ $transition: all 0.2s ease-in-out;
   }
 
   &__acciones {
-    padding-top: 1.25rem;
-    border-top: 1px solid $color-gray-light;
+    padding-top: $spacing-large;
+    border-top: 1px solid lighten($dark-color, 40%);
     display: flex;
     justify-content: flex-end;
     align-items: center;
   }
 
   &__mensaje {
-    font-size: 0.875rem;
+    font-size: $font-size-small;
     font-weight: 600;
     color: $color-success;
     margin: 0;
-    padding: 0.5rem 0;
+    padding: $spacing-small 0;
   }
 
   &__boton {
     @include button-reset;
-    background-color: $color-primary;
-    color: white;
-    padding: 0.75rem 1.25rem;
+    background-color: $btn-color;
+    color: $text-color;
+    padding: $spacing-medium $spacing-large;
     border-radius: $border-radius;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: $font-size-base;
     transition: $transition;
 
     &:hover {
-      background-color: darken($color-primary, 8%);
+      background-color: darken($btn-color, 8%);
     }
 
     &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba($color-primary, 0.3);
+      box-shadow: 0 0 0 3px rgba($btn-color, 0.3);
     }
 
     &:active {
@@ -341,32 +328,32 @@ $transition: all 0.2s ease-in-out;
   }
 
   &__extra {
-    margin-top: 1rem;
-    background: #eff6ff;
-    padding: 1rem;
-    border-left: 4px solid $color-primary;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    margin-top: $spacing-medium;
+    background: lighten($background-color, 10%);
+    padding: $spacing-medium;
+    border-left: 4px solid $accent-color;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
 
     p {
       margin: 0.3rem 0;
-      color: $color-dark;
+      color: $text-color;
 
       strong {
-        color: $color-primary;
+        color: $accent-color;
       }
     }
   }
 
   &__pendiente {
-    font-size: 0.875rem;
+    font-size: $font-size-small;
     color: $color-warning;
     font-weight: 600;
     background: #fef9c3;
     border-left: 4px solid $color-warning;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    margin-top: 0.75rem;
+    padding: $spacing-medium $spacing-large;
+    border-radius: $border-radius;
+    margin-top: $spacing-medium;
   }
 }
 </style>

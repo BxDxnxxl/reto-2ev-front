@@ -60,13 +60,16 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'|
     </template>
   </div>
 </template>
-
 <style lang="scss" scoped>
+@import "@/assets/styles/variables.scss";
+
 .dashboard {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  background-color: $background-color;
+  color: $text-color;
 
   &__login {
     display: flex;
@@ -75,17 +78,34 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'|
     align-items: center;
     height: 100vh;
     text-align: center;
-    padding: 1rem;
+    padding: $spacing-large;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    margin: auto;
   }
 
   &__login-message {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: $font-size-large;
+    color: $text-color;
+    margin-bottom: $spacing-medium;
   }
 
   &__login-button {
-    margin-top: 1rem;
+    margin-top: $spacing-medium;
     width: fit-content;
+    background-color: $btn-color;
+    color: white;
+    border-radius: $border-radius;
+    padding: $spacing-small $spacing-large;
+    font-size: $font-size-base;
+    font-weight: bold;
+    transition: $transition;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken($btn-color, 10%);
+    }
   }
 
   &__container {
@@ -97,9 +117,10 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'|
   &__content {
     flex-grow: 1;
     width: 100%;
-    padding: 1rem;
-    background: white;
+    padding: $spacing-large;
+    background: $card-background;
     overflow-x: auto;
+    color: $text-color;
   }
 
   &__panel {
@@ -110,16 +131,19 @@ const changeView = (view: 'dashboard' | 'usuarios' | 'solicitudes' | 'empresas'|
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: $spacing-large;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: $desktop) {
     &__container {
       flex-direction: row;
     }
 
     &__content {
-      padding: 2rem;
+      padding: $spacing-xl;
       margin-left: 250px;
     }
   }

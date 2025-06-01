@@ -183,104 +183,88 @@ async function borrarPublicacion(id: number) {
     </v-dialog>
   </div>
 </template>
+
 <style scoped lang="scss">
+@import "@/assets/styles/variables.scss";
+
 .publicaciones {
-  // Variables SCSS
-  $color-primary: #1976d2;
-  $color-surface: #ffffff;
-  $color-background: #f5f5f5;
-  $color-text-primary: #212121;
-  $color-text-secondary: #757575;
-  $color-border: #e0e0e0;
-  $color-shadow: rgba(0, 0, 0, 0.12);
-  
-  $border-radius: 8px;
-  $spacing-xs: 0.5rem;
-  $spacing-sm: 0.75rem;
-  $spacing-md: 1rem;
-  $spacing-lg: 1.5rem;
-  $spacing-xl: 2rem;
-  
-  $breakpoint-tablet: 768px;
-  
-  padding: $spacing-md;
+  padding: $spacing-medium;
   max-width: 100%;
   margin: 0 auto;
-  
-  @media (min-width: $breakpoint-tablet) {
+  background-color: $background-color;
+
+  @media (min-width: $desktop) {
     padding: $spacing-xl;
   }
 
-  // Header
   &__header {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
-    margin-bottom: $spacing-lg;
-    
-    @media (min-width: $breakpoint-tablet) {
+    gap: $spacing-medium;
+    margin-bottom: $spacing-large;
+
+    @media (min-width: $desktop) {
       margin-bottom: $spacing-xl;
     }
   }
 
   &__title {
-    font-size: 1.25rem;
+    font-size: $font-size-large;
     font-weight: 600;
-    color: $color-text-primary;
+    color: $primary-color;
     margin: 0;
     text-align: center;
-    
-    @media (min-width: $breakpoint-tablet) {
-      font-size: 1.5rem;
+
+    @media (min-width: $desktop) {
+      font-size: $font-size-xlarge;
     }
   }
 
   &__btn-new {
     align-self: center;
     width: fit-content;
-    
-    @media (min-width: $breakpoint-tablet) {
+
+    @media (min-width: $desktop) {
       align-self: center;
     }
   }
 
   &__btn-text {
-    @media (max-width: $breakpoint-tablet - 1px) {
+    @media (max-width: $desktop - 1px) {
       display: none;
     }
   }
 
-  // Cards para móvil
   &__cards {
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
-    
-    @media (min-width: $breakpoint-tablet) {
+    gap: $spacing-medium;
+
+    @media (min-width: $desktop) {
       display: none;
     }
   }
 
   &__card {
-    background: $color-surface;
-    border: 1px solid $color-border;
+    background: $dark-color;
+    border: 1px solid lighten($dark-color, 20%);
     border-radius: $border-radius;
-    padding: $spacing-md;
-    box-shadow: 0 2px 4px $color-shadow;
+    padding: $spacing-medium;
+    box-shadow: $box-shadow;
   }
 
   &__card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: $spacing-sm;
-    margin-bottom: $spacing-sm;
+    gap: $spacing-small;
+    margin-bottom: $spacing-small;
   }
 
   &__card-title {
-    font-size: 1rem;
+    font-size: $font-size-base;
     font-weight: 500;
-    color: $color-text-primary;
+    color: $primary-color;
     margin: 0;
     flex: 1;
     line-height: 1.4;
@@ -293,19 +277,19 @@ async function borrarPublicacion(id: number) {
   &__card-date {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
-    color: $color-text-secondary;
-    font-size: 0.875rem;
-    margin-bottom: $spacing-md;
+    gap: $spacing-extra-small;
+    color: lighten($primary-color, 20%);
+    font-size: $font-size-small;
+    margin-bottom: $spacing-medium;
   }
 
   &__card-icon {
-    color: $color-text-secondary;
+    color: lighten($primary-color, 20%);
   }
 
   &__card-actions {
     display: flex;
-    gap: $spacing-xs;
+    gap: $spacing-extra-small;
     justify-content: flex-end;
   }
 
@@ -315,40 +299,39 @@ async function borrarPublicacion(id: number) {
     max-width: 120px;
   }
 
-  // Tabla para desktop
   &__table-container {
     display: none;
-    
-    @media (min-width: $breakpoint-tablet) {
+
+    @media (min-width: $desktop) {
       display: block;
-      background: $color-surface;
+      background: $dark-color;
       border-radius: $border-radius;
-      box-shadow: 0 2px 8px $color-shadow;
+      box-shadow: $box-shadow;
       overflow: hidden;
     }
   }
 
   &__table {
     width: 100%;
-    
+
     .v-table__wrapper {
       border-radius: $border-radius;
     }
   }
 
   &__table-header {
-    background-color: #fafafa;
+    background-color: darken($background-color, 5%);
   }
 
   &__table-th {
-    padding: $spacing-md $spacing-lg;
+    padding: $spacing-medium $spacing-large;
     font-weight: 600;
-    color: $color-text-primary;
-    font-size: 0.875rem;
+    color: $primary-color;
+    font-size: $font-size-small;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid $color-border;
-    
+    border-bottom: 2px solid lighten($dark-color, 20%);
+
     &--actions {
       text-align: center;
       width: 120px;
@@ -357,28 +340,28 @@ async function borrarPublicacion(id: number) {
 
   &__table-row {
     transition: background-color 0.2s ease;
-    
+
     &:hover {
-      background-color: #fafafa;
+      background-color: lighten($background-color, 5%);
     }
   }
 
   &__table-td {
-    padding: $spacing-md $spacing-lg;
-    color: $color-text-secondary;
-    font-size: 0.9rem;
-    border-bottom: 1px solid $color-border;
+    padding: $spacing-medium $spacing-large;
+    color: lighten($primary-color, 20%);
+    font-size: $font-size-base;
+    border-bottom: 1px solid lighten($dark-color, 20%);
     vertical-align: middle;
-    
+
     &--title {
       font-weight: 500;
-      color: $color-text-primary;
+      color: $primary-color;
       max-width: 300px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     &--actions {
       text-align: center;
     }
@@ -387,19 +370,19 @@ async function borrarPublicacion(id: number) {
   &__table-actions {
     display: flex;
     justify-content: center;
-    gap: $spacing-xs;
+    gap: $spacing-extra-small;
   }
 
   &__table-btn {
     width: 32px;
     height: 32px;
     min-width: 32px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid $color-border;
-    
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid lighten($dark-color, 30%);
+
     &:hover {
-      background-color: rgba(255, 255, 255, 1);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: rgba(255, 255, 255, 0.2);
+      box-shadow: $box-shadow;
     }
   }
 }
