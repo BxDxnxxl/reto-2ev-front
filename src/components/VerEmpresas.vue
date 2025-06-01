@@ -62,7 +62,6 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
   }
 }
 </script>
-
 <template>
   <div class="empresas">
     <v-container class="empresas__contenedor" fluid>
@@ -75,10 +74,85 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
           prepend-icon="mdi-plus-circle-outline"
           @click="mostrarFormulario = true"
         >
-          Añadir Empresa
+          <span class="empresas__btn-texto">Añadir Empresa</span>
         </v-btn>
       </div>
 
+      <!-- Vista móvil: Cards -->
+      <div class="empresas__cards-movil">
+        <div 
+          v-for="empresa in store.empresasConAfiliados" 
+          :key="empresa.id" 
+          class="empresas__card"
+        >
+          <div class="empresas__card-header">
+            <h3 class="empresas__card-nombre">{{ empresa.nombre }}</h3>
+            <v-chip
+              :color="empresa.activa ? 'success' : 'error'"
+              size="small"
+              class="empresas__card-estado"
+            >
+              {{ empresa.activa ? 'Activa' : 'Inactiva' }}
+            </v-chip>
+          </div>
+          
+          <div class="empresas__card-info">
+            <div class="empresas__card-item">
+              <span class="empresas__card-label">Web:</span>
+              <span class="empresas__card-value">{{ empresa.web }}</span>
+            </div>
+            
+            <div class="empresas__card-item">
+              <span class="empresas__card-label">Acuerdo:</span>
+              <select
+                v-model.number="empresa.acuerdo"
+                @change="actualizarAcuerdo(empresa.id, empresa.acuerdo)"
+                class="empresas__select-acuerdo"
+              >
+                <option :value="0">Sin acuerdo</option>
+                <option :value="1">Plan Básico</option>
+                <option :value="2">Plan Avanzado</option>
+                <option :value="3">Plan Premium</option>
+              </select>
+            </div>
+            
+            <div class="empresas__card-item">
+              <span class="empresas__card-label">Destacadas Mensuales:</span>
+              <span class="empresas__card-value">{{ empresa.limiteDestacadasMensual }}</span>
+            </div>
+            
+            <div class="empresas__card-item">
+              <span class="empresas__card-label">Afiliados:</span>
+              <span class="empresas__card-value">{{ empresa.numeroAfiliados }}</span>
+            </div>
+          </div>
+          
+          <div class="empresas__card-acciones">
+            <v-btn 
+              icon 
+              size="small" 
+              color="warning" 
+              variant="text" 
+              @click="desactivarEmpresa(empresa.id)"
+              class="empresas__btn-accion"
+            >
+              <v-icon size="18">mdi-cancel</v-icon>
+            </v-btn>
+            <v-btn 
+              icon 
+              size="small" 
+              color="error" 
+              variant="text" 
+              @click="borrarEmpresa(empresa.id)"
+              class="empresas__btn-accion"
+            >
+              <v-icon size="18">mdi-delete</v-icon>
+            </v-btn>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista desktop: Tabla -->
       <div class="empresas__tabla-contenedor">
         <v-table class="empresas__tabla" density="comfortable">
           <thead>
@@ -100,7 +174,7 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
                 <select
                   v-model.number="empresa.acuerdo"
                   @change="actualizarAcuerdo(empresa.id, empresa.acuerdo)"
-                  class="empresa__select-acuerdo"
+                  class="empresas__select-acuerdo"
                 >
                   <option :value="0">Sin acuerdo</option>
                   <option :value="1">Plan Básico</option>
@@ -137,27 +211,35 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
     </v-dialog>
   </div>
 </template>
+
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
 .empresas {
   &__contenedor {
-    padding: $spacing-large $spacing-medium;
+    padding: $spacing-medium;
     max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: $spacing-large;
+    gap: $spacing-medium;
+
+    // Tablet y desktop
+    @media (min-width: 768px) {
+      padding: $spacing-large $spacing-medium;
+      gap: $spacing-large;
+    }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-small;
 
     .empresas__titulo {
-      font-size: $font-size-xlarge;
+      font-size: $font-size-large;
       font-weight: 800;
       margin: 0;
       color: $primary-color;
@@ -165,20 +247,43 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      flex-shrink: 0;
+
+      // Desktop
+      @media (min-width: 768px) {
+        font-size: $font-size-xlarge;
+      }
     }
 
     .empresas__btn-crear {
       font-weight: bold;
-      height: 42px;
-      font-size: $font-size-base;
+      height: 36px;
+      font-size: $font-size-small;
       background: $primary-gradient;
       color: white;
       border-radius: $border-radius;
-      padding: $spacing-small $spacing-medium;
+      padding: $spacing-extra-small $spacing-small;
       border: none;
       cursor: pointer;
       box-shadow: $box-shadow;
       transition: $transition;
+      flex-shrink: 0;
+      min-width: auto;
+
+      .empresas__btn-texto {
+        display: none;
+      }
+
+      // Tablet y desktop
+      @media (min-width: 768px) {
+        height: 42px;
+        font-size: $font-size-base;
+        padding: $spacing-small $spacing-medium;
+
+        .empresas__btn-texto {
+          display: inline;
+        }
+      }
 
       &:hover {
         transform: translateY(-2px);
@@ -187,25 +292,118 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
     }
   }
 
-  &__tabla-contenedor {
-    overflow-x: auto;
-    width: 100%;
+  // Vista móvil con cards
+  &__cards-movil {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
+
+    // Ocultar en tablet y desktop
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__card {
     background-color: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
-    border: 1px solid $primary-color;
+    border: 1px solid rgba($primary-color, 0.2);
+    padding: $spacing-medium;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+  }
 
-    &::-webkit-scrollbar {
-      height: 6px;
-    }
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-small;
+    flex-wrap: wrap;
+    gap: $spacing-extra-small;
+  }
 
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba($primary-color, 0.4);
+  &__card-nombre {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+    flex: 1;
+    word-break: break-word;
+  }
+
+  &__card-estado {
+    flex-shrink: 0;
+  }
+
+  &__card-info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+  }
+
+  &__card-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-small;
+    flex-wrap: wrap;
+  }
+
+  &__card-label {
+    font-weight: 600;
+    color: $primary-color;
+    font-size: $font-size-small;
+    flex-shrink: 0;
+  }
+
+  &__card-value {
+    color: $text-color;
+    font-size: $font-size-small;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  &__card-acciones {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-small;
+    margin-top: $spacing-small;
+    padding-top: $spacing-small;
+    border-top: 1px solid rgba($primary-color, 0.1);
+  }
+
+  &__btn-accion {
+    min-width: 40px;
+  }
+
+  // Vista desktop con tabla
+  &__tabla-contenedor {
+    display: none;
+
+    // Mostrar solo en tablet y desktop
+    @media (min-width: 768px) {
+      display: block;
+      overflow-x: auto;
+      width: 100%;
+      background-color: $card-background;
       border-radius: $border-radius;
-    }
+      box-shadow: $box-shadow;
+      border: 1px solid $primary-color;
 
-    &::-webkit-scrollbar-track {
-      background: rgba($primary-color, 0.05);
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba($primary-color, 0.4);
+        border-radius: $border-radius;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgba($primary-color, 0.05);
+      }
     }
   }
 
@@ -242,13 +440,20 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
   &__select-acuerdo {
     width: 100%;
     max-width: 160px;
-    padding: 0.5rem 0.75rem;
+    padding: 0.4rem 0.6rem;
     font-size: $font-size-small;
     border: 1px solid $color-disabled;
     border-radius: $border-radius;
     background-color: white;
     color: $primary-color;
     transition: $transition;
+
+    // En móvil, hacer el select más grande
+    @media (max-width: 767px) {
+      max-width: none;
+      padding: 0.6rem 0.8rem;
+      font-size: $font-size-base;
+    }
 
     &:focus {
       outline: none;
