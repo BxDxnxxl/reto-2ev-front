@@ -80,32 +80,70 @@ function submitForm() {
   </v-card>
 </template>
 
-
 <style scoped lang="scss">
+@import "@/assets/styles/variables.scss";
+
 .form-publicacion {
-  padding: 1.5rem;
+  padding: $spacing-large;
   max-width: 700px;
-  margin: 2rem auto;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  background: white;
+  margin: $spacing-xl auto;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  background: $background-color;
+  color: $text-color;
 
   &__titulo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-size: $font-size-xlarge;
+    font-weight: 700;
+    margin-bottom: $spacing-medium;
     text-align: center;
+    color: $primary-color;
   }
 
   &__formulario {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: $spacing-medium;
+
+    input,
+    textarea,
+    select {
+      padding: $spacing-small;
+      border-radius: $border-radius;
+      border: 1px solid $color-disabled;
+      background: #ffffff;
+      color: #000000;
+      font-size: $font-size-base;
+      transition: $transition;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba(242, 84, 33, 0.3);
+      }
+    }
+
+    label {
+      font-weight: 600;
+      font-size: $font-size-small;
+      color: lighten($text-color, 20%);
+    }
   }
 
   &__btn {
     align-self: center;
+    background-color: $primary-color;
+    color: $text-color;
     font-weight: bold;
+    padding: $spacing-small $spacing-medium;
+    border-radius: $border-radius;
+    border: none;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+      background-color: darken($primary-color, 5%);
+    }
   }
 }
 </style>

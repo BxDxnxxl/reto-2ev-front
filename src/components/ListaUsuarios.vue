@@ -145,7 +145,6 @@ function editUsuario(id: number) {
     </div>
   </div>
 </template>
-
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
@@ -154,48 +153,47 @@ function editUsuario(id: number) {
   width: 100%;
   max-width: 1200px;
   margin: $spacing-large auto;
-  
-  // Botón para agregar usuario
+  color: $text-color;
+
   .boton-agregar {
     margin-bottom: $spacing-large;
     display: block;
     width: 100%;
-    
-    @media (min-width: 768px) {
+
+    @media (min-width: $desktop) {
       width: auto;
       margin-left: 0;
     }
   }
 
-  // Contenedor de la tabla
   &__contenedor {
     width: 100%;
     overflow-x: auto;
-    display: none; // Ocultar en móvil
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
-    @media (min-width: 768px) {
-      display: block; // Mostrar en desktop
+    display: none;
+    background: lighten($card-background, 6%); // contraste con fondo oscuro
+    border-radius: $border-radius;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+    @media (min-width: $desktop) {
+      display: block;
     }
   }
 
-  // Tabla principal
   &__tabla {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     table-layout: fixed;
-    font-size: 0.9rem;
+    font-size: $font-size-small;
+    color: $text-color;
   }
 
-  // Encabezado
   &__encabezado {
     background: $primary-color;
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
+
     th {
       padding: $spacing-medium;
       font-weight: 500;
@@ -205,15 +203,14 @@ function editUsuario(id: number) {
     }
   }
 
-  // Celdas
   &__celda {
     padding: $spacing-medium;
     text-align: center;
-    border-bottom: 1px solid rgba($secondary-color, 0.2);
+    border-bottom: 1px solid lighten($card-background, 15%);
     vertical-align: middle;
     word-wrap: break-word;
     min-width: 120px;
-    
+
     &--acciones {
       display: flex;
       justify-content: center;
@@ -222,76 +219,75 @@ function editUsuario(id: number) {
     }
   }
 
-  // Filas
   &__fila {
     transition: background-color 0.2s;
-    
+
     &:hover {
-      background-color: rgba($secondary-color, 0.05);
+      background-color: lighten($card-background, 12%);
     }
-    
+
     &:last-child .tabla-usuarios__celda {
       border-bottom: none;
     }
   }
-  
-  // Botones de acciones
+
   &__boton {
     margin: 0 2px;
   }
-  
-  // Vista móvil
+
   &__mobile {
     display: block;
-    
-    @media (min-width: 768px) {
+
+    @media (min-width: $desktop) {
       display: none;
     }
   }
-  
-  // Tarjetas móviles
+
   &__card {
-    border-radius: 8px;
+    border-radius: $border-radius;
     overflow: hidden;
-    
+    background: lighten($card-background, 6%);
+    box-shadow: $box-shadow;
+    color: $text-color;
+
     &-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: $spacing-medium;
-      background-color: rgba($primary-color, 0.05);
+      background-color: rgba($primary-color, 0.1);
     }
-    
+
     &-actions {
       display: flex;
       gap: $spacing-small;
     }
-    
+
     &-content {
       padding: $spacing-medium;
     }
-    
+
     &-item {
       padding: $spacing-small 0;
       display: flex;
       flex-direction: column;
-      
+
       &:not(:last-child) {
-        border-bottom: 1px solid rgba($secondary-color, 0.1);
+        border-bottom: 1px solid lighten($card-background, 10%);
         margin-bottom: $spacing-small;
       }
     }
   }
-  
+
   &__nombre {
     font-weight: 500;
-    font-size: 1rem;
+    font-size: $font-size-base;
   }
-  
+
   &__label {
-    font-size: 0.8rem;
-    color: rgba(0, 0, 0, 0.6);
-    margin-bottom: 4px;
+    font-size: $font-size-small;
+    color: lighten($text-color, 30%);
+    margin-bottom: $spacing-extra-small;
   }
 }
 </style>

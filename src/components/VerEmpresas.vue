@@ -137,20 +137,17 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
     </v-dialog>
   </div>
 </template>
-
 <style scoped lang="scss">
-.empresas {
-  $color-text: #374151;
-  $color-text-secondary: #6b7280;
-  $color-border: #e5e7eb;
+@import '@/assets/styles/variables.scss';
 
+.empresas {
   &__contenedor {
-    padding: 2rem 1rem;
+    padding: $spacing-large $spacing-medium;
     max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: $spacing-large;
   }
 
   &__header {
@@ -160,25 +157,56 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
     align-items: center;
 
     .empresas__titulo {
-      font-size: 1.8rem;
-      font-weight: bold;
+      font-size: $font-size-xlarge;
+      font-weight: 800;
       margin: 0;
+      color: $primary-color;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .empresas__btn-crear {
       font-weight: bold;
       height: 42px;
-      font-size: 0.95rem;
+      font-size: $font-size-base;
+      background: $primary-gradient;
+      color: white;
+      border-radius: $border-radius;
+      padding: $spacing-small $spacing-medium;
+      border: none;
+      cursor: pointer;
+      box-shadow: $box-shadow;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 4px 8px rgba($primary-color, 0.3);
+      }
     }
   }
 
   &__tabla-contenedor {
     overflow-x: auto;
-    overflow-y: hidden;
     width: 100%;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background-color: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    border: 1px solid $primary-color;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba($primary-color, 0.4);
+      border-radius: $border-radius;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba($primary-color, 0.05);
+    }
   }
 
   &__tabla {
@@ -187,43 +215,65 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
     border-collapse: collapse;
 
     th {
-      background-color: #f3f4f6;
-      font-weight: 600;
-      padding: 1rem;
-      color: $color-text;
+      background-color: $card-background;
+      color: $primary-color;
+      font-weight: 700;
+      padding: $spacing-medium;
+      font-size: $font-size-small;
       text-align: center;
+      text-transform: uppercase;
+      border-bottom: 2px solid $primary-color;
     }
 
     td {
-      padding: 0.9rem;
-      color: $color-text-secondary;
+      background-color: $card-background;
+      color: $primary-color;
+      font-size: $font-size-base;
+      padding: $spacing-medium;
       text-align: center;
-      border-bottom: 1px solid $color-border;
+      border-bottom: 1px solid $primary-color;
     }
 
-    tr:hover {
-      background-color: #f9fafb;
+    tr:hover td {
+      background-color: lighten($card-background, 3%);
     }
   }
 
   &__select-acuerdo {
     width: 100%;
     max-width: 160px;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-    border: 1px solid $color-border;
-    border-radius: 6px;
-    background-color: #ffffff;
-    color: $color-text-secondary;
-    transition: border-color 0.2s ease;
+    padding: 0.5rem 0.75rem;
+    font-size: $font-size-small;
+    border: 1px solid $color-disabled;
+    border-radius: $border-radius;
+    background-color: white;
+    color: $primary-color;
+    transition: $transition;
 
     &:focus {
       outline: none;
-      border-color: #3b82f6;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
     }
 
     option {
-      color: $color-text;
+      color: $dark-color;
+    }
+  }
+
+  // Botones de acciones (editar, borrar, etc.)
+  .btn-accion {
+    background-color: $color-disabled;
+    color: $color-disabled;
+    border: none;
+    padding: $spacing-extra-small $spacing-small;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+      background-color: darken($color-disabled, 5%);
     }
   }
 }

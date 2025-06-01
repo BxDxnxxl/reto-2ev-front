@@ -236,158 +236,446 @@ async function guardarVideojuego(videojuego: any) {
     </v-dialog>
   </div>
 </template>
-
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .videojuegos {
-  padding: 2rem;
+  padding: $spacing-large;
+  background-color: $background-color;
+  color: $text-color;
+  min-height: 100vh;
 
   &__contenedor {
-    max-width: 1200px;
+    max-width: 1400px; // Aumentado para dar más espacio a la tabla
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: $spacing-large;
   }
 
   &__header {
     text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: $spacing-xl;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: $spacing-medium;
     align-items: center;
+    border: 1px solid rgba($primary-color, 0.2);
   }
 
   &__titulo {
-    font-size: 2rem;
+    font-size: $font-size-xlarge;
     font-weight: 700;
-    color: #1a202c;
+    color: $text-color;
     margin: 0;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   &__btn-crear {
     font-weight: 600;
+    background: $primary-gradient;
+    color: $text-color;
+    border-radius: $border-radius;
+    padding: $spacing-medium $spacing-large;
+    font-size: $font-size-base;
+    border: none;
+    cursor: pointer;
+    transition: $transition;
+    box-shadow: $box-shadow;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0px 4px 8px rgba($primary-color, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   &__controles {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; // Mejor distribución del espacio
     align-items: center;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: $spacing-medium $spacing-large;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: $spacing-medium;
+    border: 1px solid rgba($primary-color, 0.1);
   }
 
   &__info {
-    color: #4a5568;
+    color: rgba($text-color, 0.8);
     font-weight: 500;
+    font-size: $font-size-small;
   }
 
   &__items-por-pagina {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    
-    label {
-      color: #4a5568;
-      font-weight: 500;
-    }
-  }
+    gap: $spacing-small;
 
-  &__select-items {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    background: white;
+    label {
+      color: rgba($text-color, 0.8);
+      font-weight: 500;
+      font-size: $font-size-small;
+      white-space: nowrap;
+    }
+
+    select {
+      padding: $spacing-small $spacing-medium;
+      border-radius: $border-radius;
+      border: 1px solid $color-disabled;
+      background-color: $card-background;
+      color: $text-color;
+      font-size: $font-size-small;
+      transition: $transition;
+      min-width: 60px;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      }
+    }
   }
 
   &__tabla-contenedor {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    overflow-x: auto;
+    border: 1px solid rgba($primary-color, 0.1);
+    margin: $spacing-medium 0;
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba($primary-color, 0.1);
+      border-radius: $border-radius;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba($primary-color, 0.5);
+      border-radius: $border-radius;
+
+      &:hover {
+        background: rgba($primary-color, 0.7);
+      }
+    }
   }
 
   &__tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-base;
+    table-layout: auto; // Permite que las columnas se ajusten automáticamente
+
     th {
-      background: #f8fafc;
+      background: $card-background;
       font-weight: 600;
-      color: #1a202c;
-      padding: 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      color: $primary-color;
+      padding: $spacing-medium $spacing-large; // Más padding horizontal
+      font-size: $font-size-base; // Tamaño de fuente más grande
+      text-align: left; // Alineación a la izquierda para mejor legibilidad
+      border-bottom: 2px solid #ff8c00; // Línea naranja
+      border-right: 1px solid #ff8c00; // Separadores verticales naranjas
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      // Columnas específicas con anchos optimizados
+      &:nth-child(1) { width: 15%; } // ID
+      &:nth-child(2) { width: 25%; } // Nombre
+      &:nth-child(3) { width: 15%; } // Género
+      &:nth-child(4) { width: 15%; } // Plataforma
+      &:nth-child(5) { width: 10%; } // PEGI
+      &:nth-child(6) { width: 10%; } // Precio
+      &:nth-child(7) { width: 10%; } // Acciones
     }
 
     td {
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
+      padding: $spacing-medium $spacing-large; // Más padding horizontal
+      font-size: $font-size-base;
+      color: $primary-color;
+      background-color: $card-background;
+      border-bottom: 1px solid #ff8c00; // Línea naranja
+      border-right: 1px solid rgba(#ff8c00, 0.3); // Separadores verticales naranjas más suaves
+      transition: $transition;
+      text-align: left; // Alineación a la izquierda
       vertical-align: middle;
+      line-height: 1.5;
+
+      &:last-child {
+        border-right: none;
+        text-align: center; // Centrar solo la columna de acciones
+      }
+
+      // Ajustes específicos por tipo de contenido
+      &:nth-child(1) { // ID
+        font-weight: 600;
+        text-align: center;
+      }
+
+      &:nth-child(2) { // Nombre
+        font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:nth-child(5) { // PEGI
+        text-align: center;
+      }
+
+      &:nth-child(6) { // Precio
+        text-align: right;
+        font-weight: 600;
+      }
     }
 
-    tr:hover {
-      background: #f8fafc;
+    tr:hover td {
+      background-color: rgba($primary-color, 0.05);
+      transform: scale(1.01);
+    }
+
+    tr:nth-child(even) td {
+      background-color: rgba($card-background, 0.8);
+    }
+
+    // Mejor espaciado entre filas
+    tr {
+      height: 60px; // Altura mínima para las filas
     }
   }
 
   .pegi-badge {
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    background: rgba($primary-color, 0.2);
+    color: $primary-color;
+    padding: $spacing-extra-small $spacing-small;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba($primary-color, 0.3);
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
   }
 
   .estado-vacio {
     text-align: center;
-    padding: 3rem;
-    color: #718096;
+    padding: $spacing-xxl;
+    color: rgba($text-color, 0.6);
+    font-size: $font-size-large;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+      content: "🎮";
+      display: block;
+      font-size: 3rem;
+      margin-bottom: $spacing-medium;
+      opacity: 0.5;
+    }
   }
 
   &__paginacion {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: $spacing-small;
+    padding: $spacing-medium;
+    background: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    border: 1px solid rgba($primary-color, 0.1);
+    flex-wrap: wrap;
+
+    button {
+      background: $primary-gradient;
+      color: $text-color;
+      border: none;
+      padding: $spacing-small $spacing-large;
+      border-radius: $border-radius;
+      font-weight: 700;
+      font-size: $font-size-base;
+      cursor: pointer;
+      transition: $transition;
+      min-width: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba($primary-color, 0.3);
+
+      &:hover:not(.disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0px 4px 8px rgba($primary-color, 0.4);
+      }
+
+      &.disabled {
+        background: $color-disabled;
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+
+        &:hover {
+          transform: none;
+        }
+      }
+
+      &.current {
+        background: $text-color;
+        color: $primary-color;
+        font-weight: 800;
+        border: 2px solid $primary-color;
+      }
+    }
+
+    .pagina-info {
+      color: rgba($text-color, 0.9);
+      font-weight: 500;
+      font-size: $font-size-base;
+      padding: 0 $spacing-medium;
+      min-width: 120px;
+      text-align: center;
+    }
   }
 
-  .pagina-info {
-    color: #4a5568;
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-xxl;
+    color: rgba($text-color, 0.7);
+    font-size: $font-size-base;
+  }
+
+  &__error {
+    background: rgba($color-error, 0.1);
+    border: 1px solid rgba($color-error, 0.3);
+    color: $color-error;
+    padding: $spacing-medium;
+    border-radius: $border-radius;
+    text-align: center;
     font-weight: 500;
   }
 
-  @media (max-width: 768px) {
-    padding: 1rem;
+  @media (max-width: $desktop) {
+    padding: $spacing-medium;
+
+    &__contenedor {
+      max-width: 100%;
+    }
 
     &__header {
-      padding: 1.5rem;
+      padding: $spacing-large;
     }
 
     &__titulo {
-      font-size: 1.5rem;
+      font-size: $font-size-large;
     }
 
     &__controles {
       flex-direction: column;
       text-align: center;
-    }
-
-    &__tabla-contenedor {
-      overflow-x: auto;
+      gap: $spacing-medium;
+      justify-content: center;
     }
 
     &__paginacion {
       flex-wrap: wrap;
+      gap: $spacing-extra-small;
+
+      button {
+        min-width: 35px;
+        height: 35px;
+        font-size: $font-size-small;
+      }
     }
+
+    &__tabla-contenedor {
+      font-size: $font-size-small;
+    }
+
+    &__tabla {
+      th, td {
+        padding: $spacing-small $spacing-medium;
+      }
+
+      th {
+        font-size: $font-size-small;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__tabla {
+      th, td {
+        padding: $spacing-extra-small $spacing-small;
+        font-size: $font-size-small;
+      }
+
+      tr {
+        height: 50px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: $spacing-small;
+
+    &__header {
+      padding: $spacing-medium;
+    }
+
+    &__titulo {
+      font-size: $font-size-base;
+    }
+
+    &__btn-crear {
+      padding: $spacing-small $spacing-medium;
+      font-size: $font-size-small;
+    }
+
+    &__tabla {
+      font-size: $font-size-small;
+
+      th, td {
+        padding: $spacing-extra-small $spacing-small;
+      }
+
+      tr {
+        height: 45px;
+      }
+    }
+  }
+
+  * {
+    transition: $transition;
   }
 }
 </style>
