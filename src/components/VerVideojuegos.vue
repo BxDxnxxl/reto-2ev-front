@@ -246,7 +246,7 @@ async function guardarVideojuego(videojuego: any) {
   min-height: 100vh;
 
   &__contenedor {
-    max-width: 1200px;
+    max-width: 1400px; // Aumentado para dar más espacio a la tabla
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -303,16 +303,15 @@ async function guardarVideojuego(videojuego: any) {
 
   &__controles {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; // Mejor distribución del espacio
     align-items: center;
-    padding: $spacing-medium;
+    padding: $spacing-medium $spacing-large;
     background: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
     flex-wrap: wrap;
     gap: $spacing-medium;
     border: 1px solid rgba($primary-color, 0.1);
-    text-align: center;
   }
 
   &__info {
@@ -330,6 +329,7 @@ async function guardarVideojuego(videojuego: any) {
       color: rgba($text-color, 0.8);
       font-weight: 500;
       font-size: $font-size-small;
+      white-space: nowrap;
     }
 
     select {
@@ -340,6 +340,7 @@ async function guardarVideojuego(videojuego: any) {
       color: $text-color;
       font-size: $font-size-small;
       transition: $transition;
+      min-width: 60px;
 
       &:focus {
         outline: none;
@@ -355,6 +356,7 @@ async function guardarVideojuego(videojuego: any) {
     box-shadow: $box-shadow;
     overflow-x: auto;
     border: 1px solid rgba($primary-color, 0.1);
+    margin: $spacing-medium 0;
 
     &::-webkit-scrollbar {
       height: 8px;
@@ -378,35 +380,92 @@ async function guardarVideojuego(videojuego: any) {
   &__tabla {
     width: 100%;
     border-collapse: collapse;
+    font-size: $font-size-base;
+    table-layout: auto; // Permite que las columnas se ajusten automáticamente
 
     th {
-      background: #e5e5e5;
+      background: $card-background;
       font-weight: 600;
       color: $primary-color;
-      padding: $spacing-medium;
-      font-size: $font-size-small;
-      text-align: center;
-      border-bottom: 2px solid #d0d0d0;
+      padding: $spacing-medium $spacing-large; // Más padding horizontal
+      font-size: $font-size-base; // Tamaño de fuente más grande
+      text-align: left; // Alineación a la izquierda para mejor legibilidad
+      border-bottom: 2px solid #ff8c00; // Línea naranja
+      border-right: 1px solid #ff8c00; // Separadores verticales naranjas
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      // Columnas específicas con anchos optimizados
+      &:nth-child(1) { width: 15%; } // ID
+      &:nth-child(2) { width: 25%; } // Nombre
+      &:nth-child(3) { width: 15%; } // Género
+      &:nth-child(4) { width: 15%; } // Plataforma
+      &:nth-child(5) { width: 10%; } // PEGI
+      &:nth-child(6) { width: 10%; } // Precio
+      &:nth-child(7) { width: 10%; } // Acciones
     }
 
     td {
-      padding: $spacing-medium;
+      padding: $spacing-medium $spacing-large; // Más padding horizontal
       font-size: $font-size-base;
       color: $primary-color;
-      background-color: #f8f8f8;
-      border-bottom: 1px solid #e0e0e0;
+      background-color: $card-background;
+      border-bottom: 1px solid #ff8c00; // Línea naranja
+      border-right: 1px solid rgba(#ff8c00, 0.3); // Separadores verticales naranjas más suaves
       transition: $transition;
-      text-align: center;
+      text-align: left; // Alineación a la izquierda
+      vertical-align: middle;
+      line-height: 1.5;
+
+      &:last-child {
+        border-right: none;
+        text-align: center; // Centrar solo la columna de acciones
+      }
+
+      // Ajustes específicos por tipo de contenido
+      &:nth-child(1) { // ID
+        font-weight: 600;
+        text-align: center;
+      }
+
+      &:nth-child(2) { // Nombre
+        font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:nth-child(5) { // PEGI
+        text-align: center;
+      }
+
+      &:nth-child(6) { // Precio
+        text-align: right;
+        font-weight: 600;
+      }
     }
 
     tr:hover td {
-      background-color: #f0f0f0;
+      background-color: rgba($primary-color, 0.05);
+      transform: scale(1.01);
     }
 
     tr:nth-child(even) td {
-      background-color: #f5f5f5;
+      background-color: rgba($card-background, 0.8);
+    }
+
+    // Mejor espaciado entre filas
+    tr {
+      height: 60px; // Altura mínima para las filas
     }
   }
 
@@ -420,6 +479,9 @@ async function guardarVideojuego(videojuego: any) {
     text-transform: uppercase;
     letter-spacing: 0.3px;
     border: 1px solid rgba($primary-color, 0.3);
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
   }
 
   .estado-vacio {
@@ -525,6 +587,10 @@ async function guardarVideojuego(videojuego: any) {
   @media (max-width: $desktop) {
     padding: $spacing-medium;
 
+    &__contenedor {
+      max-width: 100%;
+    }
+
     &__header {
       padding: $spacing-large;
     }
@@ -537,6 +603,7 @@ async function guardarVideojuego(videojuego: any) {
       flex-direction: column;
       text-align: center;
       gap: $spacing-medium;
+      justify-content: center;
     }
 
     &__paginacion {
@@ -556,7 +623,24 @@ async function guardarVideojuego(videojuego: any) {
 
     &__tabla {
       th, td {
-        padding: $spacing-small;
+        padding: $spacing-small $spacing-medium;
+      }
+
+      th {
+        font-size: $font-size-small;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__tabla {
+      th, td {
+        padding: $spacing-extra-small $spacing-small;
+        font-size: $font-size-small;
+      }
+
+      tr {
+        height: 50px;
       }
     }
   }
@@ -582,6 +666,10 @@ async function guardarVideojuego(videojuego: any) {
 
       th, td {
         padding: $spacing-extra-small $spacing-small;
+      }
+
+      tr {
+        height: 45px;
       }
     }
   }
