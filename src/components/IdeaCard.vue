@@ -12,11 +12,21 @@ const usuariosApuntadosStore = useUsuariosApuntadosStore();
 const mostrarFormulario = ref(false);
 const estadoApuntado = ref<{ [key: number]: boolean }>({});
 const estadoAceptado = ref<{ [key: number]: boolean }>({});
+const tipoSeleccionado = ref<number | null>(null);
 
 onMounted(async () => {
   await ideasStore.fetchIdeasConPlazas();
   await verificarEstados();
+  await ideasStore.fetchTiposIdeas();
 });
+
+const onTipoSeleccionado = async () => {
+  if (tipoSeleccionado.value) {
+    await ideasStore.fetchIdeasPorTipo(tipoSeleccionado.value);
+    await verificarEstados();
+  }
+};
+
 
 const toggleFormulario = () => {
   mostrarFormulario.value = !mostrarFormulario.value;
@@ -77,18 +87,27 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     <button class="ideas__boton" @click="toggleFormulario">
       {{ mostrarFormulario ? "Cancelar" : "➕ Añadir idea" }}
     </button>
-
+    <select class="ideas__select" v-model="tipoSeleccionado" @change="onTipoSeleccionado">
+      <option disabled value="">Filtrar por tipo de idea</option>
+      <option :value="null">Todas las ideas</option>
+      <option v-for="tipo in ideasStore.tipos" :key="tipo.id" :value="tipo.id">
+        {{ tipo.nombre }}
+      </option>
+    </select>
     <FormularioIdea v-if="mostrarFormulario" @ideaPublicada="onIdeaPublicada" />
 
     <div class="ideas__lista">
       <div
-        v-for="idea in ideasStore.ideasConPlazas"
+        v-for="idea in tipoSeleccionado ? ideasStore.ideasFiltradasPorTipo : ideasStore.ideasConPlazas"
         :key="idea.id"
         class="idea-card"
       >
         <div class="idea-card__contenido">
           <h3 class="idea-card__titulo">{{ idea.titulo }}</h3>
-          <p class="idea-card__descripcion">{{ idea.descripcion }}</p>
+          <p class="idea-card__tipo">
+            Tipo: <strong>{{ idea.tipoIdeaNombre }}</strong>
+          </p>
+          <p class="idea-card__descripcion">Descripción: {{ idea.descripcion }}</p>
 
           <!-- Contenedor fijo para plazas -->
           <div class="idea-card__plazas-container">
@@ -145,6 +164,7 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
   </div>
 </template><style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
+@import "@/assets/styles/mixins.scss";
 
 @mixin flex-column {
   display: flex;
@@ -186,6 +206,24 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
 
     &:active {
       transform: translateY(0);
+    }
+  }
+   &__select {
+    padding: $spacing-medium $spacing-large;
+    border: 1px solid lighten($secondary-color, 40%);
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    font-family: inherit;
+    background-color: $btn-color;
+    color: $text-color;
+    transition: $transition;
+    outline: none;
+    margin-bottom: $spacing-large;
+    margin-left: $spacing-large;
+
+    &:focus {
+      border-color: $accent-color;
+      box-shadow: 0 0 0 2px rgba($accent-color, 0.3);
     }
   }
 

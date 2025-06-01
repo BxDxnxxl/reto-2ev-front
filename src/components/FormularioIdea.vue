@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
 import { useSocialStore } from "@/stores/RedSocial";
-import type { Ideas } from "@/stores/dtos/Ideas.dto";
+import type { IdeaDto } from "@/stores/dtos/Ideas.dto";
 
 const emit = defineEmits(["ideaPublicada"]);
 
@@ -11,13 +11,14 @@ const ideasStore = useIdeasStore();
 const usersStore = useUsersStore();
 const socialStore = useSocialStore();
 
-const nuevaIdea = ref<Ideas>({
+const nuevaIdea = ref<IdeaDto>({
   id: 0,
   fkIdUsuario: usersStore.currentUser?.id ?? 0,
   titulo: "",
   descripcion: "",
   plazasDisponibles: 1,
   fkIdRedSocial: 1,
+  fkIdTipoIdea: 1,
   contacto: "",
   instrucciones: "",
   fechaPublicacion: new Date()
@@ -41,6 +42,7 @@ const publicar = async () => {
     descripcion: "",
     plazasDisponibles: 1,
     fkIdRedSocial: 1,
+    fkIdTipoIdea: 1,
     contacto: "",
     instrucciones: "",
     fechaPublicacion: new Date()
@@ -49,6 +51,7 @@ const publicar = async () => {
 
 onMounted(async () => {
   await socialStore.fetchRedes();
+  await ideasStore.fetchTiposIdeas(); 
 });
 </script>
 
@@ -92,6 +95,12 @@ onMounted(async () => {
         :value="red.id"
       >
         {{ red.nombre }}
+      </option>
+    </select>
+
+    <select class="formulario-idea__select" v-model="nuevaIdea.fkIdTipoIdea" required>
+      <option v-for="tipo in ideasStore.tipos" :key="tipo.id" :value="tipo.id">
+        {{ tipo.nombre }}
       </option>
     </select>
 

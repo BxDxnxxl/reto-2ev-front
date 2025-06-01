@@ -1,12 +1,15 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Ideas } from "@/stores/dtos/Ideas.dto";
+import type { IdeaDto } from "@/stores/dtos/Ideas.dto";
 import type { IdeaConPlazasDto } from "@/stores/dtos/IdeasConPlazos.dto";
+import type { TipoIdea } from "@/stores/dtos/TipoIdea.dto";
 
 export const useIdeasStore = defineStore("ideas", () => {
-  const ideasBase = ref<Ideas[]>([]);
+  const ideasBase = ref<IdeaDto[]>([]);
   const ideasConPlazas = ref<IdeaConPlazasDto[]>([]);
-
+  const ideasFiltradasPorTipo = ref<IdeaConPlazasDto[]>([]);
+  const tipos = ref<TipoIdea[]>([]);
+  
   async function fetchIdeasBase() {
     try {
       const res = await fetch("http://localhost:4444/api/ideas");
@@ -27,7 +30,7 @@ export const useIdeasStore = defineStore("ideas", () => {
     }
   }
 
-  async function publicarIdea(nuevaIdea: Ideas) {
+  async function publicarIdea(nuevaIdea: IdeaDto) {
     try {
       const response = await fetch("http://localhost:4444/api/ideas", {
         method: "POST",
@@ -46,11 +49,35 @@ export const useIdeasStore = defineStore("ideas", () => {
     }
   }
 
+  async function fetchIdeasPorTipo(idTipoIdea: number) {
+    try {
+      const res = await fetch(`http://localhost:4444/api/ideas/conPlazas/tipo/${idTipoIdea}`);
+      if (!res.ok) throw new Error("Error al filtrar ideas por tipo");
+      ideasFiltradasPorTipo.value = await res.json();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function fetchTiposIdeas() {
+    try {
+      const res = await fetch("http://localhost:4444/api/Ideas/tipos");
+      if (!res.ok) throw new Error("Error al cargar tipos de ideas");
+      tipos.value = await res.json();
+    } catch (error) {
+      console.error("Error en fetchTiposIdeas:", error);
+    }
+  }
+
   return {
     ideasBase,
     ideasConPlazas,
+    ideasFiltradasPorTipo,
+    tipos,
     fetchIdeasBase,
     fetchIdeasConPlazas,
-    publicarIdea
+    publicarIdea,
+    fetchIdeasPorTipo,
+    fetchTiposIdeas
   };
 });

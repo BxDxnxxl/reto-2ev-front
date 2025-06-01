@@ -8,6 +8,8 @@ export interface IdeaConPlazasDto {
   plazasTotales: number;
   fkIdRedSocial: number;
   redSocialNombre: string;
+  fkIdTipoIdea: number;         
+  tipoIdeaNombre: string;         
   contacto: string;
   instrucciones: string;
   fechaPublicacion: Date;
