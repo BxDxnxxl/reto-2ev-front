@@ -124,14 +124,14 @@ async function guardarVideojuego(videojuego: any) {
           prepend-icon="mdi-plus-circle-outline"
           @click="mostrarFormulario = true"
         >
-          Añadir Videojuego
+          <span class="videojuegos__btn-texto">Añadir Videojuego</span>
         </v-btn>
       </div>
 
       <!-- Controles simples -->
       <div class="videojuegos__controles">
         <div class="videojuegos__info">
-          Mostrando {{ videojuegosPaginados.length }} de {{ store.games?.length || 0 }} videojuegos
+          <span class="videojuegos__info-texto">Mostrando {{ videojuegosPaginados.length }} de {{ store.games?.length || 0 }} videojuegos</span>
         </div>
         
         <div class="videojuegos__items-por-pagina">
@@ -149,7 +149,56 @@ async function guardarVideojuego(videojuego: any) {
         </div>
       </div>
 
-      <!-- Tabla simple -->
+      <!-- Vista móvil: Cards -->
+      <div class="videojuegos__cards-movil">
+        <div 
+          v-for="v in videojuegosPaginados" 
+          :key="v.id" 
+          class="videojuegos__card"
+        >
+          <div class="videojuegos__card-header">
+            <h3 class="videojuegos__card-titulo">{{ v.titulo }}</h3>
+            <span v-if="v.pegi" class="pegi-badge">PEGI {{ v.pegi }}</span>
+          </div>
+          
+          <div class="videojuegos__card-info">
+            <div class="videojuegos__card-item">
+              <span class="videojuegos__card-label">Descripción:</span>
+              <span class="videojuegos__card-value">{{ v.descripcion || 'Sin descripción' }}</span>
+            </div>
+            
+            <div class="videojuegos__card-item">
+              <span class="videojuegos__card-label">Año:</span>
+              <span class="videojuegos__card-value">{{ v.anioSalida }}</span>
+            </div>
+          </div>
+          
+          <div class="videojuegos__card-acciones">
+            <v-btn 
+              color="error" 
+              size="small"
+              variant="outlined"
+              @click="borrarVideojuego(v.id)"
+              class="videojuegos__btn-eliminar"
+            >
+              Eliminar
+            </v-btn>
+          </div>
+        </div>
+
+        <!-- Estado vacío para móvil -->
+        <div v-if="store.games?.length === 0" class="estado-vacio">
+          <p>No hay videojuegos disponibles</p>
+          <v-btn 
+            color="primary" 
+            @click="mostrarFormulario = true"
+          >
+            Añadir primer videojuego
+          </v-btn>
+        </div>
+      </div>
+
+      <!-- Vista desktop: Tabla -->
       <div class="videojuegos__tabla-contenedor">
         <v-table class="videojuegos__tabla">
           <thead>
@@ -184,7 +233,7 @@ async function guardarVideojuego(videojuego: any) {
           </tbody>
         </v-table>
 
-        <!-- Estado vacío -->
+        <!-- Estado vacío para desktop -->
         <div v-if="store.games?.length === 0" class="estado-vacio">
           <p>No hay videojuegos disponibles</p>
           <v-btn 
@@ -202,20 +251,25 @@ async function guardarVideojuego(videojuego: any) {
           :disabled="currentPage === 1"
           @click="cambiarPagina(currentPage - 1)"
           size="small"
+          class="videojuegos__btn-paginacion"
         >
-          Anterior
+          <span class="videojuegos__btn-pag-texto">Anterior</span>
+          <span class="videojuegos__btn-pag-icono">‹</span>
         </v-btn>
 
         <span class="pagina-info">
-          Página {{ currentPage }} de {{ totalPages }}
+          <span class="pagina-info-completa">Página {{ currentPage }} de {{ totalPages }}</span>
+          <span class="pagina-info-corta">{{ currentPage }}/{{ totalPages }}</span>
         </span>
 
         <v-btn 
           :disabled="currentPage === totalPages"
           @click="cambiarPagina(currentPage + 1)"
           size="small"
+          class="videojuegos__btn-paginacion"
         >
-          Siguiente
+          <span class="videojuegos__btn-pag-texto">Siguiente</span>
+          <span class="videojuegos__btn-pag-icono">›</span>
         </v-btn>
       </div>
     </v-container>
@@ -236,38 +290,56 @@ async function guardarVideojuego(videojuego: any) {
     </v-dialog>
   </div>
 </template>
+
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
 .videojuegos {
-  padding: $spacing-large;
+  padding: $spacing-small;
   background-color: $background-color;
   color: $text-color;
   min-height: 100vh;
 
+  // Tablet y desktop
+  @media (min-width: 768px) {
+    padding: $spacing-large;
+  }
+
   &__contenedor {
-    max-width: 1400px; // Aumentado para dar más espacio a la tabla
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: $spacing-large;
+    gap: $spacing-medium;
+
+    // Desktop
+    @media (min-width: 1024px) {
+      max-width: 1400px;
+      gap: $spacing-large;
+    }
   }
 
   &__header {
     text-align: center;
-    padding: $spacing-xl;
+    padding: $spacing-medium;
     background: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
     display: flex;
     flex-direction: column;
-    gap: $spacing-medium;
+    gap: $spacing-small;
     align-items: center;
     border: 1px solid rgba($primary-color, 0.2);
+
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-xl;
+      gap: $spacing-medium;
+    }
   }
 
   &__titulo {
-    font-size: $font-size-xlarge;
+    font-size: $font-size-large;
     font-weight: 700;
     color: $text-color;
     margin: 0;
@@ -275,6 +347,11 @@ async function guardarVideojuego(videojuego: any) {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+
+    // Desktop
+    @media (min-width: 768px) {
+      font-size: $font-size-xlarge;
+    }
   }
 
   &__btn-crear {
@@ -282,14 +359,28 @@ async function guardarVideojuego(videojuego: any) {
     background: $primary-gradient;
     color: $text-color;
     border-radius: $border-radius;
-    padding: $spacing-medium $spacing-large;
-    font-size: $font-size-base;
+    padding: $spacing-small $spacing-medium;
+    font-size: $font-size-small;
     border: none;
     cursor: pointer;
     transition: $transition;
     box-shadow: $box-shadow;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    .videojuegos__btn-texto {
+      display: none;
+    }
+
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-medium $spacing-large;
+      font-size: $font-size-base;
+
+      .videojuegos__btn-texto {
+        display: inline;
+      }
+    }
 
     &:hover {
       transform: translateY(-2px);
@@ -303,27 +394,53 @@ async function guardarVideojuego(videojuego: any) {
 
   &__controles {
     display: flex;
-    justify-content: space-between; // Mejor distribución del espacio
+    justify-content: space-between;
     align-items: center;
-    padding: $spacing-medium $spacing-large;
+    padding: $spacing-small $spacing-medium;
     background: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
     flex-wrap: wrap;
-    gap: $spacing-medium;
+    gap: $spacing-small;
     border: 1px solid rgba($primary-color, 0.1);
+
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-medium $spacing-large;
+      gap: $spacing-medium;
+    }
   }
 
   &__info {
     color: rgba($text-color, 0.8);
     font-weight: 500;
     font-size: $font-size-small;
+    flex: 1;
+
+    &-texto {
+      display: block;
+      
+      // En móvil muy pequeño, texto más corto
+      @media (max-width: 480px) {
+        &::before {
+          content: "{{ videojuegosPaginados.length }}/{{ store.games?.length || 0 }}";
+        }
+        
+        /* Ocultar el texto original en móviles muy pequeños si es necesario */
+      }
+    }
   }
 
   &__items-por-pagina {
     display: flex;
     align-items: center;
-    gap: $spacing-small;
+    gap: $spacing-extra-small;
+    flex-shrink: 0;
+
+    // Desktop
+    @media (min-width: 768px) {
+      gap: $spacing-small;
+    }
 
     label {
       color: rgba($text-color, 0.8);
@@ -333,14 +450,20 @@ async function guardarVideojuego(videojuego: any) {
     }
 
     select {
-      padding: $spacing-small $spacing-medium;
+      padding: $spacing-extra-small $spacing-small;
       border-radius: $border-radius;
       border: 1px solid $color-disabled;
       background-color: $card-background;
       color: $text-color;
       font-size: $font-size-small;
       transition: $transition;
-      min-width: 60px;
+      min-width: 50px;
+
+      // Desktop
+      @media (min-width: 768px) {
+        padding: $spacing-small $spacing-medium;
+        min-width: 60px;
+      }
 
       &:focus {
         outline: none;
@@ -350,29 +473,120 @@ async function guardarVideojuego(videojuego: any) {
     }
   }
 
-  &__tabla-contenedor {
-    background: $card-background;
+  // Vista móvil con cards
+  &__cards-movil {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
+
+    // Ocultar en desktop
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__card {
+    background-color: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
-    overflow-x: auto;
-    border: 1px solid rgba($primary-color, 0.1);
-    margin: $spacing-medium 0;
+    border: 1px solid rgba($primary-color, 0.2);
+    padding: $spacing-medium;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+  }
 
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-small;
+    flex-wrap: wrap;
+    gap: $spacing-extra-small;
+  }
 
-    &::-webkit-scrollbar-track {
-      background: rgba($primary-color, 0.1);
+  &__card-titulo {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+    flex: 1;
+    word-break: break-word;
+    min-width: 0;
+  }
+
+  &__card-info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+  }
+
+  &__card-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-small;
+    flex-wrap: wrap;
+  }
+
+  &__card-label {
+    font-weight: 600;
+    color: $primary-color;
+    font-size: $font-size-small;
+    flex-shrink: 0;
+  }
+
+  &__card-value {
+    color: $text-color;
+    font-size: $font-size-small;
+    text-align: right;
+    word-break: break-word;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__card-acciones {
+    display: flex;
+    justify-content: center;
+    margin-top: $spacing-small;
+    padding-top: $spacing-small;
+    border-top: 1px solid rgba($primary-color, 0.1);
+  }
+
+  &__btn-eliminar {
+    min-width: 80px;
+  }
+
+  // Vista desktop con tabla
+  &__tabla-contenedor {
+    display: none;
+
+    // Mostrar solo en desktop
+    @media (min-width: 768px) {
+      display: block;
+      background: $card-background;
       border-radius: $border-radius;
-    }
+      box-shadow: $box-shadow;
+      overflow-x: auto;
+      border: 1px solid rgba($primary-color, 0.1);
+      margin: $spacing-medium 0;
 
-    &::-webkit-scrollbar-thumb {
-      background: rgba($primary-color, 0.5);
-      border-radius: $border-radius;
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
 
-      &:hover {
-        background: rgba($primary-color, 0.7);
+      &::-webkit-scrollbar-track {
+        background: rgba($primary-color, 0.1);
+        border-radius: $border-radius;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba($primary-color, 0.5);
+        border-radius: $border-radius;
+
+        &:hover {
+          background: rgba($primary-color, 0.7);
+        }
       }
     }
   }
@@ -381,17 +595,17 @@ async function guardarVideojuego(videojuego: any) {
     width: 100%;
     border-collapse: collapse;
     font-size: $font-size-base;
-    table-layout: auto; // Permite que las columnas se ajusten automáticamente
+    table-layout: auto;
 
     th {
       background: $card-background;
       font-weight: 600;
       color: $primary-color;
-      padding: $spacing-medium $spacing-large; // Más padding horizontal
-      font-size: $font-size-base; // Tamaño de fuente más grande
-      text-align: left; // Alineación a la izquierda para mejor legibilidad
-      border-bottom: 2px solid #ff8c00; // Línea naranja
-      border-right: 1px solid #ff8c00; // Separadores verticales naranjas
+      padding: $spacing-medium $spacing-large;
+      font-size: $font-size-base;
+      text-align: left;
+      border-bottom: 2px solid #ff8c00;
+      border-right: 1px solid #ff8c00;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       white-space: nowrap;
@@ -403,40 +617,31 @@ async function guardarVideojuego(videojuego: any) {
         border-right: none;
       }
 
-      // Columnas específicas con anchos optimizados
-      &:nth-child(1) { width: 15%; } // ID
-      &:nth-child(2) { width: 25%; } // Nombre
-      &:nth-child(3) { width: 15%; } // Género
-      &:nth-child(4) { width: 15%; } // Plataforma
-      &:nth-child(5) { width: 10%; } // PEGI
-      &:nth-child(6) { width: 10%; } // Precio
-      &:nth-child(7) { width: 10%; } // Acciones
+      &:nth-child(1) { width: 25%; }
+      &:nth-child(2) { width: 35%; }
+      &:nth-child(3) { width: 15%; }
+      &:nth-child(4) { width: 15%; }
+      &:nth-child(5) { width: 10%; }
     }
 
     td {
-      padding: $spacing-medium $spacing-large; // Más padding horizontal
+      padding: $spacing-medium $spacing-large;
       font-size: $font-size-base;
       color: $primary-color;
       background-color: $card-background;
-      border-bottom: 1px solid #ff8c00; // Línea naranja
-      border-right: 1px solid rgba(#ff8c00, 0.3); // Separadores verticales naranjas más suaves
+      border-bottom: 1px solid #ff8c00;
+      border-right: 1px solid rgba(#ff8c00, 0.3);
       transition: $transition;
-      text-align: left; // Alineación a la izquierda
+      text-align: left;
       vertical-align: middle;
       line-height: 1.5;
 
       &:last-child {
         border-right: none;
-        text-align: center; // Centrar solo la columna de acciones
-      }
-
-      // Ajustes específicos por tipo de contenido
-      &:nth-child(1) { // ID
-        font-weight: 600;
         text-align: center;
       }
 
-      &:nth-child(2) { // Nombre
+      &:nth-child(1) {
         font-weight: 500;
         max-width: 200px;
         overflow: hidden;
@@ -444,13 +649,20 @@ async function guardarVideojuego(videojuego: any) {
         white-space: nowrap;
       }
 
-      &:nth-child(5) { // PEGI
-        text-align: center;
+      &:nth-child(2) {
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      &:nth-child(6) { // Precio
-        text-align: right;
+      &:nth-child(3) {
+        text-align: center;
         font-weight: 600;
+      }
+
+      &:nth-child(4) {
+        text-align: center;
       }
     }
 
@@ -463,9 +675,8 @@ async function guardarVideojuego(videojuego: any) {
       background-color: rgba($card-background, 0.8);
     }
 
-    // Mejor espaciado entre filas
     tr {
-      height: 60px; // Altura mínima para las filas
+      height: 60px;
     }
   }
 
@@ -482,25 +693,38 @@ async function guardarVideojuego(videojuego: any) {
     display: inline-block;
     min-width: 30px;
     text-align: center;
+    flex-shrink: 0;
   }
 
   .estado-vacio {
     text-align: center;
-    padding: $spacing-xxl;
+    padding: $spacing-large;
     color: rgba($text-color, 0.6);
-    font-size: $font-size-large;
+    font-size: $font-size-base;
     font-weight: 500;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-xxl;
+      font-size: $font-size-large;
+    }
+
     &::before {
       content: "🎮";
       display: block;
-      font-size: 3rem;
-      margin-bottom: $spacing-medium;
+      font-size: 2rem;
+      margin-bottom: $spacing-small;
       opacity: 0.5;
+
+      // Desktop
+      @media (min-width: 768px) {
+        font-size: 3rem;
+        margin-bottom: $spacing-medium;
+      }
     }
   }
 
@@ -508,60 +732,107 @@ async function guardarVideojuego(videojuego: any) {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: $spacing-small;
-    padding: $spacing-medium;
+    gap: $spacing-extra-small;
+    padding: $spacing-small $spacing-medium;
     background: $card-background;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
     border: 1px solid rgba($primary-color, 0.1);
     flex-wrap: wrap;
 
-    button {
-      background: $primary-gradient;
-      color: $text-color;
-      border: none;
-      padding: $spacing-small $spacing-large;
-      border-radius: $border-radius;
-      font-weight: 700;
+    // Desktop
+    @media (min-width: 768px) {
+      gap: $spacing-small;
+      padding: $spacing-medium;
+    }
+  }
+
+  &__btn-paginacion {
+    background: $primary-gradient;
+    color: $text-color;
+    border: none;
+    padding: $spacing-small;
+    border-radius: $border-radius;
+    font-weight: 700;
+    font-size: $font-size-small;
+    cursor: pointer;
+    transition: $transition;
+    min-width: 40px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba($primary-color, 0.3);
+
+    .videojuegos__btn-pag-texto {
+      display: none;
+    }
+
+    .videojuegos__btn-pag-icono {
+      display: inline;
       font-size: $font-size-base;
-      cursor: pointer;
-      transition: $transition;
+    }
+
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-small $spacing-large;
+      font-size: $font-size-base;
       min-width: 100px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 6px rgba($primary-color, 0.3);
 
-      &:hover:not(.disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0px 4px 8px rgba($primary-color, 0.4);
+      .videojuegos__btn-pag-texto {
+        display: inline;
       }
 
-      &.disabled {
-        background: $color-disabled;
-        cursor: not-allowed;
-        opacity: 0.6;
-        box-shadow: none;
-
-        &:hover {
-          transform: none;
-        }
-      }
-
-      &.current {
-        background: $text-color;
-        color: $primary-color;
-        font-weight: 800;
-        border: 2px solid $primary-color;
+      .videojuegos__btn-pag-icono {
+        display: none;
       }
     }
 
-    .pagina-info {
-      color: rgba($text-color, 0.9);
-      font-weight: 500;
+    &:hover:not([disabled]) {
+      transform: translateY(-2px);
+      box-shadow: 0px 4px 8px rgba($primary-color, 0.4);
+    }
+
+    &[disabled] {
+      background: $color-disabled;
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+
+  .pagina-info {
+    color: rgba($text-color, 0.9);
+    font-weight: 500;
+    font-size: $font-size-small;
+    padding: 0 $spacing-small;
+    text-align: center;
+
+    // Desktop
+    @media (min-width: 768px) {
       font-size: $font-size-base;
       padding: 0 $spacing-medium;
       min-width: 120px;
-      text-align: center;
+    }
+
+    .pagina-info-completa {
+      display: none;
+
+      // Desktop
+      @media (min-width: 768px) {
+        display: inline;
+      }
+    }
+
+    .pagina-info-corta {
+      display: inline;
+
+      // Desktop
+      @media (min-width: 768px) {
+        display: none;
+      }
     }
   }
 
@@ -569,9 +840,14 @@ async function guardarVideojuego(videojuego: any) {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: $spacing-xxl;
+    padding: $spacing-large;
     color: rgba($text-color, 0.7);
     font-size: $font-size-base;
+
+    // Desktop
+    @media (min-width: 768px) {
+      padding: $spacing-xxl;
+    }
   }
 
   &__error {
@@ -582,96 +858,6 @@ async function guardarVideojuego(videojuego: any) {
     border-radius: $border-radius;
     text-align: center;
     font-weight: 500;
-  }
-
-  @media (max-width: $desktop) {
-    padding: $spacing-medium;
-
-    &__contenedor {
-      max-width: 100%;
-    }
-
-    &__header {
-      padding: $spacing-large;
-    }
-
-    &__titulo {
-      font-size: $font-size-large;
-    }
-
-    &__controles {
-      flex-direction: column;
-      text-align: center;
-      gap: $spacing-medium;
-      justify-content: center;
-    }
-
-    &__paginacion {
-      flex-wrap: wrap;
-      gap: $spacing-extra-small;
-
-      button {
-        min-width: 35px;
-        height: 35px;
-        font-size: $font-size-small;
-      }
-    }
-
-    &__tabla-contenedor {
-      font-size: $font-size-small;
-    }
-
-    &__tabla {
-      th, td {
-        padding: $spacing-small $spacing-medium;
-      }
-
-      th {
-        font-size: $font-size-small;
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    &__tabla {
-      th, td {
-        padding: $spacing-extra-small $spacing-small;
-        font-size: $font-size-small;
-      }
-
-      tr {
-        height: 50px;
-      }
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: $spacing-small;
-
-    &__header {
-      padding: $spacing-medium;
-    }
-
-    &__titulo {
-      font-size: $font-size-base;
-    }
-
-    &__btn-crear {
-      padding: $spacing-small $spacing-medium;
-      font-size: $font-size-small;
-    }
-
-    &__tabla {
-      font-size: $font-size-small;
-
-      th, td {
-        padding: $spacing-extra-small $spacing-small;
-      }
-
-      tr {
-        height: 45px;
-      }
-    }
   }
 
   * {
