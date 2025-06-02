@@ -21,8 +21,10 @@ const nuevaIdea = ref<IdeaDto>({
   fkIdTipoIdea: 1,
   contacto: "",
   instrucciones: "",
-  fechaPublicacion: new Date()
+  fechaPublicacion: new Date(),
+  fechaCaducidad: null,
 });
+
 
 const publicar = async () => {
   if (!usersStore.currentUser?.id) {
@@ -35,7 +37,7 @@ const publicar = async () => {
   await ideasStore.publicarIdea(nuevaIdea.value);
   emit("ideaPublicada");
 
-  nuevaIdea.value = {
+nuevaIdea.value = {
     id: 0,
     fkIdUsuario: usersStore.currentUser.id,
     titulo: "",
@@ -45,8 +47,10 @@ const publicar = async () => {
     fkIdTipoIdea: 1,
     contacto: "",
     instrucciones: "",
-    fechaPublicacion: new Date()
+    fechaPublicacion: new Date(),
+    fechaCaducidad: null, // Resetear la fecha de caducidad
   };
+
 };
 
 onMounted(async () => {
@@ -109,6 +113,13 @@ onMounted(async () => {
       type="text"
       placeholder="Contacto (ej. @usuario)"
       v-model="nuevaIdea.contacto"
+      required
+    />
+
+    <input
+      class="formulario-idea__input"
+      type="datetime-local"
+      v-model="nuevaIdea.fechaCaducidad"
       required
     />
 

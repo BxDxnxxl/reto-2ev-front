@@ -50,6 +50,7 @@ export const useUsersStore = defineStore("users", () => {
       const usuario = await response.json();
       users.value = users.value.filter((u) => u.id !== id);
       users.value.push(usuario);
+      return usuario;
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
     }
@@ -58,38 +59,18 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(formData: FormData) {
     try {
-
-     const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario", {
+      const response = await fetch('http://localhost:4444/api/usuarios', {
         method: 'POST',
         body: formData,
       });
-
-        console.log("Raw Response:", response);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Error al crear usuario:", errorText);
-            return null;
-        }
-
-        const idString = await response.text();
-        const userId = parseInt(idString, 10);
-
-        if (isNaN(userId)) {
-            console.error("Error: No se pudo convertir la respuesta a un ID válido.");
-            return null;
-        }
-
-        console.log("Usuario creado con ID:", userId);
-        await fetchUsuarios();
-        return { id: userId };
-
+      
+      await fetchUsuarios();
+      const id = await response.json();
+      return id;
     } catch (error) {
       console.error('Error al crear usuario:', error);
     }
   }
-  
-
 
   //Actualizar un usuario existente
   async function updateUsuario(id: number, usuarioActualizado: UserDto) {

@@ -4,6 +4,10 @@ import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
 import { useUsuariosApuntadosStore } from "@/stores/UsuarioApuntado";
 import FormularioIdea from "@/components/FormularioIdea.vue";
+import Swal from "sweetalert2";
+import { useRolesStore } from "@/stores/roles";
+
+const rolesStore = useRolesStore();
 
 const ideasStore = useIdeasStore();
 const usersStore = useUsersStore();
@@ -24,6 +28,9 @@ const onTipoSeleccionado = async () => {
   if (tipoSeleccionado.value) {
     await ideasStore.fetchIdeasPorTipo(tipoSeleccionado.value);
     await verificarEstados();
+  } else {
+    await ideasStore.fetchIdeasConPlazas(); // Mostrar todas las ideas si no hay filtro
+    await verificarEstados();
   }
 };
 
@@ -43,19 +50,11 @@ const verificarEstados = async () => {
   if (!userId) return;
 
   for (const idea of ideasStore.ideasConPlazas) {
-    const apuntado = await usuariosApuntadosStore.verificarSiUsuarioApuntado(
-      idea.id,
-      userId
-    );
-    const aceptado = await usuariosApuntadosStore.verificarEstadoApuntadoYAceptado(
-      idea.id,
-      userId
-    );
-
-    console.log(`Idea ${idea.id} => Apuntado: ${apuntado}, Aceptado: ${aceptado}`);
+    const apuntado = await usuariosApuntadosStore.verificarSiUsuarioApuntado(idea.id, userId);
+    const estado = await usuariosApuntadosStore.verificarEstadoApuntadoYAceptado(idea.id, userId);
 
     estadoApuntado.value[idea.id] = apuntado;
-    estadoAceptado.value[idea.id] = aceptado;
+    estadoAceptado.value[idea.id] = estado.aceptado;
   }
 };
 
@@ -80,6 +79,48 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
   await ideasStore.fetchIdeasConPlazas();
   await verificarEstados();
 };
+
+const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
+  try {
+    const usuariosIds = await ideasStore.deleteIdea(idIdea);
+
+    await Swal.fire({
+      icon: "success",
+      title: "Idea borrada",
+      text: `Idea "${tituloIdea}" borrada correctamente.`,
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    for (const idUsuario of usuariosIds) {
+      const usuario = await usersStore.fetchUsuarioById(idUsuario);
+      if (usuario && usuario.email) {
+        const asunto = encodeURIComponent(`La idea "${tituloIdea}" ha sido eliminada`);
+        const cuerpo = encodeURIComponent(
+          `Hola ${usuario.nombre},\n\n` +
+          `La idea "${tituloIdea}" a la que estabas apuntado ha sido eliminada.\n` +
+          `Este correo ha sido enviado por wannagamessv@gmail.com.\n\n` +
+          `Saludos.`
+        );
+        const mailtoLink = `mailto:${usuario.email}?subject=${asunto}&body=${cuerpo}`;
+        window.open(mailtoLink, "_blank");
+      } else {
+        console.warn(`No se encontró email para el usuario con id ${idUsuario}`);
+      }
+    }
+
+    // Recarga las ideas
+    await ideasStore.fetchIdeasConPlazas();
+  } catch (error) {
+    await Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Error al borrar la idea.",
+    });
+    console.error(error);
+  }
+};
+
 </script>
 
 <template>
@@ -104,10 +145,14 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
       >
         <div class="idea-card__contenido">
           <h3 class="idea-card__titulo">{{ idea.titulo }}</h3>
-          <p class="idea-card__tipo">
-            Tipo: <strong>{{ idea.tipoIdeaNombre }}</strong>
-          </p>
+          <p class="idea-card__tipo">Tipo: <strong>{{ idea.tipoIdeaNombre }}</strong></p>
           <p class="idea-card__descripcion">Descripción: {{ idea.descripcion }}</p>
+
+          <p class="idea-card__fecha-caducidad" v-if="idea.fechaCaducidad">
+            Caduca el: {{ new Date(idea.fechaCaducidad).toLocaleDateString() }}
+          </p>
+
+
 
           <!-- Contenedor fijo para plazas -->
           <div class="idea-card__plazas-container">
@@ -157,12 +202,22 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
                 ¡Me uno!
               </button>
             </template>
+            <!-- Botón borrar solo para propietario o admin -->
+            <button
+              v-if="usersStore.currentUser.id === idea.fkIdUsuario || usersStore.currentUser.roles.some(r => r.id === rolesStore.ADMIN)"
+              @click="eliminarIdea(idea.id, idea.titulo)"
+              class="idea-card__boton-borrar"
+              title="Borrar idea"
+            >
+              Borrar idea
+            </button>
           </template>
         </div>
       </div>
     </div>
   </div>
-</template><style scoped lang="scss">
+</template>
+<style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 @import "@/assets/styles/mixins.scss";
 
@@ -295,6 +350,18 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     flex-grow: 1;
   }
 
+   &__fecha-caducidad {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #d97706;
+    background-color: #fef3c7;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    width: fit-content;
+    user-select: none;
+  }
+
   &__plazas-container {
     margin-top: $spacing-medium;
     margin-bottom: $spacing-medium;
@@ -326,12 +393,13 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     }
   }
 
-  &__acciones {
+   &__acciones {
     padding-top: $spacing-large;
     border-top: 1px solid lighten($dark-color, 40%);
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    gap: 0.75rem; // espacio entre botones
   }
 
   &__mensaje {
@@ -358,6 +426,30 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
 
     &:focus {
       box-shadow: 0 0 0 3px rgba($btn-color, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__boton-borrar {
+    @include button-reset;
+    background-color: #dc2626; // rojo fuerte (Tailwind red-600)
+    color: white;
+    padding: $spacing-medium $spacing-large;
+    border-radius: $border-radius;
+    font-weight: 600;
+    font-size: $font-size-base;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+      background-color: #b91c1c; // rojo más oscuro (Tailwind red-700)
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5);
     }
 
     &:active {
@@ -393,5 +485,6 @@ const handleUnirse = async (idIdea: number, creadorId: number) => {
     border-radius: $border-radius;
     margin-top: $spacing-medium;
   }
+
 }
 </style>

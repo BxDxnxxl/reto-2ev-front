@@ -69,6 +69,27 @@ export const useIdeasStore = defineStore("ideas", () => {
     }
   }
 
+  async function deleteIdea(id: number): Promise<number[]> {
+    try {
+      const response = await fetch(`http://localhost:4444/api/ideas/${id}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al borrar la idea: ${errorText}`);
+      }
+
+      const data = await response.json();
+      await fetchIdeasConPlazas();
+      return data.usuariosNotificados as number[];
+    } catch (error) {
+      console.error("Error al borrar idea:", error);
+      return [];
+    }
+  }
+
+
   return {
     ideasBase,
     ideasConPlazas,
@@ -78,6 +99,7 @@ export const useIdeasStore = defineStore("ideas", () => {
     fetchIdeasConPlazas,
     publicarIdea,
     fetchIdeasPorTipo,
-    fetchTiposIdeas
+    fetchTiposIdeas,
+    deleteIdea
   };
 });

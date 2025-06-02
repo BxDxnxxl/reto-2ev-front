@@ -98,11 +98,26 @@ async function saveUser() {
 
     let savedUserId: number | undefined
 
+    function userDtoToFormData(user: UserDto): FormData {
+      const formData = new FormData()
+      formData.append('username', user.username || '')
+      formData.append('email', user.email || '')
+      formData.append('contrasenia', user.contrasenia || '')
+      formData.append('nombre', user.nombre || '')
+      formData.append('apellido1', user.apellido1 || '')
+      formData.append('apellido2', user.apellido2 || '')
+      formData.append('profilePic', user.profilePic || '')
+      if (user.id) formData.append('id', user.id.toString())
+
+      return formData
+    }
+
+    const userFormData = userDtoToFormData(userToSave)
     if (editMode.value && userId.value) {
       await usersStore.updateUsuario(userId.value, userToSave)
       savedUserId = userId.value
     } else {
-      const createdUser = await usersStore.createUsuario(userToSave)
+      const createdUser = await usersStore.createUsuario(userFormData)
       savedUserId = createdUser?.id
     }
 

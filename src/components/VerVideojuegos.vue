@@ -68,9 +68,15 @@ function cambiarPagina(page: number) {
   }
 }
 
-function cambiarItemsPorPagina(newItemsPerPage: number) {
-  itemsPerPage.value = newItemsPerPage;
-  currentPage.value = 1; // Resetear a la primera página
+function cambiarItemsPorPagina(event: Event) {
+  const target = event.target as HTMLSelectElement | null
+  if (!target) return
+
+  const value = Number(target.value)
+  if (isNaN(value) || value <= 0) return
+
+  itemsPerPage.value = value
+  currentPage.value = 1 
 }
 
 async function borrarVideojuego(id: number) {
@@ -138,7 +144,7 @@ async function guardarVideojuego(videojuego: any) {
           <label>Mostrar:</label>
           <select 
             :value="itemsPerPage" 
-            @change="cambiarItemsPorPagina(Number($event.target.value))"
+            @change="cambiarItemsPorPagina"
             class="videojuegos__select-items"
           >
             <option :value="5">5</option>
