@@ -34,6 +34,7 @@ const onTipoSeleccionado = async () => {
   }
 };
 
+
 const toggleFormulario = () => {
   mostrarFormulario.value = !mostrarFormulario.value;
 };
@@ -150,6 +151,8 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
           <p class="idea-card__fecha-caducidad" v-if="idea.fechaCaducidad">
             Caduca el: {{ new Date(idea.fechaCaducidad).toLocaleDateString() }}
           </p>
+
+
 
           <!-- Contenedor fijo para plazas -->
           <div class="idea-card__plazas-container">

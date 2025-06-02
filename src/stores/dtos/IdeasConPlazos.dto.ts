@@ -15,3 +15,7 @@ export interface IdeaConPlazasDto {
   fechaPublicacion: Date;
   fechaCaducidad: Date | null;
 }
+
+
+
+  
