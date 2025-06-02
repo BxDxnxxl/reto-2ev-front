@@ -230,7 +230,7 @@ async function borrarPublicacion(id: number) {
   }
 
   &__btn-text {
-    @media (max-width: $desktop - 1px) {
+    @media (max-width: #{ $desktop - 1px }) {
       display: none;
     }
   }

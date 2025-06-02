@@ -39,7 +39,9 @@ console.log(publicacionesStore.novedades);
               </div>
               <div class="novedades-blog__empresa-details">
                 <h2 class="novedades-blog__empresa-nombre">{{ novedad.nombreEmpresa }}</h2>
-                <time class="novedades-blog__fecha" :datetime="novedad.fechaPublicacion">
+                <time class="novedades-blog__fecha"
+                  :datetime="new Date(novedad.fechaPublicacion).toISOString()"
+                >
                   {{ new Date(novedad.fechaPublicacion).toLocaleDateString('es-ES', {
                     year: 'numeric',
                     month: 'long',

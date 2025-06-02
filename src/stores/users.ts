@@ -50,6 +50,7 @@ export const useUsersStore = defineStore("users", () => {
       const usuario = await response.json();
       users.value = users.value.filter((u) => u.id !== id);
       users.value.push(usuario);
+      return usuario;
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
     }
@@ -58,17 +59,18 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(formData: FormData) {
     try {
-      await fetch('http://localhost:4444/api/usuarios', {
+      const response = await fetch('http://localhost:4444/api/usuarios', {
         method: 'POST',
         body: formData,
       });
+      
       await fetchUsuarios();
+      const id = await response.json();
+      return id;
     } catch (error) {
       console.error('Error al crear usuario:', error);
     }
   }
-  
-
 
   //Actualizar un usuario existente
   async function updateUsuario(id: number, usuarioActualizado: UserDto) {
