@@ -4,7 +4,7 @@ metadata:
   name: front-wannagames-deployment
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:022429230024:certificate/64381a7f-3a94-4c09-8aad-efb5d922489e
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:617438117816:certificate/28fa30d6-7773-4f12-b5d2-c3a7688675cd
 
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
 spec:
