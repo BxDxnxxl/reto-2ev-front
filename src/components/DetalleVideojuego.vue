@@ -60,19 +60,33 @@ onMounted(async () => {
     await gamesStore.verDetalleVideojuego(props.gameId)
     videojuego.value = gamesStore.detalleVideojuego
     console.log('Cargado:', videojuego.value)
+
+    if (videojuego.value?.titulo) {
+      await cargarClips(videojuego.value.titulo)
+    }
   }
 })
+
+
+const clips = ref<any[]>([])
+
+const cargarClips = async (nombreJuego: string) => {
+  try {
+    const res = await fetch(`http://localhost:4444/api/twitch/clips?game=${encodeURIComponent(nombreJuego)}`)
+    const data = await res.json()
+    clips.value = data.data
+  } catch (error) {
+    console.error("Error cargando clips de Twitch:", error)
+  }
+}
+
 </script>
 
 <template>
   <div class="detalle-videojuego">
     <div v-if="videojuego" class="detalle-videojuego__contenedor">
       <div class="detalle-videojuego__imagen-wrapper">
-        <img
-          :src="videojuego.caratula"
-          :alt="videojuego.titulo"
-          class="detalle-videojuego__imagen"
-        />
+        <img :src="videojuego.caratula" :alt="videojuego.titulo" class="detalle-videojuego__imagen" />
       </div>
 
       <div class="detalle-videojuego__info">
@@ -87,11 +101,7 @@ onMounted(async () => {
           </span>
           <span v-if="videojuego.pegi" class="detalle-videojuego__pegi">
             <h3>Pegi:</h3>
-            <img
-              :src="getPegiImageUrl(videojuego.pegi)"
-              :alt="`PEGI ${videojuego.pegi}`"
-              class="pegi-imagen"
-            />
+            <img :src="getPegiImageUrl(videojuego.pegi)" :alt="`PEGI ${videojuego.pegi}`" class="pegi-imagen" />
           </span>
         </div>
 
@@ -116,11 +126,7 @@ onMounted(async () => {
         <div class="detalle-videojuego__seccion">
           <h3><span class="icono">🕹️</span> Plataformas</h3>
           <div class="detalle-videojuego__tags">
-            <span
-              v-for="plataforma in videojuego.plataformas"
-              :key="plataforma.id"
-              class="tag tag--plataforma"
-            >
+            <span v-for="plataforma in videojuego.plataformas" :key="plataforma.id" class="tag tag--plataforma">
               {{ plataforma.nombre }}
             </span>
           </div>
@@ -128,6 +134,19 @@ onMounted(async () => {
         <button class="boton-review" @click="irAReview()">Ver Review Completa</button>
       </div>
     </div>
+
+    <!-- Clips de Twitch -->
+    <div class="detalle-videojuego__seccion" v-if="clips.length">
+      <h3><span class="icono">📺</span> Clips populares en Twitch</h3>
+      <div class="detalle-videojuego__clips">
+        <div class="twitch-clip" v-for="clip in clips" :key="clip.id">
+          <iframe :src="`https://clips.twitch.tv/embed?clip=${clip.id}&parent=localhost`" width="100%" height="300"
+            allowfullscreen></iframe>
+          <p>{{ clip.title }}</p>
+        </div>
+      </div>
+    </div>
+
 
     <div v-else class="detalle-videojuego__error">
       <p>No se ha encontrado información del videojuego.</p>
@@ -196,7 +215,7 @@ onMounted(async () => {
     gap: 16px;
     font-size: 15px;
 
-    > span {
+    >span {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -334,6 +353,70 @@ onMounted(async () => {
     color: #fff;
     padding: 20px;
   }
+
+  &__clips {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    justify-content: flex-start;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .twitch-clip {
+      flex: 0 0 auto;
+      width: 320px;
+      height: 180px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      p {
+        color: #fff;
+        font-size: 14px;
+        margin-top: 8px;
+        text-align: center;
+        max-width: 100%;
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  @media (max-width: 400px) {
+    &__clips {
+      padding-bottom: 8px;
+      gap: 8px;
+
+      .twitch-clip {
+        width: 260px;
+        height: 146px;
+      }
+    }
+  }
+
+  /* --- Resto media queries existentes --- */
 
   @media (min-width: 768px) {
     margin-bottom: 40px;

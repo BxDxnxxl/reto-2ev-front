@@ -33,7 +33,6 @@ function nextSlide() {
 </script>
 
 <template>
-  <h2 class="carousel__heading">Los mejor valorados</h2>
   <section class="carousel">
     <div class="carousel__main">
       <img
