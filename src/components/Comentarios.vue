@@ -149,6 +149,7 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
     display: flex;
     flex-direction: column;
     margin-bottom: 8px;
+    color: #000;
 
     @media (min-width: 768px) {
       flex-direction: row;
@@ -177,20 +178,24 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
     font-size: 1.1rem;
     margin: 8px 0;
     font-weight: 600;
+    color: #000;
   }
 
   &__texto {
     margin-bottom: 12px;
     line-height: 1.5;
+    color: #000;
   }
 
   &__valoracion {
     margin-bottom: 12px;
+    color: #000;
   }
 
   &__acciones {
     display: flex;
     gap: 16px;
+    color: #000;
   }
 
   &__like,
@@ -202,6 +207,7 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
 
   &__contador {
     font-size: 0.9rem;
+    color: #000;
   }
 
   &__vacio {
