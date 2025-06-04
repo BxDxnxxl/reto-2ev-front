@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useUsersStore } from '@/stores/users'
-import { useRolesStore } from '@/stores/roles'
-import { useRoute, useRouter } from 'vue-router'
-import { useEmpresasStore } from '@/stores/empresasStore'
-import { useUsuariosEmpresasStore } from '@/stores/usuariosEmpresasStore'
+import { ref, onMounted, computed } from 'vue';
+import { useUsersStore } from '@/stores/users';
+import { useRolesStore } from '@/stores/roles';
+import { useRoute, useRouter } from 'vue-router';
+import { useEmpresasStore } from '@/stores/empresasStore';
+import { useUsuariosEmpresasStore } from '@/stores/usuariosEmpresasStore';
 
-import type { RolAsignacionDto } from '@/stores/dtos/UsuarioRol.dto'
-import type { UserDto } from '@/stores/dtos/user.dto'
+import type { RolAsignacionDto } from '@/stores/dtos/UsuarioRol.dto';
+import type { UserDto } from '@/stores/dtos/user.dto';
+import type { UserUpdateDto } from '@/stores/dtos/UserUpdateDto';
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const usersStore = useUsersStore()
-const rolesStore = useRolesStore()
-const empresasStore = useEmpresasStore()
-const usuariosEmpresasStore = useUsuariosEmpresasStore()
+const usersStore = useUsersStore();
+const rolesStore = useRolesStore();
+const empresasStore = useEmpresasStore();
+const usuariosEmpresasStore = useUsuariosEmpresasStore();
 
-const editMode = computed(() => route.query.edit === 'true')
-const userId = computed(() => route.query.id ? Number(route.query.id) : null)
+const editMode = computed(() => route.query.edit === 'true');
+const userId = computed(() => route.query.id ? Number(route.query.id) : null);
 
 const userData = ref<UserDto>({
   username: '',
@@ -27,43 +28,47 @@ const userData = ref<UserDto>({
   nombre: '',
   apellido1: '',
   apellido2: '',
-  profilePic: ''
-})
+  profilePic: null
+});
 
-const userRoles = ref<number[]>([])
-const marcarAfiliado = ref(false)
-const empresaSeleccionada = ref<number | null>(null)
+const userRoles = ref<number[]>([]);
+const marcarAfiliado = ref(false);
+const empresaSeleccionada = ref<number | null>(null);
 
 onMounted(async () => {
-  await rolesStore.fetchRoles()
-  await empresasStore.fetchEmpresas()
+  await rolesStore.fetchRoles();
+  await empresasStore.fetchEmpresas();
 
   if (editMode.value && userId.value) {
-    await usersStore.fetchUsuarioConRolesById(userId.value)
+    await usersStore.fetchUsuarioConRolesById(userId.value);
 
     if (usersStore.usuarioConRoles) {
       userData.value = {
         id: usersStore.usuarioConRoles.id,
-        username: usersStore.usuarioConRoles.username || '',
-        email: usersStore.usuarioConRoles.email || '',
+        username: usersStore.usuarioConRoles.username ?? '',
+        email: usersStore.usuarioConRoles.email ?? '',
         contrasenia: '',
-        nombre: usersStore.usuarioConRoles.nombre || '',
-        apellido1: usersStore.usuarioConRoles.apellido1 || '',
-        apellido2: usersStore.usuarioConRoles.apellido2 || '',
-        profilePic: usersStore.usuarioConRoles.profilePic || ''
-      }
+        nombre: usersStore.usuarioConRoles.nombre ?? '',
+        apellido1: usersStore.usuarioConRoles.apellido1 ?? '',
+        apellido2: usersStore.usuarioConRoles.apellido2 ?? '',
+        profilePic: null
+      };
 
-      userRoles.value = usersStore.usuarioConRoles.roles.map(rol => rol.id)
-      marcarAfiliado.value = userRoles.value.includes(5)
+      userRoles.value = usersStore.usuarioConRoles.roles.map((rol: any) => rol.id);
+      marcarAfiliado.value = userRoles.value.includes(5);
 
-      // Obtener empresa afiliada si existe
-      const empresasUsuario = await usuariosEmpresasStore.getEmpresasDeUsuario(userId.value)
+      const empresasUsuario = await usuariosEmpresasStore.getEmpresasDeUsuario(userId.value);
       if (empresasUsuario.length > 0) {
-        empresaSeleccionada.value = empresasUsuario[0]
+        empresaSeleccionada.value = empresasUsuario[0];
       }
     }
   }
-})
+});
+
+function onFileChange(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) userData.value.profilePic = file;
+}
 
 async function saveUser() {
   try {
@@ -72,92 +77,87 @@ async function saveUser() {
       { field: userData.value.email, message: 'Email' },
       { field: userData.value.nombre, message: 'Nombre' },
       { field: userData.value.apellido1, message: 'Primer apellido' }
-    ]
+    ];
 
     const missingFields = requiredFields
       .filter(req => !req.field || req.field.trim() === '')
-      .map(req => req.message)
+      .map(req => req.message);
 
     if (missingFields.length > 0) {
-      throw new Error(`Por favor complete los siguientes campos: ${missingFields.join(', ')}`)
+      throw new Error(`Por favor complete los siguientes campos: ${missingFields.join(', ')}`);
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(userData.value.email.trim())) {
-      throw new Error('Por favor, introduce un email válido')
+      throw new Error('Por favor, introduce un email válido');
     }
 
-    const userToSave: UserDto = {
-      ...userData.value,
-      username: userData.value.username.trim(),
-      email: userData.value.email.trim(),
-      contrasenia: editMode.value && !userData.value.contrasenia
-        ? usersStore.usuarioConRoles?.contrasenia
-        : userData.value.contrasenia
-    }
+    let savedUserId: number | undefined;
 
-    let savedUserId: number | undefined
-
-    function userDtoToFormData(user: UserDto): FormData {
-      const formData = new FormData()
-      formData.append('username', user.username || '')
-      formData.append('email', user.email || '')
-      formData.append('contrasenia', user.contrasenia || '')
-      formData.append('nombre', user.nombre || '')
-      formData.append('apellido1', user.apellido1 || '')
-      formData.append('apellido2', user.apellido2 || '')
-      formData.append('profilePic', user.profilePic || '')
-      if (user.id) formData.append('id', user.id.toString())
-
-      return formData
-    }
-
-    const userFormData = userDtoToFormData(userToSave)
     if (editMode.value && userId.value) {
-      await usersStore.updateUsuario(userId.value, userToSave)
-      savedUserId = userId.value
+      const updateDto: UserUpdateDto = {
+        username: userData.value.username.trim(),
+        email: userData.value.email.trim(),
+        contraseña: userData.value.contrasenia || '',
+        nombre: userData.value.nombre?.trim() || '',
+        apellido1: userData.value.apellido1?.trim() || '',
+        apellido2: userData.value.apellido2?.trim() || '',
+        profilePic: userData.value.profilePic instanceof File ? userData.value.profilePic : null
+      };
+
+      await usersStore.updateUsuario(userId.value, updateDto);
+      savedUserId = userId.value;
     } else {
-      const createdUser = await usersStore.createUsuario(userFormData)
-      savedUserId = createdUser?.id
+      const formData = new FormData();
+      formData.append('Username', userData.value.username.trim());
+      formData.append('Email', userData.value.email.trim());
+      formData.append('Contrasenia', userData.value.contrasenia || '');
+      formData.append('Nombre', userData.value.nombre?.trim() || '');
+      formData.append('Apellido1', userData.value.apellido1?.trim() || '');
+      formData.append('Apellido2', userData.value.apellido2?.trim() || '');
+
+      if (userData.value.profilePic instanceof File) {
+        formData.append('ProfilePic', userData.value.profilePic);
+      }
+
+      const created = await usersStore.createUsuario(formData);
+      savedUserId = created?.id;
     }
 
     if (savedUserId) {
-      // Si el check está marcado, aseguramos el rol 5
       if (marcarAfiliado.value && !userRoles.value.includes(5)) {
-        userRoles.value.push(5)
+        userRoles.value.push(5);
       }
-
-      // Si no está marcado, quitamos rol 5 si estaba
       if (!marcarAfiliado.value) {
-        userRoles.value = userRoles.value.filter(id => id !== 5)
+        userRoles.value = userRoles.value.filter(id => id !== 5);
       }
 
       const roleAssignment: RolAsignacionDto = {
         usuarioId: savedUserId,
         rolesIds: userRoles.value
-      }
-      await usersStore.asignarRolesAUsuario(roleAssignment)
+      };
+      await usersStore.asignarRolesAUsuario(roleAssignment);
 
-      // GESTIÓN DE RELACIÓN EMPRESA-USUARIO
       if (marcarAfiliado.value && empresaSeleccionada.value) {
         await usuariosEmpresasStore.addRelacion({
           idUsuario: savedUserId,
           idEmpresa: empresaSeleccionada.value
-        })
+        });
       } else {
-        const empresasUsuario = await usuariosEmpresasStore.getEmpresasDeUsuario(savedUserId)
+        const empresasUsuario = await usuariosEmpresasStore.getEmpresasDeUsuario(savedUserId);
         if (empresasUsuario.length > 0) {
-          await usuariosEmpresasStore.deleteRelacion(savedUserId, empresasUsuario[0])
+          await usuariosEmpresasStore.deleteRelacion(savedUserId, empresasUsuario[0]);
         }
       }
     }
 
-    router.push('/dashboard')
+    router.push('/dashboard');
   } catch (error) {
-    console.error('Error al guardar usuario:', error)
+    console.error('Error al guardar usuario:', error);
   }
 }
 </script>
+
 
 <template>
   <v-container>

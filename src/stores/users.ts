@@ -56,79 +56,91 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  //Crear un nuevo usuario
   async function createUsuario(formData: FormData) {
     try {
-      const response = await fetch('https://wannagamesapi.retocsv.es/api/usuarios', {
+      const res = await fetch('https://wannagamesapi.retocsv.es/api/usuarios', {
         method: 'POST',
-        body: formData,
+        body: formData
       });
-      
+      if (!res.ok) throw new Error(await res.text());
       await fetchUsuarios();
-      const id = await response.json();
-      return id;
+      return await res.json(); // devuelve { id: ... }
     } catch (error) {
       console.error('Error al crear usuario:', error);
     }
   }
 
-  //Actualizar un usuario existente
-  async function updateUsuario(id: number, usuarioActualizado: UserDto) {
+  async function updateUsuario(id: number, userDto: UserUpdateDto) {
     try {
-      console.log(usuarioActualizado)
-      await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(usuarioActualizado),
+      const formData = new FormData();
+      formData.append('Username', userDto.username);
+      formData.append('Email', userDto.email);
+      formData.append('Contrasenia', userDto.contraseña);
+      formData.append('Nombre', userDto.nombre ?? '');
+      formData.append('Apellido1', userDto.apellido1 ?? '');
+      formData.append('Apellido2', userDto.apellido2 ?? '');
+      if (userDto.profilePic instanceof File) {
+        formData.append('ProfilePic', userDto.profilePic);
+      }
+
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, {
+        method: 'PUT',
+        body: formData
       });
-      await fetchUsuarios(); //Refresca la lista después de actualizar
+      if (!res.ok) throw new Error(await res.text());
+      await fetchUsuarios();
     } catch (error) {
-      console.error("Error al actualizar usuario:", error);
+      console.error('Error al actualizar usuario:', error);
     }
   }
 
+
   async function updateCurrentUser(usuarioActualizado: UserUpdateDto) {
-    try {
-      if (!currentUser.value) throw new Error("No hay usuario autenticado.");
-      const usuarioId = currentUser.value.id ?? 0;
-  
-      const formData = new FormData();
-      formData.append("Username", usuarioActualizado.username);
-      formData.append("Email", usuarioActualizado.email);
-      formData.append("Contrasenia", usuarioActualizado.contraseña);
-      formData.append("Nombre", usuarioActualizado.nombre ?? "");
-      formData.append("Apellido1", usuarioActualizado.apellido1 ?? "");
-      formData.append("Apellido2", usuarioActualizado.apellido2 ?? "");
-  
-      if (usuarioActualizado.profilePic instanceof File) {
-        formData.append("ProfilePic", usuarioActualizado.profilePic);
-      }
-  
-      const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${currentUser.value.id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${tokenLogin}`
-          // No pongas Content-Type al enviar FormData
-        },
-        body: formData,
-      });
-  
-      if (!response.ok) throw new Error(`Error en la actualización: ${await response.text()}`);
-      
-      await fetchUsuarios();
-      const loginDto: UserLoginDto = {
-        username: usuarioActualizado.username,
-        password: usuarioActualizado.contraseña
-      };
-      
-      const loginSuccess = await login(loginDto);
-  
-      return loginSuccess;
-    } catch (error) {
-      console.error("Error en la actualización del usuario:", error);
-      throw error;
+  try {
+    if (!currentUser.value) throw new Error("No hay usuario autenticado.");
+    const usuarioId = currentUser.value.id ?? 0;
+
+    // ⚠️ Guarda la contraseña actual (por si no se ha cambiado)
+    const oldPassword = currentUser.value.contrasenia ?? "";
+
+    const finalPassword = usuarioActualizado.contraseña || oldPassword;
+
+    const formData = new FormData();
+    formData.append("Username", usuarioActualizado.username);
+    formData.append("Email", usuarioActualizado.email);
+    formData.append("Contrasenia", finalPassword);
+    formData.append("Nombre", usuarioActualizado.nombre ?? "");
+    formData.append("Apellido1", usuarioActualizado.apellido1 ?? "");
+    formData.append("Apellido2", usuarioActualizado.apellido2 ?? "");
+
+    if (usuarioActualizado.profilePic instanceof File) {
+      formData.append("ProfilePic", usuarioActualizado.profilePic);
     }
-  }  
+
+    const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${usuarioId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${tokenLogin}`
+      },
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error(`Error en la actualización: ${await response.text()}`);
+
+    await fetchUsuarios();
+
+    const loginDto: UserLoginDto = {
+      username: usuarioActualizado.username,
+      password: finalPassword // ✅ usamos la misma que mandamos
+    };
+
+    const loginSuccess = await login(loginDto);
+    return loginSuccess;
+  } catch (error) {
+    console.error("Error en la actualización del usuario:", error);
+    return false;
+  }
+}
 
   //Eliminar un usuario
   async function deleteUsuario(id: number) {
