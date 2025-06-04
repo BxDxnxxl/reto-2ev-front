@@ -14,7 +14,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function fetchPublicaciones() {
     try {
-      const res = await fetch("http://localhost:4444/api/PublicacionesEmpresas");
+      const res = await fetch("https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas");
       if (!res.ok) throw new Error("Error al cargar publicaciones");
       publicaciones.value = await res.json();
     } catch (err) {
@@ -24,7 +24,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function fetchPublicacionesDestacadasNoLeidas(idUsuario: number) {
     try {
-      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/destacadas-no-leidas/${idUsuario}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/destacadas-no-leidas/${idUsuario}`);
       if (!res.ok) throw new Error("Error al cargar destacadas no leídas");
       destacadasNoLeidas.value = await res.json();
     } catch (err) {
@@ -34,7 +34,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function fetchNoticiasEmpresaAfiliada(idUsuario: number) {
     try {
-      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/noticias-afiliado/${idUsuario}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/noticias-afiliado/${idUsuario}`);
       if (!res.ok) throw new Error('Error al cargar noticias de empresa afiliada');
       noticiasEmpresaAfiliada.value = await res.json();
     } catch (error) {
@@ -44,7 +44,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function addPublicacion(formData: FormData) {
     try {
-      const response = await fetch('http://localhost:4444/api/PublicacionesEmpresas', {
+      const response = await fetch('https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas', {
         method: 'POST',
         body: formData,
       });
@@ -64,7 +64,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function updatePublicacion(publicacion: PublicacionEmpresaDto) {
     try {
-      await fetch(`http://localhost:4444/api/PublicacionesEmpresas/${publicacion.id}`, {
+      await fetch(`https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/${publicacion.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(publicacion),
@@ -77,7 +77,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
 
   async function deletePublicacion(id: number) {
     try {
-      await fetch(`http://localhost:4444/api/PublicacionesEmpresas/${id}`, {
+      await fetch(`https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/${id}`, {
         method: "DELETE",
       });
       await fetchPublicaciones();
@@ -87,14 +87,14 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
   }
 
   async function fetchNovedades() {
-    const res = await fetch("http://localhost:4444/api/PublicacionesEmpresas/novedades");
+    const res = await fetch("https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/novedades");
     if (!res.ok) throw new Error("Error al cargar novedades");
     novedades.value = await res.json();
   }
 
   async function actualizarAcuerdo(dto: ActualizarAcuerdoDto) {
     try {
-      const res = await fetch(`http://localhost:4444/api/Empresas/actualizar-acuerdo/${dto.idEmpresa}`, {
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/Empresas/actualizar-acuerdo/${dto.idEmpresa}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

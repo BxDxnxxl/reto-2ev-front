@@ -59,7 +59,7 @@ export const useUsersStore = defineStore("users", () => {
   //Crear un nuevo usuario
   async function createUsuario(formData: FormData) {
     try {
-      const response = await fetch('http://localhost:4444/api/usuarios', {
+      const response = await fetch('https://wannagamesapi.retocsv.es/api/usuarios', {
         method: 'POST',
         body: formData,
       });

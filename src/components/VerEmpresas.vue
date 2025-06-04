@@ -40,27 +40,16 @@ async function guardarEmpresa(empresa: FormData) {
   mostrarFormulario.value = false;
 }
 
-async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
-  const dto: ActualizarAcuerdoDto = {
-    idEmpresa,
-    nuevoAcuerdo
-  };
+async function onActualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
+  const { ok, mensaje } = await store.actualizarAcuerdo(idEmpresa, nuevoAcuerdo);
 
-  try {
-    const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/actualizar-acuerdo/${idEmpresa}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dto)
-    });
-
-    if (!res.ok) throw new Error('Error al actualizar el acuerdo');
-    const data = await res.json();
-    Swal.fire('Actualizado', data.mensaje, 'success');
-  } catch (error) {
-    console.error('Error:', error);
-    Swal.fire('Error', 'No se pudo actualizar el acuerdo.', 'error');
+  if (ok) {
+    Swal.fire('Actualizado', mensaje, 'success');
+  } else {
+    Swal.fire('Error', mensaje, 'error');
   }
 }
+
 </script>
 <template>
   <div class="empresas">
@@ -106,7 +95,7 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
               <span class="empresas__card-label">Acuerdo:</span>
               <select
                 v-model.number="empresa.acuerdo"
-                @change="actualizarAcuerdo(empresa.id, empresa.acuerdo)"
+                @change="onActualizarAcuerdo(empresa.id, empresa.acuerdo)"
                 class="empresas__select-acuerdo"
               >
                 <option :value="0">Sin acuerdo</option>
@@ -173,7 +162,7 @@ async function actualizarAcuerdo(idEmpresa: number, nuevoAcuerdo: number) {
               <td class="text-center">
                 <select
                   v-model.number="empresa.acuerdo"
-                  @change="actualizarAcuerdo(empresa.id, empresa.acuerdo)"
+                  @change="onActualizarAcuerdo(empresa.id, empresa.acuerdo)"
                   class="empresas__select-acuerdo"
                 >
                   <option :value="0">Sin acuerdo</option>

@@ -7,7 +7,7 @@ export const useSocialStore = defineStore("social", () => {
 
   async function fetchRedes() {
     try {
-      const response = await fetch("http://localhost:4444/api/redessociales");
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/redessociales");
       if (!response.ok) throw new Error("Error al cargar redes sociales");
       redes.value = await response.json();
     } catch (error) {

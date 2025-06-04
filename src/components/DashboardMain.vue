@@ -4,6 +4,7 @@ import { useUsersStore } from "@/stores/users";
 import type { UserDto } from "@/stores/dtos/user.dto";
 import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
 import PerfilAnimado from './PerfilAnimado.vue';
+import type { UserUpdateDto } from "@/stores/dtos/UserUpdateDto";
 
 const usersStore = useUsersStore();
 
@@ -52,13 +53,6 @@ const handleProfilePicUpload = (event: Event) => {
   }
 };
 
-// Login tras actualizar
-async function relogin(username: string, password: string) {
-  const loginDto: UserLoginDto = { username, password };
-  return await usersStore.login(loginDto);
-}
-
-// Actualizar perfil
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
@@ -71,39 +65,27 @@ const updateProfile = async () => {
     const usuario = usersStore.currentUser;
     if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-    const formData = new FormData();
-    formData.append("Username", editedUser.value.username);
-    formData.append("Email", editedUser.value.email);
-    formData.append("Nombre", editedUser.value.nombre ?? "");
-    formData.append("Apellido1", editedUser.value.apellido1 ?? "");
-    formData.append("Apellido2", editedUser.value.apellido2 ?? "");
-
     const finalPassword = editedUser.value.contrasenia?.trim() || usuario.contrasenia || "";
-    formData.append("Contrasenia", finalPassword);
 
-    if (profilePicFile.value) {
-      formData.append("ProfilePic", profilePicFile.value);
-    }
+    const userUpdateDto: UserUpdateDto = {
+      username: editedUser.value.username,
+      email: editedUser.value.email,
+      contraseña: finalPassword,
+      nombre: editedUser.value.nombre ?? "",
+      apellido1: editedUser.value.apellido1 ?? "",
+      apellido2: editedUser.value.apellido2 ?? "",
+      profilePic: profilePicFile.value as File || undefined
+    };
 
-    const response = await fetch(`http://localhost:4444/api/usuario/${usuario.id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${usersStore.tokenLogin}`
-      },
-      body: formData
-    });
+    const loginSuccess = await usersStore.updateCurrentUser(userUpdateDto);
 
-    if (!response.ok) {
-      throw new Error(await response.text());
-    }
-
-    const loginExito = await relogin(editedUser.value.username, finalPassword);
-    if (!loginExito) throw new Error("Error al reloguear.");
+    if (!loginSuccess) throw new Error("Error al reloguear.");
 
     snackbarMessage.value = "Perfil actualizado correctamente";
     snackbarColor.value = "success";
     snackbar.value = true;
     editedUser.value.contrasenia = "";
+
   } catch (error) {
     console.error("Error actualizando usuario:", error);
     snackbarMessage.value = "Error al actualizar perfil";
