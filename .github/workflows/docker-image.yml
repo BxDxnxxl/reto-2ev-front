@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "develop-kubernetes" ]
 env:
-  EKS_CLUSTER_NAME: cluster-cluter
+  EKS_CLUSTER_NAME: cluster-cluster
   AWS_REGION: us-east-1
 
 jobs:
