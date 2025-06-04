@@ -14,7 +14,10 @@ const logout = () => {
 };
 
 const emit = defineEmits(["change-view"]);
-
+const getUserImage = computed(() => {
+  const pic = userStore.currentUser?.profilePic;
+  return pic && pic.trim() !== "" ? pic : "https://via.placeholder.com/80";
+});
 const isAdmin = computed(() =>
   userStore.currentUser?.roles?.some((role) => role.id === rolesStore.ADMIN) || false
 );
@@ -23,8 +26,13 @@ const isAdmin = computed(() =>
 <template>
   <div class="sidebar">
     <div class="sidebar__profile">
-      <img src="https://via.placeholder.com/80" alt="Perfil" class="sidebar__profile-img" />
+      <img
+        :src="getUserImage"
+        alt="Perfil"
+        class="sidebar__profile-img"
+      />
     </div>
+
     <nav class="sidebar__nav">
       <button v-if="isAdmin" class="sidebar__link" @click="emit('change-view', 'usuarios')">
         Usuarios
@@ -77,13 +85,16 @@ const isAdmin = computed(() =>
   }
 
   &__profile-img {
-    border-radius: 50%;
-    margin-bottom: $spacing-medium;
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border: 2px solid $primary-color;
-  }
+  display: block;
+  width: 100px;
+  height: 100px;
+  max-width: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $primary-color;
+  margin: 0 auto $spacing-medium;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
 
   &__nav {
     width: 100%;

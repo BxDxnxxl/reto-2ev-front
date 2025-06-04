@@ -57,42 +57,52 @@ export const useUsersStore = defineStore("users", () => {
   }
 
   async function createUsuario(formData: FormData) {
-    try {
-      const res = await fetch('https://wannagamesapi.retocsv.es/api/usuarios', {
-        method: 'POST',
-        body: formData
-      });
-      if (!res.ok) throw new Error(await res.text());
-      await fetchUsuarios();
-      return await res.json(); // devuelve { id: ... }
-    } catch (error) {
-      console.error('Error al crear usuario:', error);
-    }
-  }
+  try {
+    const res = await fetch('https://wannagamesapi.retocsv.es/api/Usuario', {
+      method: 'POST',
+      body: formData,
+    });
 
-  async function updateUsuario(id: number, userDto: UserUpdateDto) {
-    try {
-      const formData = new FormData();
-      formData.append('Username', userDto.username);
-      formData.append('Email', userDto.email);
-      formData.append('Contrasenia', userDto.contraseña);
-      formData.append('Nombre', userDto.nombre ?? '');
-      formData.append('Apellido1', userDto.apellido1 ?? '');
-      formData.append('Apellido2', userDto.apellido2 ?? '');
-      if (userDto.profilePic instanceof File) {
-        formData.append('ProfilePic', userDto.profilePic);
-      }
+    if (!res.ok) throw new Error(await res.text());
 
-      const res = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, {
-        method: 'PUT',
-        body: formData
-      });
-      if (!res.ok) throw new Error(await res.text());
-      await fetchUsuarios();
-    } catch (error) {
-      console.error('Error al actualizar usuario:', error);
-    }
+    await fetchUsuarios();
+    return await res.json();
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
   }
+}
+
+
+async function updateUsuario(id: number, userDto: UserUpdateDto) {
+  try {
+    const formData = new FormData();
+    formData.append('Username', userDto.username.trim());
+    formData.append('Email', userDto.email.trim());
+    formData.append('Contrasenia', userDto.contraseña ?? '');
+    formData.append('Nombre', userDto.nombre ?? '');
+    formData.append('Apellido1', userDto.apellido1 ?? '');
+    formData.append('Apellido2', userDto.apellido2 ?? '');
+
+    // ✅ Siempre enviar ProfilePic
+    if (userDto.profilePic && typeof userDto.profilePic !== 'string') {
+      formData.append('ProfilePic', userDto.profilePic);
+    } else {
+      const emptyFile = new Blob([], { type: 'image/png' });
+      formData.append('ProfilePic', emptyFile, 'empty.png');
+    }
+
+    const res = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    await fetchUsuarios();
+  } catch (error) {
+    console.error('Error al actualizar usuario:', error);
+  }
+}
 
 
   async function updateCurrentUser(usuarioActualizado: UserUpdateDto) {
@@ -100,10 +110,12 @@ export const useUsersStore = defineStore("users", () => {
     if (!currentUser.value) throw new Error("No hay usuario autenticado.");
     const usuarioId = currentUser.value.id ?? 0;
 
-    // ⚠️ Guarda la contraseña actual (por si no se ha cambiado)
-    const oldPassword = currentUser.value.contrasenia ?? "";
+    let finalPassword = usuarioActualizado.contraseña?.trim();
 
-    const finalPassword = usuarioActualizado.contraseña || oldPassword;
+    if (!finalPassword) {
+      const usuarioFull = await fetchUsuarioById(usuarioId);
+      finalPassword = usuarioFull?.contrasenia?.trim() ?? "";
+    }
 
     const formData = new FormData();
     formData.append("Username", usuarioActualizado.username);
@@ -120,18 +132,16 @@ export const useUsersStore = defineStore("users", () => {
     const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${usuarioId}`, {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${tokenLogin}`
+        Authorization: `Bearer ${tokenLogin.value}`
       },
       body: formData,
     });
 
     if (!response.ok) throw new Error(`Error en la actualización: ${await response.text()}`);
 
-    await fetchUsuarios();
-
     const loginDto: UserLoginDto = {
       username: usuarioActualizado.username,
-      password: finalPassword // ✅ usamos la misma que mandamos
+      password: finalPassword
     };
 
     const loginSuccess = await login(loginDto);

@@ -2,9 +2,8 @@
 import { ref, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import type { UserDto } from "@/stores/dtos/user.dto";
-import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
-import PerfilAnimado from './PerfilAnimado.vue';
 import type { UserUpdateDto } from "@/stores/dtos/UserUpdateDto";
+import PerfilAnimado from './PerfilAnimado.vue';
 
 const usersStore = useUsersStore();
 
@@ -19,6 +18,7 @@ const editedUser = ref<UserDto>({
   profilePic: ""
 });
 
+const storedPassword = ref<string>(""); // Contraseña real para reloguear si no cambia
 const profilePicFile = ref<File | null>(null);
 const valid = ref(false);
 const isUpdating = ref(false);
@@ -42,6 +42,7 @@ onMounted(() => {
       ...usersStore.currentUser,
       contrasenia: ""
     };
+    storedPassword.value = usersStore.currentUser.contrasenia ?? "";
   }
 });
 
@@ -52,14 +53,14 @@ const handleProfilePicUpload = (event: Event) => {
     profilePicFile.value = input.files[0];
   }
 };
+
 function getImageSrc(pic: string | File | null | undefined): string {
   if (!pic) return 'https://via.placeholder.com/100';
-
   if (typeof pic === 'string') return pic;
   if (pic instanceof File) return URL.createObjectURL(pic);
-
   return 'https://via.placeholder.com/100';
 }
+
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
@@ -72,7 +73,8 @@ const updateProfile = async () => {
     const usuario = usersStore.currentUser;
     if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-    const finalPassword = editedUser.value.contrasenia?.trim() || usuario.contrasenia || "";
+    // ⚠️ Si no se ha cambiado la contraseña, usamos la original almacenada
+    const finalPassword = editedUser.value.contrasenia?.trim() || storedPassword.value;
 
     const userUpdateDto: UserUpdateDto = {
       username: editedUser.value.username,
@@ -290,6 +292,9 @@ const updateProfile = async () => {
 
     .v-avatar img {
       border: 2px solid $accent-color;
+      object-fit: contain !important;
+      width: 100%;
+      height: 100%;
     }
   }
 

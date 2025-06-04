@@ -69,7 +69,6 @@ function onFileChange(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file) userData.value.profilePic = file;
 }
-
 async function saveUser() {
   try {
     const requiredFields = [
@@ -108,6 +107,14 @@ async function saveUser() {
       await usersStore.updateUsuario(userId.value, updateDto);
       savedUserId = userId.value;
     } else {
+      // ⚠️ Usar imagen por defecto si no se ha subido ninguna
+      if (!(userData.value.profilePic instanceof File)) {
+        const response = await fetch('/predefinida.jpg');
+        const blob = await response.blob();
+        const defaultFile = new File([blob], 'predefinida.jpg', { type: blob.type });
+        userData.value.profilePic = defaultFile;
+      }
+
       const formData = new FormData();
       formData.append('Username', userData.value.username.trim());
       formData.append('Email', userData.value.email.trim());
@@ -115,10 +122,7 @@ async function saveUser() {
       formData.append('Nombre', userData.value.nombre?.trim() || '');
       formData.append('Apellido1', userData.value.apellido1?.trim() || '');
       formData.append('Apellido2', userData.value.apellido2?.trim() || '');
-
-      if (userData.value.profilePic instanceof File) {
-        formData.append('ProfilePic', userData.value.profilePic);
-      }
+      formData.append('ProfilePic', userData.value.profilePic);
 
       const created = await usersStore.createUsuario(formData);
       savedUserId = created?.id;
@@ -158,7 +162,6 @@ async function saveUser() {
 }
 </script>
 
-
 <template>
   <v-container>
     <v-card class="pa-5">
@@ -188,7 +191,12 @@ async function saveUser() {
             />
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field label="Foto de Perfil (URL)" v-model="userData.profilePic" />
+          <v-file-input
+              label="Foto de Perfil"
+              accept="image/*"
+              @change="onFileChange"
+              prepend-icon="mdi-camera"
+            />
           </v-col>
 
           <v-col cols="12">
