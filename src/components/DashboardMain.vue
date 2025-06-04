@@ -52,7 +52,14 @@ const handleProfilePicUpload = (event: Event) => {
     profilePicFile.value = input.files[0];
   }
 };
+function getImageSrc(pic: string | File | null | undefined): string {
+  if (!pic) return 'https://via.placeholder.com/100';
 
+  if (typeof pic === 'string') return pic;
+  if (pic instanceof File) return URL.createObjectURL(pic);
+
+  return 'https://via.placeholder.com/100';
+}
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
@@ -105,7 +112,7 @@ const updateProfile = async () => {
           <div class="d-flex justify-center mb-4">
             <v-avatar size="100">
               <img
-                :src="usersStore.currentUser?.profilePic || 'https://via.placeholder.com/100'"
+                :src="getImageSrc(usersStore.currentUser?.profilePic)"
                 alt="Foto de perfil"
               />
             </v-avatar>
