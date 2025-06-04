@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "develop-kubernetes" ]
 env:
-  EKS_CLUSTER_NAME: demo-cluter
+  EKS_CLUSTER_NAME: cluster-cluter
   AWS_REGION: us-east-1
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         flavor: |
           latest=false
         tags: |
-          type=raw,value=24
+          type=raw,value=25
 
     - name: Build and Push to Docker Hub
       id: docker_build
@@ -60,7 +60,7 @@ jobs:
         aws-region: ${{env.AWS_REGION}}
 
     - name: Update kube config
-      run: aws eks update-kubeconfig --name cluster-cluster --region $AWS_REGION
+      run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
     - name: Deploy to EKS
       run: |
