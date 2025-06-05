@@ -35,7 +35,7 @@ jobs:
         flavor: |
           latest=false
         tags: |
-          type=raw,value=30
+          type=raw,value=31
 
     - name: Build and Push to Docker Hub
       id: docker_build

@@ -2,6 +2,8 @@
 import { ref, watch } from "vue";
 import { useGamesStore } from "@/stores/games";
 import type { GameCreateDto } from "@/stores/dtos/GameCreateDto";
+import Swal from 'sweetalert2'
+
 
 const emit = defineEmits(["creado"]);
 const store = useGamesStore();
@@ -45,14 +47,25 @@ function validateFile(file: File): boolean {
   const maxSize = 5 * 1024 * 1024; // 5MB
   
   if (!allowedTypes.includes(file.type)) {
-    alert('Por favor selecciona una imagen válida (JPEG, PNG o GIF)');
-    return false;
-  }
-  
-  if (file.size > maxSize) {
-    alert('La imagen debe ser menor a 5MB');
-    return false;
-  }
+   Swal.fire({
+    icon: 'error',
+    title: 'Archivo no válido',
+    text: 'Por favor selecciona una imagen válida (JPEG, PNG o GIF)',
+    confirmButtonText: 'Entendido'
+  })
+  return false
+}
+
+if (file.size > maxSize) {
+ Swal.fire({
+    icon: 'warning',
+    title: 'Imagen demasiado grande',
+    text: 'La imagen debe ser menor a 5MB',
+    confirmButtonText: 'Cerrar'
+  })
+  return false
+}
+
   
   return true;
 }
@@ -67,7 +80,12 @@ function formatFileSize(bytes: number): string {
 
 async function handleSubmit() {
   if (!form.value.caratula) {
-    alert('Por favor selecciona una imagen');
+    await Swal.fire({
+      icon: 'info',
+      title: 'Imagen requerida',
+      text: 'Por favor selecciona una imagen.',
+      confirmButtonText: 'Entendido'
+    })
     return;
   }
 
@@ -90,7 +108,12 @@ async function handleSubmit() {
     resetForm();
   } catch (error) {
     console.error('Error al crear videojuego:', error);
-    alert('Error al crear el videojuego. Por favor, inténtalo de nuevo.');
+    await Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'Error al crear el videojuego. Por favor, inténtalo de nuevo.',
+    confirmButtonText: 'Aceptar'
+    })
   } finally {
     isSubmitting.value = false;
   }

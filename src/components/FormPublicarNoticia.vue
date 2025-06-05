@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useUsersStore } from '@/stores/users';
 import { useUsuariosEmpresasStore } from '@/stores/usuariosEmpresasStore';
 import type { PublicacionEmpresaCreateDto } from '@/stores/dtos/PublicacionEmpresaCreateDto';
+import Swal from 'sweetalert2'
 
 const emit = defineEmits(['guardar']);
 const usersStore = useUsersStore();
@@ -51,22 +52,37 @@ function validateFile(file: File): boolean {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
   const maxSize = 5 * 1024 * 1024; // 5MB
   
-  if (!allowedTypes.includes(file.type)) {
-    alert('Por favor selecciona una imagen válida (JPEG, PNG o GIF)');
-    return false;
-  }
-  
-  if (file.size > maxSize) {
-    alert('La imagen debe ser menor a 5MB');
-    return false;
-  }
+      if (!allowedTypes.includes(file.type)) {
+       Swal.fire({
+        icon: 'warning',
+        title: 'Formato no permitido',
+        text: 'Por favor selecciona una imagen válida (JPEG, PNG o GIF).',
+        confirmButtonText: 'Aceptar'
+      })
+      return false
+    }
+
+    if (file.size > maxSize) {
+       Swal.fire({
+        icon: 'warning',
+        title: 'Imagen demasiado grande',
+        text: 'La imagen debe ser menor a 5MB.',
+        confirmButtonText: 'Aceptar'
+      })
+      return false
+    }
   
   return true;
 }
 
 async function submitForm() {
   if (!imagenFile.value) {
-    alert("Debe seleccionar una imagen.");
+    await Swal.fire({
+      icon: 'info',
+      title: 'Imagen requerida',
+      text: 'Debe seleccionar una imagen.',
+      confirmButtonText: 'Aceptar'
+    })
     return;
   }
 
@@ -85,7 +101,12 @@ async function submitForm() {
     resetForm();
   } catch (error) {
     console.error('Error al crear publicación:', error);
-    alert('Error al crear la publicación. Por favor, inténtalo de nuevo.');
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error al crear la publicación',
+      text: 'Por favor, inténtalo de nuevo.',
+      confirmButtonText: 'Aceptar'
+    })
   } finally {
     isSubmitting.value = false;
   }

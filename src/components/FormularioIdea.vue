@@ -4,6 +4,7 @@ import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
 import { useSocialStore } from "@/stores/RedSocial";
 import type { IdeaDto } from "@/stores/dtos/Ideas.dto";
+import Swal from 'sweetalert2'
 
 const emit = defineEmits(["ideaPublicada"]);
 
@@ -29,7 +30,12 @@ const isSubmitting = ref(false);
 
 const publicar = async () => {
   if (!usersStore.currentUser?.id) {
-    alert("Para realizar esta acción debes iniciar sesión.");
+    await Swal.fire({
+      icon: 'info',
+      title: 'Inicia sesión',
+      text: 'Para realizar esta acción debes iniciar sesión.',
+      confirmButtonText: 'Aceptar'
+    })
     return;
   }
 
@@ -44,7 +50,13 @@ const publicar = async () => {
     resetForm();
   } catch (error) {
     console.error('Error al publicar idea:', error);
-    alert('Error al publicar la idea. Por favor, inténtalo de nuevo.');
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error al publicar',
+      text: 'Error al publicar la idea. Por favor, inténtalo de nuevo.',
+      confirmButtonText: 'Aceptar'
+    })
+
   } finally {
     isSubmitting.value = false;
   }

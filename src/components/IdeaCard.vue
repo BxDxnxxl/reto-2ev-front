@@ -64,19 +64,34 @@ const verificarEstados = async () => {
 const handleUnirse = async (idIdea: number, creadorId: number) => {
   const userId = usersStore.currentUser?.id;
   if (!userId) {
-    alert("Para realizar esta acción debes iniciar sesión.");
-    return;
-  }
+  await Swal.fire({
+    icon: 'info',
+    title: 'Inicia sesión',
+    text: 'Para realizar esta acción debes iniciar sesión.',
+    confirmButtonText: 'Entendido'
+  })
+  return
+}
 
-  if (userId === creadorId) {
-    alert("No puedes unirte a tu propia idea.");
-    return;
-  }
+if (userId === creadorId) {
+  await Swal.fire({
+    icon: 'warning',
+    title: 'Acción no permitida',
+    text: 'No puedes unirte a tu propia idea.',
+    confirmButtonText: 'Ok'
+  })
+  return
+}
 
-  if (estadoApuntado.value[idIdea]) {
-    alert("Ya estás apuntado a esta idea.");
-    return;
-  }
+if (estadoApuntado.value[idIdea]) {
+  await Swal.fire({
+    icon: 'info',
+    title: 'Ya apuntado',
+    text: 'Ya estás apuntado a esta idea.',
+    confirmButtonText: 'Cerrar'
+  })
+  return
+}
 
   await usuariosApuntadosStore.unirseAIdea(idIdea, userId);
   await ideasStore.fetchIdeasConPlazas();

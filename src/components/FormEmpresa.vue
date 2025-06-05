@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-
+import Swal from 'sweetalert2'
 const emit = defineEmits(['guardarEmpresa']);
 
 const empresa = ref({
@@ -35,13 +35,23 @@ function validateFile(file: File): boolean {
   const maxSize = 5 * 1024 * 1024; // 5MB
   
   if (!allowedTypes.includes(file.type)) {
-    alert('Por favor selecciona una imagen válida (JPEG, PNG o GIF)');
-    return false;
+     Swal.fire({
+      icon: 'warning',
+      title: 'Formato inválido',
+      text: 'Por favor selecciona una imagen válida (JPEG, PNG o GIF).',
+      confirmButtonText: 'Aceptar'
+    })
+    return false
   }
-  
+
   if (file.size > maxSize) {
-    alert('La imagen debe ser menor a 5MB');
-    return false;
+     Swal.fire({
+      icon: 'warning',
+      title: 'Imagen demasiado grande',
+      text: 'La imagen debe ser menor a 5MB.',
+      confirmButtonText: 'Aceptar'
+    })
+    return false
   }
   
   return true;
@@ -49,7 +59,12 @@ function validateFile(file: File): boolean {
 
 async function submitForm() {
   if (!empresa.value.Logo) {
-    alert("Debe seleccionar un logo.");
+    await Swal.fire({
+      icon: 'info',
+      title: 'Logo requerido',
+      text: 'Debe seleccionar un logo.',
+      confirmButtonText: 'Aceptar'
+    })
     return;
   }
 
@@ -69,7 +84,12 @@ async function submitForm() {
     resetForm();
   } catch (error) {
     console.error('Error al crear empresa:', error);
-    alert('Error al crear la empresa. Por favor, inténtalo de nuevo.');
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error al crear la empresa',
+      text: 'Por favor, inténtalo de nuevo.',
+      confirmButtonText: 'Aceptar'
+    })
   } finally {
     isSubmitting.value = false;
   }
