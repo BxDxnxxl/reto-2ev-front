@@ -32,9 +32,9 @@ onMounted(() => {
       class="game-card"
     >
       <div class="game-card__image">
-        <img :src="game.caratula" :alt="game.titulo" class="game-card__image--img" />
+        <img :src="game.caratula" :alt="game.titulo" class="game-card__image-img" />
         <div class="game-card__overlay">
-          <span class="game-card__overlay--details">Ver detalles</span>
+          <span class="game-card__overlay-details">Ver detalles</span>
         </div>
       </div>
       <div class="game-card__info">
@@ -86,7 +86,7 @@ onMounted(() => {
       opacity: 1;
     }
 
-    .game-card__image--img {
+    .game-card__image-img {
       transform: scale(1.05);
     }
   }
