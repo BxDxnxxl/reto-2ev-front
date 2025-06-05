@@ -72,7 +72,7 @@ const clips = ref<any[]>([])
 
 const cargarClips = async (nombreJuego: string) => {
   try {
-    const res = await fetch(`http://wannagamesapi.retocsv.es/api/twitch/clips?game=${encodeURIComponent(nombreJuego)}`)
+    const res = await fetch(`https://wannagamesapi.retocsv.es/api/twitch/clips?game=${encodeURIComponent(nombreJuego)}`)
     const data = await res.json()
     clips.value = data.data
   } catch (error) {

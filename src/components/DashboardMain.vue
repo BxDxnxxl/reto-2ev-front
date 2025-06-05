@@ -223,6 +223,7 @@ const updateProfile = async () => {
     </v-snackbar>
   </v-container>
 </template>
+
 <style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 
@@ -237,70 +238,130 @@ const updateProfile = async () => {
   align-items: center;
 
   .profile-card {
-    background-color: $dark-color; // fondo claro para contraste con la vista oscura
-    color: $dark-color;
+    background-color: rgba(30, 30, 30, 0.9) !important;
+    backdrop-filter: blur(20px);
+    color: $text-color !important;
     padding: $spacing-large;
-    border-radius: calc($border-radius * 4); // borde más redondeado
+    border-radius: calc($border-radius * 4);
     box-shadow: $box-shadow;
     width: 100%;
     max-width: 800px;
-
-    border: 3px;
-    border-color: $primary-gradient;
+    border: 2px solid $primary-color;
 
     .v-card-title {
-      font-size: $font-size-xlarge;
-      font-weight: bold;
-      color: $dark-color;
+      font-size: $font-size-xlarge !important;
+      font-weight: bold !important;
+      color: $text-color !important;
       text-align: center;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .v-text-field,
-    .v-file-input {
-      .v-input__control {
-        background-color: white !important;
-        color: $dark-color !important;
-        border-radius: calc($border-radius * 1.2);
-        border: 1px solid $color-disabled;
+    // Estilos para todos los campos de entrada
+    :deep(.v-text-field),
+    :deep(.v-file-input) {
+      // Campo base
+      .v-field {
+        background-color: transparent !important;
+        
+        &__field {
+          background-color: transparent !important;
+          color: $text-color !important;
+        }
 
-        input {
-          color: $dark-color !important;
-          font-size: $font-size-base;
+        &__input {
+          color: $text-color !important;
+          
+          input {
+            color: $text-color !important;
+          }
+        }
+
+        // Bordes y contornos
+        &__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-opacity: 1 !important;
+        }
+
+        &__outline__start,
+        &__outline__notch::before,
+        &__outline__notch::after,
+        &__outline__end {
+          border-color: $primary-color !important;
+          border-width: 2px !important;
+        }
+
+        // Estado de foco
+        &--focused .v-field__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-width: 3px !important;
+        }
+
+        // Estado hover
+        &:hover .v-field__outline {
+          --v-field-border-color: #{lighten($primary-color, 10%)} !important;
         }
       }
 
+      // Labels
       .v-label {
-        color: $dark-color !important;
+        color: rgba($text-color, 0.8) !important;
         font-weight: 500;
         font-size: $font-size-base;
+
+        &.v-field-label--focused {
+          color: $primary-color !important;
+        }
+      }
+
+      // Iconos
+      .v-field__prepend-inner .v-icon,
+      .v-field__append-inner .v-icon {
+        color: $primary-color !important;
+      }
+
+      // Mensajes de error
+      .v-messages__message {
+        color: $color-error !important;
       }
     }
 
-    .v-btn {
-      background-color: $btn-color !important;
+    // Botón
+    :deep(.v-btn) {
+      background: $primary-gradient !important;
       color: white !important;
       font-weight: bold;
       border-radius: $border-radius;
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
       transition: $transition;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
 
       &:hover {
-        background-color: darken($btn-color, 10%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($primary-color, 0.4);
+      }
+
+      &:disabled {
+        background: $color-disabled !important;
+        color: rgba(white, 0.6) !important;
       }
     }
 
+    // Avatar
     .v-avatar img {
-      border: 2px solid $accent-color;
-      object-fit: contain !important;
+      border: 3px solid $primary-color;
+      object-fit: cover !important;
       width: 100%;
       height: 100%;
     }
   }
 
-  .v-snackbar {
+  // Snackbar
+  :deep(.v-snackbar) {
     font-size: $font-size-base;
     font-weight: 500;
   }
-}
-</style>
+}</style>
