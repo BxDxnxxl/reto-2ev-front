@@ -58,7 +58,7 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
 @import '@/assets/styles/variables.scss';
 
 .solicitudes {
-  padding: $spacing-medium;
+  padding: $spacing-small;
 
   &__titulo {
     font-size: $font-size-large;
@@ -87,17 +87,24 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
   &__card {
     background-color: $card-background;
     border-radius: $border-radius;
-    padding: $spacing-medium;
+    padding: $spacing-small;
     border: 1px solid $primary-color;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     box-shadow: $box-shadow;
     transition: $transition;
 
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba($primary-color, 0.15);
+    }
+
+    @media (min-width: 600px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-medium;
     }
   }
 
@@ -106,6 +113,11 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     flex-direction: column;
     gap: $spacing-extra-small;
     color: $text-color;
+    margin-bottom: $spacing-small;
+
+    @media (min-width: 600px) {
+      margin-bottom: 0;
+    }
   }
 
   &__usuario-nombre {
@@ -136,9 +148,16 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     transition: $transition;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    align-self: stretch; 
 
     &:hover {
       background-color: darken($btn-color, 10%);
+    }
+
+    @media (min-width: 600px) {
+      align-self: auto;
+      padding: $spacing-small $spacing-large;
+      width: auto;
     }
   }
 }
