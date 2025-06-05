@@ -41,7 +41,7 @@ const getPegiImageUrl = (pegiValue: number) => {
       return undefined
   }
 }
-
+const parentDomain = window.location.hostname
 // Formato de fecha a española
 const formatearFechaEspañola = (fecha: string | number | Date) => {
   if (typeof fecha === 'number') {
@@ -235,8 +235,10 @@ const cargarClips = async (nombreJuego: string) => {
       <h3><span class="icono">📺</span> Clips populares en Twitch</h3>
       <div class="detalle-videojuego__clips">
         <div class="twitch-clip" v-for="clip in clips" :key="clip.id">
-          <iframe :src="`https://clips.twitch.tv/embed?clip=${clip.id}&parent=localhost`" width="100%" height="300"
-            allowfullscreen></iframe>
+          <iframe
+            :src="`https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}`"
+            width="100%" height="300" allowfullscreen>
+          </iframe>
           <p>{{ clip.title }}</p>
         </div>
       </div>
