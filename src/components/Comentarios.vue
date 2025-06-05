@@ -76,18 +76,36 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
         <h4 class="comentarios__titulo-texto">{{ comentario.titulo }}</h4>
         <p class="comentarios__texto">{{ comentario.texto }}</p>
 
-        <div class="comentarios__valoracion">Valoración: {{ comentario.valoracion }}</div>
+        <div class="comentarios__valoracion">
+          <span class="comentarios__valoracion-label">Valoración:</span>
+          <div class="comentarios__valoracion-estrellas">
+            <span class="comentarios__valoracion-numero">{{ comentario.valoracion }}</span>
+            <span class="comentarios__valoracion-max">/10</span>
+          </div>
+        </div>
 
         <div class="comentarios__acciones">
           <div class="comentarios__like">
-            <v-btn icon variant="text" size="small" @click="commentsStore.likeComentario(comentario.id, props.gameId)">
+            <v-btn 
+              icon 
+              variant="text" 
+              size="small" 
+              class="comentarios__boton-accion comentarios__boton-accion--like"
+              @click="commentsStore.likeComentario(comentario.id, props.gameId)"
+            >
               <v-icon>mdi-thumb-up</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.likes }}</span>
           </div>
 
           <div class="comentarios__dislike">
-            <v-btn icon variant="text" size="small" @click="commentsStore.dislikeComentario(comentario.id, props.gameId)">
+            <v-btn 
+              icon 
+              variant="text" 
+              size="small" 
+              class="comentarios__boton-accion comentarios__boton-accion--dislike"
+              @click="commentsStore.dislikeComentario(comentario.id, props.gameId)"
+            >
               <v-icon>mdi-thumb-down</v-icon>
             </v-btn>
             <span class="comentarios__contador">{{ comentario.dislikes }}</span>
@@ -96,9 +114,9 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
           <v-btn 
             v-if="puedenEliminar[comentario.id]" 
             icon 
-            color="error" 
             variant="text" 
             size="small" 
+            class="comentarios__boton-accion comentarios__boton-accion--delete"
             @click="eliminarComentario(comentario.id)"
           >
             <v-icon>mdi-delete</v-icon>
@@ -107,159 +125,326 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
       </div>
 
       <div v-if="!commentsStore.comentariosByVideojuego.length" class="comentarios__vacio">
-        <p>No hay comentarios disponibles para este videojuego</p>
+        <div class="comentarios__vacio-icono">
+          <v-icon size="48">mdi-comment-outline</v-icon>
+        </div>
+        <p class="comentarios__vacio-texto">No hay comentarios disponibles para este videojuego</p>
+        <p class="comentarios__vacio-subtexto">¡Sé el primero en comentar!</p>
       </div>
     </div>
   </div>
 </template>
 
-
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+
 .comentarios {
   width: 100%;
   max-width: 100%;
   margin-top: 0;
-  padding-bottom: 32px;
-
+  padding-bottom: $spacing-xxl;
 
   &__titulo {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    font-weight: bold;
+    font-family: $font-family-title;
+    font-size: $font-size-xlarge;
+    margin-bottom: $spacing-medium;
+    font-weight: 700;
+    color: $text-color;
+    text-align: center;
+    
+    @media (min-width: $desktop) {
+      font-size: 28px;
+      text-align: left;
+    }
   }
 
   &__lista {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: $spacing-medium;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
+    padding: 0 $spacing-medium;
   }
 
   &__item {
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: $card-background;
+    border-radius: $border-radius;
+    padding: $spacing-medium;
+    box-shadow: $box-shadow;
+    border: 1px solid rgba($primary-color, 0.1);
+    transition: $transition;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba($primary-color, 0.15);
+      border-color: rgba($primary-color, 0.3);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: $primary-gradient;
+      opacity: 0;
+      transition: $transition;
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
   }
 
   &__cabecera {
     display: flex;
     flex-direction: column;
-    margin-bottom: 8px;
+    margin-bottom: $spacing-small;
+    gap: $spacing-extra-small;
 
-    @media (min-width: 768px) {
+    @media (min-width: $desktop) {
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
+      gap: $spacing-medium;
     }
   }
 
   &__nombre {
-    font-weight: bold;
-    font-size: 1rem;
+    font-family: $font-family-base;
+    font-weight: 700;
+    font-size: $font-size-base;
     margin: 0;
+    color: $primary-color;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '👤';
+      margin-right: $spacing-extra-small;
+      font-size: $font-size-small;
+    }
   }
 
   &__fecha {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 4px;
-
-    @media (min-width: 768px) {
-      margin-top: 0;
+    font-family: $font-family-base;
+    font-size: $font-size-small;
+    color: rgba($text-color, 0.7);
+    font-weight: 500;
+    
+    &::before {
+      content: '📅';
+      margin-right: $spacing-extra-small;
     }
   }
 
   &__titulo-texto {
-    font-size: 1.1rem;
-    margin: 8px 0;
+    font-family: $font-family-base;
+    font-size: $font-size-large;
+    margin: $spacing-small 0;
     font-weight: 600;
-    color:#000;
+    color: $text-color;
+    line-height: 1.4;
   }
 
   &__texto {
-    margin-bottom: 12px;
-    line-height: 1.5;
-    color:#000;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    margin-bottom: $spacing-medium;
+    line-height: 1.6;
+    color: rgba($text-color, 0.9);
   }
 
   &__valoracion {
-    margin-bottom: 12px;
-    color:#000;
+    display: flex;
+    align-items: center;
+    gap: $spacing-small;
+    margin-bottom: $spacing-medium;
+    padding: $spacing-extra-small $spacing-small;
+    background: rgba($primary-color, 0.1);
+    border-radius: $border-radius / 2;
+    width: fit-content;
+
+    &-label {
+      font-family: $font-family-base;
+      font-size: $font-size-small;
+      color: $text-color;
+      font-weight: 600;
+    }
+
+    &-estrellas {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    &-numero {
+      font-family: $font-family-base;
+      font-size: $font-size-base;
+      font-weight: 700;
+      color: $primary-color;
+    }
+
+    &-max {
+      font-family: $font-family-base;
+      font-size: $font-size-small;
+      color: rgba($text-color, 0.6);
+    }
   }
 
   &__acciones {
     display: flex;
-    gap: 16px;
-    color: #000;
+    gap: $spacing-medium;
+    align-items: center;
+    justify-content: flex-start;
+
+    @media (min-width: $desktop) {
+      justify-content: flex-end;
+    }
   }
 
   &__like,
   &__dislike {
     display: flex;
     align-items: center;
-    gap: 4px;
-    color:#000;
+    gap: $spacing-extra-small;
+  }
+
+  &__boton-accion {
+    transition: $transition;
+    border-radius: 50%;
+
+    &--like {
+      color: $color-success;
+
+      &:hover {
+        background-color: rgba($color-success, 0.1);
+        color: lighten($color-success, 10%);
+      }
+    }
+
+    &--dislike {
+      color: $color-warning;
+
+      &:hover {
+        background-color: rgba($color-warning, 0.1);
+        color: darken($color-warning, 10%);
+      }
+    }
+
+    &--delete {
+      color: $color-error;
+
+      &:hover {
+        background-color: rgba($color-error, 0.1);
+        color: lighten($color-error, 10%);
+      }
+    }
   }
 
   &__contador {
-    font-size: 0.9rem;
-    color: #000;
+    font-family: $font-family-base;
+    font-size: $font-size-small;
+    font-weight: 600;
+    color: $text-color;
+    min-width: 20px;
+    text-align: center;
   }
 
   &__vacio {
     text-align: center;
-    padding: 24px;
-    color: #666;
+    padding: $spacing-xxl;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    border: 2px dashed rgba($primary-color, 0.3);
+
+    &-icono {
+      color: rgba($text-color, 0.4);
+      margin-bottom: $spacing-medium;
+    }
+
+    &-texto {
+      font-family: $font-family-base;
+      font-size: $font-size-large;
+      color: rgba($text-color, 0.7);
+      margin-bottom: $spacing-small;
+      font-weight: 600;
+    }
+
+    &-subtexto {
+      font-family: $font-family-base;
+      font-size: $font-size-base;
+      color: rgba($text-color, 0.5);
+      font-style: italic;
+    }
   }
 
-  @media (min-width: 768px) {
+  // Media queries usando variables
+  @media (min-width: $desktop) {
     &__lista {
-      max-width: 1200px;
+      padding: 0 $spacing-large;
     }
 
     &__item {
-      padding: 24px;
-    }
-
-    &__acciones {
-      justify-content: flex-end;
+      padding: $spacing-large;
     }
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: $laptop) {
     &__lista {
-      max-width: 1200px;
+      padding: 0 $spacing-xl;
+    }
+
+    &__item {
+      padding: $spacing-xl;
+    }
+
+    &__titulo {
+      font-size: 32px;
+    }
+
+    &__texto {
+      font-size: $font-size-large;
+    }
+
+    &__titulo-texto {
+      font-size: $font-size-xlarge;
     }
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: $xl) {
     &__lista {
       max-width: 1400px;
     }
 
-    &__item {
-      padding: 28px;
-    }
-
     &__titulo {
-      font-size: 1.75rem;
-    }
-
-    &__texto {
-      font-size: 1.1rem;
-    }
-
-    &__titulo-texto {
-      font-size: 1.25rem;
+      font-size: 36px;
     }
 
     &__contador {
-      font-size: 1rem;
+      font-size: $font-size-base;
     }
   }
+}
+
+// Animaciones
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.comentarios__item {
+  animation: slideInLeft 0.3s ease forwards;
 }
 </style>
