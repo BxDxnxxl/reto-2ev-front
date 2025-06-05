@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useCommentsStore } from '@/stores/Comentarios';
-import { useUsersStore } from '@/stores/users';
-import { useRolesStore } from '@/stores/roles';
-import type { ComentarioDto } from '@/stores/dtos/Comentario.dto';
+import { ref, onMounted } from 'vue'
+import { useCommentsStore } from '@/stores/Comentarios'
+import { useUsersStore } from '@/stores/users'
+import { useRolesStore } from '@/stores/roles'
+import type { ComentarioDto } from '@/stores/dtos/Comentario.dto'
 
 const props = defineProps({
   gameId: {
@@ -16,44 +16,66 @@ const commentsStore = useCommentsStore()
 const usersStore = useUsersStore()
 const rolesStore = useRolesStore()
 
-const puedenEliminar = ref<{ [key: number]: boolean }>({});
+const puedenEliminar = ref<{ [key: number]: boolean }>({})
+const reaccionesUsuario = ref<{ [comentarioId: number]: 'like' | 'dislike' | null }>({})
 
 const verificarPermisoEliminar = async (comentarioId: number): Promise<boolean> => {
-  const comentario = await commentsStore.fetchComentarioById(comentarioId);
-  if (!comentario) return false;
+  const comentario = await commentsStore.fetchComentarioById(comentarioId)
+  if (!comentario) return false
 
   return (
     comentario.fkIdUsuario === usersStore.currentUser?.id ||
     (usersStore.currentUser?.roles?.some(role => role.id === rolesStore.ADMIN) ?? false)
-  );
-};
+  )
+}
 
 onMounted(async () => {
   if (props.gameId) {
-    await commentsStore.fetchComentariosByVideojuegos(props.gameId);
-    
+    await commentsStore.fetchComentariosByVideojuegos(props.gameId)
+
     for (const comentario of commentsStore.comentariosByVideojuego) {
-      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id);
+      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id)
+      reaccionesUsuario.value[comentario.id] = null
     }
   }
-});
+})
 
 const eliminarComentario = async (comentarioId: number) => {
-  await commentsStore.deleteComentario(comentarioId, props.gameId);
-};
+  await commentsStore.deleteComentario(comentarioId, props.gameId)
+}
+
+const toggleLike = (comentario: ComentarioDto) => {
+  const reaccionActual = reaccionesUsuario.value[comentario.id]
+
+  if (reaccionActual === 'like') {
+    comentario.likes--
+    reaccionesUsuario.value[comentario.id] = null
+  } else {
+    if (reaccionActual === 'dislike') comentario.dislikes--
+    comentario.likes++
+    reaccionesUsuario.value[comentario.id] = 'like'
+  }
+}
+
+const toggleDislike = (comentario: ComentarioDto) => {
+  const reaccionActual = reaccionesUsuario.value[comentario.id]
+
+  if (reaccionActual === 'dislike') {
+    comentario.dislikes--
+    reaccionesUsuario.value[comentario.id] = null
+  } else {
+    if (reaccionActual === 'like') comentario.likes--
+    comentario.dislikes++
+    reaccionesUsuario.value[comentario.id] = 'dislike'
+  }
+}
 
 const formatearFechaEspañola = (fecha: string | number | Date) => {
-  // Si es un año, lo devolvemos como string
-  if (typeof fecha === 'number') {
-    return fecha.toString()
-  }
-
-  // Si es fecha completa, la formateamos como DD/MM/AAAA
+  if (typeof fecha === 'number') return fecha.toString()
   const fechaObj = new Date(fecha)
   const dia = fechaObj.getDate().toString().padStart(2, '0')
   const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
   const anio = fechaObj.getFullYear()
-
   return `${dia}/${mes}/${anio}`
 }
 </script>
@@ -91,7 +113,8 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
               variant="text" 
               size="small" 
               class="comentarios__boton-accion comentarios__boton-accion--like"
-              @click="commentsStore.likeComentario(comentario.id, props.gameId)"
+              :class="{ activo: reaccionesUsuario[comentario.id] === 'like' }"
+              @click="toggleLike(comentario)"
             >
               <v-icon>mdi-thumb-up</v-icon>
             </v-btn>
@@ -104,7 +127,8 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
               variant="text" 
               size="small" 
               class="comentarios__boton-accion comentarios__boton-accion--dislike"
-              @click="commentsStore.dislikeComentario(comentario.id, props.gameId)"
+              :class="{ activo: reaccionesUsuario[comentario.id] === 'dislike' }"
+              @click="toggleDislike(comentario)"
             >
               <v-icon>mdi-thumb-down</v-icon>
             </v-btn>
@@ -446,5 +470,13 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
 
 .comentarios__item {
   animation: slideInLeft 0.3s ease forwards;
+}
+
+.comentarios__boton-accion--like.activo {
+  color: green;
+}
+
+.comentarios__boton-accion--dislike.activo {
+  color: red;
 }
 </style>
