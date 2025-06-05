@@ -38,6 +38,10 @@ const toggleFormulario = () => {
   mostrarFormulario.value = !mostrarFormulario.value;
 };
 
+const cerrarModal = () => {
+  mostrarFormulario.value = false;
+};
+
 const onIdeaPublicada = async () => {
   mostrarFormulario.value = false;
   await ideasStore.fetchIdeasConPlazas();
@@ -119,13 +123,12 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     console.error(error);
   }
 };
-
 </script>
 
 <template>
   <div class="ideas">
     <button class="ideas__boton" @click="toggleFormulario">
-      {{ mostrarFormulario ? "Cancelar" : "➕ Añadir idea" }}
+      ➕ Añadir idea
     </button>
     <select class="ideas__select" v-model="tipoSeleccionado" @change="onTipoSeleccionado">
       <option disabled value="">Filtrar por tipo de idea</option>
@@ -134,7 +137,21 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
         {{ tipo.nombre }}
       </option>
     </select>
-    <FormularioIdea v-if="mostrarFormulario" @ideaPublicada="onIdeaPublicada" />
+
+    <!-- Modal para el formulario -->
+    <div v-if="mostrarFormulario" class="modal-overlay" @click="cerrarModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h2 class="modal-title">Nueva Idea</h2>
+          <button class="modal-close" @click="cerrarModal">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <FormularioIdea @ideaPublicada="onIdeaPublicada" />
+        </div>
+      </div>
+    </div>
 
     <div class="ideas__lista">
       <div
@@ -214,6 +231,7 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     </div>
   </div>
 </template>
+
 <style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 @import "@/assets/styles/mixins.scss";
@@ -231,6 +249,115 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
   font-size: inherit;
   padding: 0;
   margin: 0;
+}
+
+// Estilos del modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: $spacing-medium;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background-color: $background-color;
+  border-radius: calc($border-radius * 2);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-large $spacing-large $spacing-medium;
+  border-bottom: 1px solid lighten($dark-color, 15%);
+  position: sticky;
+  top: 0;
+  background-color: $background-color;
+  z-index: 10;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: $font-size-large;
+  font-weight: 700;
+  background: $primary-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modal-close {
+  @include button-reset;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: lighten($background-color, 8%);
+  color: $text-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  transition: $transition;
+  border: 1px solid $color-disabled;
+
+  &:hover {
+    background-color: $color-error;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  span {
+    line-height: 1;
+  }
+}
+
+.modal-body {
+  padding: 0;
+  
+  // Resetear estilos del FormularioIdea para el modal
+  :deep(.form-container) {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    max-width: none;
+  }
+
+  :deep(.form-header) {
+    display: none; // Ocultamos el header del formulario ya que tenemos el del modal
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .ideas {
@@ -260,7 +387,8 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
       transform: translateY(0);
     }
   }
-   &__select {
+   
+  &__select {
     padding: $spacing-medium $spacing-large;
     border: 1px solid lighten($secondary-color, 40%);
     border-radius: $border-radius;
@@ -347,7 +475,7 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     flex-grow: 1;
   }
 
-   &__fecha-caducidad {
+  &__fecha-caducidad {
     font-size: 0.85rem;
     font-weight: 600;
     color: #d97706;
@@ -390,13 +518,13 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     }
   }
 
-   &__acciones {
+  &__acciones {
     padding-top: $spacing-large;
     border-top: 1px solid lighten($dark-color, 40%);
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 0.75rem; // espacio entre botones
+    gap: 0.75rem;
   }
 
   &__mensaje {
@@ -432,7 +560,7 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
 
   &__boton-borrar {
     @include button-reset;
-    background-color: #dc2626; // rojo fuerte (Tailwind red-600)
+    background-color: #dc2626;
     color: white;
     padding: $spacing-medium $spacing-large;
     border-radius: $border-radius;
@@ -441,7 +569,7 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     transition: background-color 0.2s ease-in-out;
 
     &:hover {
-      background-color: #b91c1c; // rojo más oscuro (Tailwind red-700)
+      background-color: #b91c1c;
     }
 
     &:focus {
@@ -482,6 +610,24 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
     border-radius: $border-radius;
     margin-top: $spacing-medium;
   }
+}
 
+// Responsive para el modal
+@media (max-width: $desktop) {
+  .modal-overlay {
+    padding: $spacing-small;
+  }
+  
+  .modal-content {
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: $spacing-medium;
+  }
+  
+  .modal-title {
+    font-size: $font-size-base;
+  }
 }
 </style>

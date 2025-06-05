@@ -7,7 +7,7 @@ export const useNoticiasLeidasStore = defineStore("noticiasLeidas", () => {
 
   async function fetchLeidas(idUsuario: number) {
     try {
-      const res = await fetch(`http://localhost:4444/api/UsuariosNoticiasLeidas/${idUsuario}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/UsuariosNoticiasLeidas/${idUsuario}`);
       if (!res.ok) throw new Error("Error al obtener publicaciones leídas");
       publicacionesLeidas.value = await res.json();
     } catch (err) {
@@ -17,7 +17,7 @@ export const useNoticiasLeidasStore = defineStore("noticiasLeidas", () => {
 
   async function marcarLeida(dto: UsuarioNoticiaLeidaDto) {
     try {
-      await fetch("http://localhost:4444/api/UsuariosNoticiasLeidas", {
+      await fetch("https://wannagamesapi.retocsv.es/api/UsuariosNoticiasLeidas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dto),

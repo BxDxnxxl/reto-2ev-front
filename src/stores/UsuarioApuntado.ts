@@ -8,7 +8,7 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
   async function unirseAIdea(idIdea: number, idUsuario: number) {
     try {
       const response = await fetch(
-        `http://localhost:4444/api/usuariosapuntados/apuntarse?idIdea=${idIdea}&idUsuario=${idUsuario}`,
+        `https://wannagamesapi.retocsv.es/api/usuariosapuntados/apuntarse?idIdea=${idIdea}&idUsuario=${idUsuario}`,
         { method: "POST" }
       );
 
@@ -24,7 +24,7 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
 
   async function verificarSiUsuarioApuntado(fkIdIdea: number, fkIdUsuario: number): Promise<boolean> {
     try {
-      const response = await fetch("http://localhost:4444/api/usuariosapuntados/existe", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/usuariosapuntados/existe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fkIdIdea, fkIdUsuario })
@@ -41,7 +41,7 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
 
   async function verificarEstadoApuntadoYAceptado(idIdea: number, idUsuario: number): Promise<{ apuntado: boolean; aceptado: boolean }> {
     try {
-      const response = await fetch(`http://localhost:4444/api/usuariosapuntados/estado?idIdea=${idIdea}&idUsuario=${idUsuario}`);
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuariosapuntados/estado?idIdea=${idIdea}&idUsuario=${idUsuario}`);
       if (!response.ok) throw new Error("Error al verificar el estado del usuario en la idea");
 
       return await response.json();
@@ -63,7 +63,7 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
       
       console.log(dto);
       
-      const response = await fetch("http://localhost:4444/api/usuariosapuntados/aceptar", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/usuariosapuntados/aceptar", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dto) // <-- CORREGIDO
@@ -77,7 +77,7 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
 
   async function fetchSolicitudesRecibidas(idCreador: number): Promise<SolicitudRecibidaDto[]> {
     try {
-      const response = await fetch(`http://localhost:4444/api/UsuariosApuntados/solicitudes-recibidas/${idCreador}`);
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/UsuariosApuntados/solicitudes-recibidas/${idCreador}`);
       if (!response.ok) throw new Error("Error al cargar solicitudes recibidas");
       return await response.json();
     } catch (error) {

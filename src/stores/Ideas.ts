@@ -12,7 +12,7 @@ export const useIdeasStore = defineStore("ideas", () => {
   
   async function fetchIdeasBase() {
     try {
-      const res = await fetch("http://localhost:4444/api/ideas");
+      const res = await fetch("https://wannagamesapi.retocsv.es/api/ideas");
       if (!res.ok) throw new Error("Error al cargar las ideas base");
       ideasBase.value = await res.json();
     } catch (error) {
@@ -22,7 +22,7 @@ export const useIdeasStore = defineStore("ideas", () => {
 
   async function fetchIdeasConPlazas() {
     try {
-      const res = await fetch("http://localhost:4444/api/ideas/conPlazas");
+      const res = await fetch("https://wannagamesapi.retocsv.es/api/ideas/conPlazas");
       if (!res.ok) throw new Error("Error al cargar ideas con plazas");
       ideasConPlazas.value = await res.json();
     } catch (error) {
@@ -32,7 +32,7 @@ export const useIdeasStore = defineStore("ideas", () => {
 
   async function publicarIdea(nuevaIdea: IdeaDto) {
     try {
-      const response = await fetch("http://localhost:4444/api/ideas", {
+      const response = await fetch("https://wannagamesapi.retocsv.es/api/ideas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaIdea)
@@ -51,7 +51,7 @@ export const useIdeasStore = defineStore("ideas", () => {
 
   async function fetchIdeasPorTipo(idTipoIdea: number) {
     try {
-      const res = await fetch(`http://localhost:4444/api/ideas/conPlazas/tipo/${idTipoIdea}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/ideas/conPlazas/tipo/${idTipoIdea}`);
       if (!res.ok) throw new Error("Error al filtrar ideas por tipo");
       ideasFiltradasPorTipo.value = await res.json();
     } catch (error) {
@@ -61,7 +61,7 @@ export const useIdeasStore = defineStore("ideas", () => {
 
   async function fetchTiposIdeas() {
     try {
-      const res = await fetch("http://localhost:4444/api/Ideas/tipos");
+      const res = await fetch("https://wannagamesapi.retocsv.es/api/Ideas/tipos");
       if (!res.ok) throw new Error("Error al cargar tipos de ideas");
       tipos.value = await res.json();
     } catch (error) {
@@ -71,7 +71,7 @@ export const useIdeasStore = defineStore("ideas", () => {
 
   async function deleteIdea(id: number): Promise<number[]> {
     try {
-      const response = await fetch(`http://localhost:4444/api/ideas/${id}`, {
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/ideas/${id}`, {
         method: "DELETE"
       });
 
