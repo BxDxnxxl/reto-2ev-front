@@ -2,12 +2,11 @@
 import { ref, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import type { UserDto } from "@/stores/dtos/user.dto";
-import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
+import type { UserUpdateDto } from "@/stores/dtos/UserUpdateDto";
 import PerfilAnimado from './PerfilAnimado.vue';
 
 const usersStore = useUsersStore();
 
-// Estado del formulario
 const editedUser = ref<UserDto>({
   username: "",
   email: "",
@@ -18,6 +17,7 @@ const editedUser = ref<UserDto>({
   profilePic: ""
 });
 
+const storedPassword = ref<string>("");
 const profilePicFile = ref<File | null>(null);
 const valid = ref(false);
 const isUpdating = ref(false);
@@ -27,7 +27,6 @@ const snackbarColor = ref("success");
 const editProfileForm = ref<any>(null);
 const showPassword = ref(false);
 
-// Reglas de validación
 const passwordRules = [
   (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
   (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
@@ -41,10 +40,10 @@ onMounted(() => {
       ...usersStore.currentUser,
       contrasenia: ""
     };
+    storedPassword.value = usersStore.currentUser.contrasenia ?? "";
   }
 });
 
-// Manejar subida de imagen
 const handleProfilePicUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
@@ -52,13 +51,13 @@ const handleProfilePicUpload = (event: Event) => {
   }
 };
 
-// Login tras actualizar
-async function relogin(username: string, password: string) {
-  const loginDto: UserLoginDto = { username, password };
-  return await usersStore.login(loginDto);
+function getImageSrc(pic: string | File | null | undefined): string {
+  if (!pic) return 'https://via.placeholder.com/100';
+  if (typeof pic === 'string') return pic;
+  if (pic instanceof File) return URL.createObjectURL(pic);
+  return 'https://via.placeholder.com/100';
 }
 
-// Actualizar perfil
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
@@ -71,39 +70,27 @@ const updateProfile = async () => {
     const usuario = usersStore.currentUser;
     if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-    const formData = new FormData();
-    formData.append("Username", editedUser.value.username);
-    formData.append("Email", editedUser.value.email);
-    formData.append("Nombre", editedUser.value.nombre ?? "");
-    formData.append("Apellido1", editedUser.value.apellido1 ?? "");
-    formData.append("Apellido2", editedUser.value.apellido2 ?? "");
+    const finalPassword = editedUser.value.contrasenia?.trim() || storedPassword.value;
 
-    const finalPassword = editedUser.value.contrasenia?.trim() || usuario.contrasenia || "";
-    formData.append("Contrasenia", finalPassword);
+    const userUpdateDto: UserUpdateDto = {
+      username: editedUser.value.username,
+      email: editedUser.value.email,
+      contraseña: finalPassword,
+      nombre: editedUser.value.nombre ?? "",
+      apellido1: editedUser.value.apellido1 ?? "",
+      apellido2: editedUser.value.apellido2 ?? "",
+      profilePic: profilePicFile.value as File || undefined
+    };
 
-    if (profilePicFile.value) {
-      formData.append("ProfilePic", profilePicFile.value);
-    }
+    const loginSuccess = await usersStore.updateCurrentUser(userUpdateDto);
 
-    const response = await fetch(`http://localhost:4444/api/usuario/${usuario.id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${usersStore.tokenLogin}`
-      },
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error(await response.text());
-    }
-
-    const loginExito = await relogin(editedUser.value.username, finalPassword);
-    if (!loginExito) throw new Error("Error al reloguear.");
+    if (!loginSuccess) throw new Error("Error al reloguear.");
 
     snackbarMessage.value = "Perfil actualizado correctamente";
     snackbarColor.value = "success";
     snackbar.value = true;
     editedUser.value.contrasenia = "";
+
   } catch (error) {
     console.error("Error actualizando usuario:", error);
     snackbarMessage.value = "Error al actualizar perfil";
@@ -123,7 +110,7 @@ const updateProfile = async () => {
           <div class="d-flex justify-center mb-4">
             <v-avatar size="100">
               <img
-                :src="usersStore.currentUser?.profilePic || 'https://via.placeholder.com/100'"
+                :src="getImageSrc(usersStore.currentUser?.profilePic)"
                 alt="Foto de perfil"
               />
             </v-avatar>
@@ -232,6 +219,7 @@ const updateProfile = async () => {
     </v-snackbar>
   </v-container>
 </template>
+
 <style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 
@@ -246,67 +234,120 @@ const updateProfile = async () => {
   align-items: center;
 
   .profile-card {
-    background-color: $dark-color; // fondo claro para contraste con la vista oscura
-    color: $dark-color;
+    background-color: rgba(30, 30, 30, 0.9) !important;
+    backdrop-filter: blur(20px);
+    color: $text-color !important;
     padding: $spacing-large;
-    border-radius: calc($border-radius * 4); // borde más redondeado
+    border-radius: calc($border-radius * 4);
     box-shadow: $box-shadow;
     width: 100%;
     max-width: 800px;
-
-    border: 3px;
-    border-color: $primary-gradient;
+    border: 2px solid $primary-color;
 
     .v-card-title {
-      font-size: $font-size-xlarge;
-      font-weight: bold;
-      color: $dark-color;
+      font-size: $font-size-xlarge !important;
+      font-weight: bold !important;
+      color: $text-color !important;
       text-align: center;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .v-text-field,
-    .v-file-input {
-      .v-input__control {
-        background-color: white !important;
-        color: $dark-color !important;
-        border-radius: calc($border-radius * 1.2);
-        border: 1px solid $color-disabled;
+    :deep(.v-text-field),
+    :deep(.v-file-input) {
+      .v-field {
+        background-color: transparent !important;
+        
+        &__field {
+          background-color: transparent !important;
+          color: $text-color !important;
+        }
 
-        input {
-          color: $dark-color !important;
-          font-size: $font-size-base;
+        &__input {
+          color: $text-color !important;
+          
+          input {
+            color: $text-color !important;
+          }
+        }
+
+        &__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-opacity: 1 !important;
+        }
+
+        &__outline__start,
+        &__outline__notch::before,
+        &__outline__notch::after,
+        &__outline__end {
+          border-color: $primary-color !important;
+          border-width: 2px !important;
+        }
+
+        &--focused .v-field__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-width: 3px !important;
+        }
+
+        &:hover .v-field__outline {
+          --v-field-border-color: #{lighten($primary-color, 10%)} !important;
         }
       }
 
       .v-label {
-        color: $dark-color !important;
+        color: rgba($text-color, 0.8) !important;
         font-weight: 500;
         font-size: $font-size-base;
+
+        &.v-field-label--focused {
+          color: $primary-color !important;
+        }
+      }
+
+      .v-field__prepend-inner .v-icon,
+      .v-field__append-inner .v-icon {
+        color: $primary-color !important;
+      }
+
+      .v-messages__message {
+        color: $color-error !important;
       }
     }
 
-    .v-btn {
-      background-color: $btn-color !important;
+    :deep(.v-btn) {
+      background: $primary-gradient !important;
       color: white !important;
       font-weight: bold;
       border-radius: $border-radius;
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
       transition: $transition;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
 
       &:hover {
-        background-color: darken($btn-color, 10%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($primary-color, 0.4);
+      }
+
+      &:disabled {
+        background: $color-disabled !important;
+        color: rgba(white, 0.6) !important;
       }
     }
 
+
     .v-avatar img {
-      border: 2px solid $accent-color;
+      border: 3px solid $primary-color;
+      object-fit: cover !important;
+      width: 100%;
+      height: 100%;
     }
   }
 
-  .v-snackbar {
+  :deep(.v-snackbar) {
     font-size: $font-size-base;
     font-weight: 500;
   }
-}
-</style>
+}</style>

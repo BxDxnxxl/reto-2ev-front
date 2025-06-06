@@ -7,7 +7,10 @@ import Footer from '@/components/Footer.vue'
 
 <template>
   <Header />
-  <CatalogFilter />
-  <CatalogCards />
+  <main>
+    <CatalogFilter />
+    <CatalogCards />
+  </main>
+
   <Footer />
 </template>

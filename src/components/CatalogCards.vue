@@ -7,7 +7,7 @@ const route = useRoute()
 const games = useGamesStore()
 
 const gamesToDisplay = computed(() => {
-  //si hay un filtro activo, se aplica
+
   if (games.filtroActivo) {
     return games.juegosFiltrados
   }
@@ -52,35 +52,45 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+
 .games-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: $spacing-large;
   width: 100%;
-  padding: 1rem;
-  margin-bottom: 3rem;
+  padding: $spacing-medium;
+  margin-bottom: $spacing-xxl;
 
   &__no-results {
     text-align: center;
-    font-weight: bold;
+    font-family: $font-family-base;
+    font-weight: 600;
+    color: $text-color;
+    font-size: $font-size-base;
+    padding: $spacing-xl;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
   }
 }
 
 .game-card {
-  background-color: #e8e8e8;
-  border-radius: 12px;
+  background-color: $card-background;
+  border-radius: $border-radius;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: $box-shadow;
+  transition: $transition;
   position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
   text-decoration: none;
+  border: 1px solid transparent;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(242, 84, 33, 0.2);
+    border-color: $primary-color;
 
     .game-card__overlay {
       opacity: 1;
@@ -89,18 +99,23 @@ onMounted(() => {
     .game-card__image--img {
       transform: scale(1.05);
     }
+
+    .game-card__overlay--details {
+      transform: translateY(0);
+    }
   }
 
   &__image {
     position: relative;
     height: 180px;
     overflow: hidden;
+    background-color: $secondary-color;
 
     &--img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: all 0.3s ease;
+      transition: $transition;
     }
   }
 
@@ -110,44 +125,53 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba($secondary-color, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: $transition;
 
     &--details {
-      background-color: #f25421;
-      color: white;
-      padding: 0.5rem 1rem;
+      background: $primary-gradient;
+      color: $text-color;
+      padding: $spacing-small $spacing-medium;
       border-radius: 30px;
+      font-family: $font-family-base;
       font-weight: 600;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      font-size: $font-size-small;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
       transform: translateY(5px);
-      transition: all 0.3s ease;
+      transition: $transition;
+      border: none;
+      cursor: pointer;
     }
   }
 
   &__info {
-    padding: 1rem;
+    padding: $spacing-medium;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    background-color: #e8e8e8;
+    background-color: $card-background;
   }
 
   &__title {
-    color: #f25421;
+    color: $primary-color;
+    font-family: $font-family-base;
     font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    font-size: $font-size-base;
+    margin-bottom: $spacing-small;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    transition: $transition;
+
+    &:hover {
+      color: lighten($primary-color, 10%);
+    }
   }
 
   &__footer {
@@ -155,48 +179,135 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: $spacing-small;
   }
 
   &__badge {
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    padding: $spacing-extra-small $spacing-small;
+    border-radius: $border-radius / 2;
+    font-family: $font-family-base;
+    font-size: 12px;
     font-weight: 600;
-    color: white;
+    color: $text-color;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: $transition;
 
     &--year {
-      background-color: #00aa6c;
+      background-color: $color-success;
+      
+      &:hover {
+        background-color: lighten($color-success, 10%);
+      }
     }
 
     &--pegi {
-      background-color: #f25421;
+      background-color: $primary-color;
+      
+      &:hover {
+        background-color: lighten($primary-color, 10%);
+      }
     }
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: $desktop) {
   .games-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: $spacing-large;
+    padding: $spacing-large;
   }
 
-  .game-card__image {
-    height: 200px;
+  .game-card {
+    &__image {
+      height: 200px;
+    }
+
+    &__title {
+      font-size: $font-size-large;
+    }
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: $laptop) {
   .games-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    padding: 2rem;
+    gap: $spacing-xl;
+    padding: $spacing-xl;
+  }
+
+  .game-card {
+    &__image {
+      height: 220px;
+    }
+
+    &__info {
+      padding: $spacing-large;
+    }
+
+    &__title {
+      font-size: $font-size-large;
+      margin-bottom: $spacing-medium;
+    }
   }
 }
 
-@media (min-width: 1440px) {
+@media (min-width: $xl) {
   .games-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-xl;
   }
+
+  .game-card {
+    &__image {
+      height: 240px;
+    }
+
+    &__title {
+      font-size: $font-size-xlarge;
+    }
+  }
+}
+
+.game-card {
+  &--loading {
+    background-color: $color-disabled;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  &--error {
+    border-color: $color-error;
+    
+    .game-card__title {
+      color: $color-error;
+    }
+  }
+}
+
+.game-card {
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-card {
+  animation: fadeInUp 0.3s ease forwards;
 }
 </style>

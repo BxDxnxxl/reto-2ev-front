@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useCommentsStore } from '@/stores/Comentarios';
-import { useUsersStore } from '@/stores/users';
-import { useRolesStore } from '@/stores/roles';
-import type { ComentarioDto } from '@/stores/dtos/Comentario.dto';
+import { ref, onMounted } from 'vue'
+import { useCommentsStore } from '@/stores/Comentarios'
+import { useUsersStore } from '@/stores/users'
+import { useRolesStore } from '@/stores/roles'
+import type { ComentarioDto } from '@/stores/dtos/Comentario.dto'
 
 const props = defineProps({
   gameId: {
@@ -16,45 +16,63 @@ const commentsStore = useCommentsStore()
 const usersStore = useUsersStore()
 const rolesStore = useRolesStore()
 
-const puedenEliminar = ref<{ [key: number]: boolean }>({});
+const puedenEliminar = ref<{ [key: number]: boolean }>({})
+const reaccionesUsuario = ref<{ [comentarioId: number]: 'like' | 'dislike' | null }>({})
 
 const verificarPermisoEliminar = async (comentarioId: number): Promise<boolean> => {
-  const comentario = await commentsStore.fetchComentarioById(comentarioId);
-  if (!comentario) return false;
+  const comentario = await commentsStore.fetchComentarioById(comentarioId)
+  if (!comentario) return false
 
   return (
     comentario.fkIdUsuario === usersStore.currentUser?.id ||
     (usersStore.currentUser?.roles?.some(role => role.id === rolesStore.ADMIN) ?? false)
-  );
-};
+  )
+}
 
 onMounted(async () => {
   if (props.gameId) {
-    await commentsStore.fetchComentariosByVideojuegos(props.gameId);
-    
+    await commentsStore.fetchComentariosByVideojuegos(props.gameId)
+
     for (const comentario of commentsStore.comentariosByVideojuego) {
-      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id);
+      puedenEliminar.value[comentario.id] = await verificarPermisoEliminar(comentario.id)
+      reaccionesUsuario.value[comentario.id] = null
     }
   }
-});
+})
 
 const eliminarComentario = async (comentarioId: number) => {
-  await commentsStore.deleteComentario(comentarioId, props.gameId);
-};
+  await commentsStore.deleteComentario(comentarioId, props.gameId)
+}
 
-const formatearFechaEspañola = (fecha: string | number | Date) => {
-  // Si es un año, lo devolvemos como string
-  if (typeof fecha === 'number') {
-    return fecha.toString()
+const toggleLike = (comentario: ComentarioDto) => {
+  const reaccionActual = reaccionesUsuario.value[comentario.id]
+
+  if (reaccionActual === 'like') {
+    comentario.likes--
+    reaccionesUsuario.value[comentario.id] = null
+  } else {
+    if (reaccionActual === 'dislike') comentario.dislikes--
+    comentario.likes++
+    reaccionesUsuario.value[comentario.id] = 'like'
   }
+}
 
-  // Si es fecha completa, la formateamos como DD/MM/AAAA
-  const fechaObj = new Date(fecha)
-  const dia = fechaObj.getDate().toString().padStart(2, '0')
-  const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
-  const anio = fechaObj.getFullYear()
+const toggleDislike = (comentario: ComentarioDto) => {
+  const reaccionActual = reaccionesUsuario.value[comentario.id]
 
-  return `${dia}/${mes}/${anio}`
+  if (reaccionActual === 'dislike') {
+    comentario.dislikes--
+    reaccionesUsuario.value[comentario.id] = null
+  } else {
+    if (reaccionActual === 'like') comentario.likes--
+    comentario.dislikes++
+    reaccionesUsuario.value[comentario.id] = 'dislike'
+  }
+}
+
+const formatearFecha = (fecha: string | number | Date) => {
+  if (typeof fecha === 'number') return fecha.toString()
+  return new Date(fecha).toLocaleDateString('es-ES')
 }
 </script>
 
@@ -66,193 +84,187 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
       <div
         v-for="comentario in commentsStore.comentariosByVideojuego"
         :key="comentario.id"
-        class="comentarios__item"
+        class="comentario"
       >
-        <div class="comentarios__cabecera">
-          <h3 class="comentarios__nombre">{{ comentario.usuarioNombre }}</h3>
-          <span class="comentarios__fecha">{{ formatearFechaEspañola(comentario.fecha) }}</span>
+        <div class="comentario__header">
+          <span class="comentario__autor">{{ comentario.usuarioNombre }}</span>
+          <span class="comentario__fecha">{{ formatearFecha(comentario.fecha) }}</span>
         </div>
 
-        <h4 class="comentarios__titulo-texto">{{ comentario.titulo }}</h4>
-        <p class="comentarios__texto">{{ comentario.texto }}</p>
+        <h4 class="comentario__titulo">{{ comentario.titulo }}</h4>
+        <p class="comentario__texto">{{ comentario.texto }}</p>
 
-        <div class="comentarios__valoracion">Valoración: {{ comentario.valoracion }}</div>
-
-        <div class="comentarios__acciones">
-          <div class="comentarios__like">
-            <v-btn icon variant="text" size="small" @click="commentsStore.likeComentario(comentario.id, props.gameId)">
-              <v-icon>mdi-thumb-up</v-icon>
-            </v-btn>
-            <span class="comentarios__contador">{{ comentario.likes }}</span>
+        <div class="comentario__footer">
+          <div class="comentario__valoracion">
+            {{ comentario.valoracion }}/10
           </div>
 
-          <div class="comentarios__dislike">
-            <v-btn icon variant="text" size="small" @click="commentsStore.dislikeComentario(comentario.id, props.gameId)">
-              <v-icon>mdi-thumb-down</v-icon>
-            </v-btn>
-            <span class="comentarios__contador">{{ comentario.dislikes }}</span>
-          </div>
+          <div class="comentario__acciones">
+            <button 
+              class="btn-icon"
+              :class="{ active: reaccionesUsuario[comentario.id] === 'like' }"
+              @click="toggleLike(comentario)"
+            >
+              <v-icon size="small">mdi-thumb-up</v-icon>
+              {{ comentario.likes }}
+            </button>
 
-          <v-btn 
-            v-if="puedenEliminar[comentario.id]" 
-            icon 
-            color="error" 
-            variant="text" 
-            size="small" 
-            @click="eliminarComentario(comentario.id)"
-          >
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
+            <button 
+              class="btn-icon"
+              :class="{ active: reaccionesUsuario[comentario.id] === 'dislike' }"
+              @click="toggleDislike(comentario)"
+            >
+              <v-icon size="small">mdi-thumb-down</v-icon>
+              {{ comentario.dislikes }}
+            </button>
+
+            <button 
+              v-if="puedenEliminar[comentario.id]" 
+              class="btn-icon btn-delete"
+              @click="eliminarComentario(comentario.id)"
+            >
+              <v-icon size="small">mdi-delete</v-icon>
+            </button>
+          </div>
         </div>
       </div>
 
       <div v-if="!commentsStore.comentariosByVideojuego.length" class="comentarios__vacio">
-        <p>No hay comentarios disponibles para este videojuego</p>
+        <v-icon size="48" class="comentarios__vacio-icon">mdi-comment-outline</v-icon>
+        <p>No hay comentarios disponibles</p>
+        <small>¡Sé el primero en comentar!</small>
       </div>
     </div>
   </div>
 </template>
 
-
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
-.comentarios {
-  width: 100%;
-  max-width: 100%;
-  margin-top: 0;
-  padding-bottom: 32px;
 
+.comentarios {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-medium;
 
   &__titulo {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    font-weight: bold;
+    font-size: $font-size-xlarge;
+    font-weight: 600;
+    margin-bottom: $spacing-large;
+    color: $text-color;
   }
 
   &__lista {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  &__item {
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  &__cabecera {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 8px;
-
-    @media (min-width: 768px) {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-  }
-
-  &__nombre {
-    font-weight: bold;
-    font-size: 1rem;
-    margin: 0;
-  }
-
-  &__fecha {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 4px;
-
-    @media (min-width: 768px) {
-      margin-top: 0;
-    }
-  }
-
-  &__titulo-texto {
-    font-size: 1.1rem;
-    margin: 8px 0;
-    font-weight: 600;
-  }
-
-  &__texto {
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }
-
-  &__valoracion {
-    margin-bottom: 12px;
-  }
-
-  &__acciones {
-    display: flex;
-    gap: 16px;
-  }
-
-  &__like,
-  &__dislike {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  &__contador {
-    font-size: 0.9rem;
+    gap: $spacing-large;
   }
 
   &__vacio {
     text-align: center;
-    padding: 24px;
-    color: #666;
-  }
-
-  @media (min-width: 768px) {
-    &__lista {
-      max-width: 1200px;
+    padding: $spacing-xxl;
+    color: rgba($text-color, 0.6);
+    
+    &-icon {
+      margin-bottom: $spacing-medium;
+      opacity: 0.5;
     }
-
-    &__item {
-      padding: 24px;
+    
+    p {
+      margin-bottom: $spacing-small;
+      font-size: $font-size-base;
     }
-
-    &__acciones {
-      justify-content: flex-end;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    &__lista {
-      max-width: 1200px;
+    
+    small {
+      font-size: $font-size-small;
+      opacity: 0.7;
     }
   }
+}
 
-  @media (min-width: 1440px) {
-    &__lista {
-      max-width: 1400px;
-    }
+.comentario {
+  background: $card-background;
+  border-radius: $border-radius;
+  padding: $spacing-large;
+  border: 1px solid rgba($primary-color, 0.1);
 
-    &__item {
-      padding: 28px;
-    }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-medium;
+  }
 
-    &__titulo {
-      font-size: 1.75rem;
-    }
+  &__autor {
+    font-weight: 600;
+    color: $primary-color;
+  }
 
-    &__texto {
-      font-size: 1.1rem;
-    }
+  &__fecha {
+    font-size: $font-size-small;
+    color: rgba($text-color, 0.6);
+  }
 
-    &__titulo-texto {
-      font-size: 1.25rem;
-    }
+  &__titulo {
+    font-size: $font-size-large;
+    font-weight: 600;
+    margin-bottom: $spacing-small;
+    color: $text-color;
+  }
 
-    &__contador {
-      font-size: 1rem;
+  &__texto {
+    color: rgba($text-color, 0.9);
+    line-height: 1.5;
+    margin-bottom: $spacing-medium;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__valoracion {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+    padding: $spacing-extra-small $spacing-small;
+    border-radius: $border-radius;
+    font-weight: 600;
+    font-size: $font-size-small;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $spacing-small;
+  }
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: rgba($text-color, 0.6);
+  cursor: pointer;
+  padding: $spacing-extra-small $spacing-small;
+  border-radius: $border-radius;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-small;
+  transition: $transition;
+
+  &:hover {
+    background: rgba($text-color, 0.1);
+    color: $text-color;
+  }
+
+  &.active {
+    color: $primary-color;
+  }
+
+  &.btn-delete {
+    color: $color-error;
+    
+    &:hover {
+      background: rgba($color-error, 0.1);
     }
   }
 }

@@ -6,5 +6,5 @@ export interface UserDto {
   nombre?: string;
   apellido1?: string;
   apellido2?: string;
-  profilePic?: string;
+  profilePic: string | File | null;
 }

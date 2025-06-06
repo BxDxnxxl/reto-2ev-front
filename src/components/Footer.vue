@@ -39,8 +39,6 @@ import { RouterLink } from 'vue-router'
 <style lang="scss">
 @import '@/assets/styles/variables.scss';
 
-
-/* 🔹 Footer */
 .footer {
   width: 100%;
   background: $background-color;
@@ -69,7 +67,6 @@ import { RouterLink } from 'vue-router'
   max-width: 300px;
 }
 
-/* 🔹 Títulos */
 .footer__title {
   font-weight: bold;
   font-size: $font-size-xlarge;

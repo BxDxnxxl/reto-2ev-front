@@ -2,6 +2,8 @@
 import { ref, watch } from "vue";
 import { useGamesStore } from "@/stores/games";
 import type { GameCreateDto } from "@/stores/dtos/GameCreateDto";
+import Swal from 'sweetalert2'
+
 
 const emit = defineEmits(["creado"]);
 const store = useGamesStore();
@@ -23,7 +25,7 @@ function handleFile(event: Event) {
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
     
-    // Validar el archivo
+   
     if (!validateFile(file)) {
       target.value = '';
       return;
@@ -31,7 +33,7 @@ function handleFile(event: Event) {
     
     form.value.caratula = file;
     
-    // Crear vista previa
+
     const reader = new FileReader();
     reader.onload = (e) => {
       imagePreview.value = e.target?.result as string;
@@ -42,17 +44,28 @@ function handleFile(event: Event) {
 
 function validateFile(file: File): boolean {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = 5 * 1024 * 1024;  
   
   if (!allowedTypes.includes(file.type)) {
-    alert('Por favor selecciona una imagen válida (JPEG, PNG o GIF)');
-    return false;
-  }
-  
-  if (file.size > maxSize) {
-    alert('La imagen debe ser menor a 5MB');
-    return false;
-  }
+   Swal.fire({
+    icon: 'error',
+    title: 'Archivo no válido',
+    text: 'Por favor selecciona una imagen válida (JPEG, PNG o GIF)',
+    confirmButtonText: 'Entendido'
+  })
+  return false
+}
+
+if (file.size > maxSize) {
+ Swal.fire({
+    icon: 'warning',
+    title: 'Imagen demasiado grande',
+    text: 'La imagen debe ser menor a 5MB',
+    confirmButtonText: 'Cerrar'
+  })
+  return false
+}
+
   
   return true;
 }
@@ -67,7 +80,12 @@ function formatFileSize(bytes: number): string {
 
 async function handleSubmit() {
   if (!form.value.caratula) {
-    alert('Por favor selecciona una imagen');
+    await Swal.fire({
+      icon: 'info',
+      title: 'Imagen requerida',
+      text: 'Por favor selecciona una imagen.',
+      confirmButtonText: 'Entendido'
+    })
     return;
   }
 
@@ -82,7 +100,6 @@ async function handleSubmit() {
       formData.append("pegi", form.value.pegi.toString());
     }
     formData.append("fkIdCompania", form.value.fkIdCompania.toString());
-    // ¡IMPORTANTE! El backend espera "Imagen", no "caratula"
     formData.append("Imagen", form.value.caratula);
 
     await store.createVideojuegos(formData);
@@ -90,7 +107,12 @@ async function handleSubmit() {
     resetForm();
   } catch (error) {
     console.error('Error al crear videojuego:', error);
-    alert('Error al crear el videojuego. Por favor, inténtalo de nuevo.');
+    await Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'Error al crear el videojuego. Por favor, inténtalo de nuevo.',
+    confirmButtonText: 'Aceptar'
+    })
   } finally {
     isSubmitting.value = false;
   }
@@ -107,21 +129,18 @@ function resetForm() {
   };
   imagePreview.value = null;
   
-  // Limpiar el input de archivo
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   if (fileInput) {
     fileInput.value = '';
   }
 }
 
-// Limpiar vista previa si se quita la imagen
 watch(() => form.value.caratula, (newValue) => {
   if (!newValue) {
     imagePreview.value = null;
   }
 });
 </script>
-
 <template>
   <div class="form-container">
     <div class="form-header">
@@ -130,7 +149,6 @@ watch(() => form.value.caratula, (newValue) => {
     </div>
     
     <form class="formulario" @submit.prevent="handleSubmit">
-      <!-- Fila 1: Título y Año -->
       <div class="formulario__fila">
         <div class="formulario__grupo formulario__grupo--flex-2">
           <label class="formulario__label">Título *</label>
@@ -154,7 +172,6 @@ watch(() => form.value.caratula, (newValue) => {
         </div>
       </div>
 
-      <!-- Fila 2: PEGI y ID Compañía -->
       <div class="formulario__fila">
         <div class="formulario__grupo">
           <label class="formulario__label">PEGI</label>
@@ -181,52 +198,38 @@ watch(() => form.value.caratula, (newValue) => {
         </div>
       </div>
 
-      <!-- Descripción -->
       <div class="formulario__grupo">
         <label class="formulario__label">Descripción</label>
         <textarea 
           v-model="form.descripcion" 
           class="formulario__textarea" 
           placeholder="Describe el videojuego (opcional)"
-          rows="4"
+          rows="3"
         />
       </div>
 
-      <!-- Carátula -->
       <div class="formulario__grupo">
         <label class="formulario__label">Carátula *</label>
-        <div class="upload-section">
-          <div class="file-input-container">
-            <input 
-              @change="handleFile" 
-              type="file" 
-              accept="image/jpeg,image/png,image/gif" 
-              class="formulario__file-input" 
-              id="file-input"
-              required 
-            />
-            <label for="file-input" class="file-input-label">
-              <div class="file-input-content">
-                <span class="file-icon">📷</span>
-                <div class="file-text-container">
-                  <span class="file-text">
-                    {{ form.caratula ? form.caratula.name : 'Seleccionar imagen' }}
-                  </span>
-                  <span class="file-hint">JPEG, PNG o GIF (máx. 5MB)</span>
-                </div>
+        <div class="file-input-container">
+          <input 
+            @change="handleFile" 
+            type="file" 
+            accept="image/jpeg,image/png,image/gif" 
+            class="formulario__file-input" 
+            id="file-input"
+            required 
+          />
+          <label for="file-input" class="file-input-label">
+            <div class="file-input-content">
+              <span class="file-icon">📷</span>
+              <div class="file-text-container">
+                <span class="file-text">
+                  {{ form.caratula ? form.caratula.name : 'Seleccionar imagen' }}
+                </span>
+                <span class="file-hint">JPEG, PNG o GIF (máx. 5MB)</span>
               </div>
-            </label>
-          </div>
-
-          <!-- Vista previa -->
-          <div class="image-preview-container" v-if="imagePreview">
-            <div class="image-preview">
-              <img :src="imagePreview" alt="Vista previa" class="preview-image" />
             </div>
-            <div class="file-info" v-if="form.caratula">
-              <small>{{ formatFileSize(form.caratula.size) }}</small>
-            </div>
-          </div>
+          </label>
         </div>
       </div>
 
@@ -244,13 +247,14 @@ watch(() => form.value.caratula, (newValue) => {
     </form>
   </div>
 </template>
+
 <style scoped lang="scss">
 @import '@/assets/styles/variables.scss';
 
 .form-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: $spacing-xxl;
+  padding: $spacing-large;
   background: linear-gradient(135deg, lighten($background-color, 4%) 0%, lighten($background-color, 10%) 100%);
   border-radius: calc($border-radius * 2);
   box-shadow: 
@@ -263,14 +267,14 @@ watch(() => form.value.caratula, (newValue) => {
 
 .form-header {
   text-align: center;
-  margin-bottom: $spacing-xxl;
-  padding-bottom: $spacing-large;
+  margin-bottom: $spacing-large;
+  padding-bottom: $spacing-medium;
   border-bottom: 2px solid lighten($dark-color, 15%);
 }
 
 .form-title {
-  font-size: $font-size-xlarge;
-  font-weight: 800;
+  font-size: $font-size-large;
+  font-weight: 700;
   background: $primary-gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -280,7 +284,7 @@ watch(() => form.value.caratula, (newValue) => {
 
 .form-subtitle {
   color: lighten($text-color, 20%);
-  font-size: $font-size-base;
+  font-size: $font-size-small;
   font-weight: 500;
   margin: 0;
 }
@@ -288,23 +292,23 @@ watch(() => form.value.caratula, (newValue) => {
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: $spacing-xxl;
+  gap: $spacing-medium;
 
   &__fila {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: $spacing-large;
+    gap: $spacing-medium;
 
     @media (max-width: $desktop) {
       grid-template-columns: 1fr;
-      gap: $spacing-medium;
+      gap: $spacing-small;
     }
   }
 
   &__grupo {
     display: flex;
     flex-direction: column;
-    gap: $spacing-small;
+    gap: $spacing-extra-small;
 
     &--flex-1 { flex: 1; }
     &--flex-2 { flex: 2; }
@@ -313,8 +317,8 @@ watch(() => form.value.caratula, (newValue) => {
   &__label {
     font-weight: 600;
     color: $text-color;
-    font-size: $font-size-base;
-    margin-bottom: $spacing-small;
+    font-size: $font-size-small;
+    margin-bottom: $spacing-extra-small;
     display: flex;
     align-items: center;
     gap: $spacing-extra-small;
@@ -323,10 +327,10 @@ watch(() => form.value.caratula, (newValue) => {
   &__input,
   &__textarea,
   &__select {
-    padding: $spacing-medium;
+    padding: $spacing-small $spacing-medium;
     border: 2px solid $color-disabled;
     border-radius: $border-radius;
-    font-size: $font-size-base;
+    font-size: $font-size-small;
     background-color: white;
     color: $dark-color;
     transition: $transition;
@@ -351,16 +355,16 @@ watch(() => form.value.caratula, (newValue) => {
 
   &__textarea {
     resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
+    min-height: 80px;
+    line-height: 1.4;
   }
 
   &__acciones {
     display: flex;
-    gap: $spacing-medium;
+    gap: $spacing-small;
     justify-content: flex-end;
-    margin-top: $spacing-large;
-    padding-top: $spacing-large;
+    margin-top: $spacing-medium;
+    padding-top: $spacing-medium;
     border-top: 1px solid lighten($dark-color, 15%);
 
     @media (max-width: $desktop) {
@@ -372,14 +376,14 @@ watch(() => form.value.caratula, (newValue) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: $spacing-small;
-    padding: $spacing-medium $spacing-xlarge;
+    gap: $spacing-extra-small;
+    padding: $spacing-small $spacing-large;
     border-radius: $border-radius;
-    font-size: $font-size-base;
+    font-size: $font-size-small;
     font-weight: 600;
     cursor: pointer;
     transition: $transition;
-    min-width: 160px;
+    min-width: 140px;
     border: none;
 
     &:disabled {
@@ -416,22 +420,24 @@ watch(() => form.value.caratula, (newValue) => {
   }
 }
 
-.upload-section {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: $spacing-large;
-  align-items: start;
+.file-input-container {
+  width: 100%;
+}
 
-  @media (max-width: $desktop) {
-    grid-template-columns: 1fr;
-  }
+.formulario__file-input {
+  display: none;
+}
+
+.file-input-label {
+  cursor: pointer;
+  display: block;
 }
 
 .file-input-content {
   display: flex;
   align-items: center;
-  gap: $spacing-medium;
-  padding: $spacing-large;
+  gap: $spacing-small;
+  padding: $spacing-small $spacing-medium;
   border: 2px dashed $color-disabled;
   border-radius: $border-radius;
   background: linear-gradient(135deg, lighten($background-color, 8%), lighten($background-color, 15%));
@@ -444,65 +450,43 @@ watch(() => form.value.caratula, (newValue) => {
   }
 }
 
-.image-preview {
-  width: 140px;
-  height: 140px;
-  border-radius: $border-radius;
-  overflow: hidden;
-  border: 3px solid $color-disabled;
-  box-shadow: $box-shadow;
-  transition: $transition;
+.file-icon {
+  font-size: $font-size-base;
+}
 
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  }
-
-  .preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.file-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .file-text {
   font-weight: 600;
   color: $dark-color;
+  font-size: $font-size-small;
 }
 
 .file-hint {
-  font-size: $font-size-small;
+  font-size: 12px;
   color: lighten($dark-color, 30%);
 }
 
-.file-info small {
-  color: lighten($dark-color, 30%);
-  font-size: $font-size-small;
-  font-weight: 500;
-}
-
-// Responsive
 @media (max-width: $desktop) {
   .form-container {
-    padding: $spacing-large;
-    margin: $spacing-medium;
+    padding: $spacing-medium;
+    margin: $spacing-small;
   }
 
   .form-title {
-    font-size: $font-size-large;
+    font-size: $font-size-base;
   }
 
   .formulario {
-    gap: $spacing-large;
+    gap: $spacing-small;
 
     &__boton {
       width: 100%;
     }
-  }
-
-  .image-preview {
-    width: 120px;
-    height: 120px;
   }
 }
 </style>

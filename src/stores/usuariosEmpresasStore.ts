@@ -7,7 +7,7 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
   const puedePublicarDestacada = ref<boolean>(true);
   async function fetchRelaciones() {
     try {
-      const res = await fetch("http://localhost:4444/api/UsuariosEmpresas");
+      const res = await fetch("https://wannagamesapi.retocsv.es/api/UsuariosEmpresas");
       if (!res.ok) throw new Error("Error al cargar relaciones");
       relaciones.value = await res.json();
     } catch (err) {
@@ -17,7 +17,7 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
 
   async function addRelacion(relacion: UsuarioEmpresaDto) {
     try {
-      await fetch("http://localhost:4444/api/UsuariosEmpresas", {
+      await fetch("https://wannagamesapi.retocsv.es/api/UsuariosEmpresas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(relacion),
@@ -31,7 +31,7 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
   async function deleteRelacion(idUsuario: number, idEmpresa: number) {
     try {
       await fetch(
-        `http://localhost:4444/api/UsuariosEmpresas?idUsuario=${idUsuario}&idEmpresa=${idEmpresa}`,
+        `https://wannagamesapi.retocsv.es/api/UsuariosEmpresas?idUsuario=${idUsuario}&idEmpresa=${idEmpresa}`,
         { method: "DELETE" }
       );
       await fetchRelaciones();
@@ -42,7 +42,7 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
 
   async function getEmpresasDeUsuario(idUsuario: number): Promise<number[]> {
     try {
-      const res = await fetch(`http://localhost:4444/api/UsuariosEmpresas/usuario/${idUsuario}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/UsuariosEmpresas/usuario/${idUsuario}`);
       if (!res.ok) throw new Error('Error al obtener empresas del usuario');
       return await res.json();
     } catch (err) {
@@ -53,7 +53,7 @@ export const useUsuariosEmpresasStore = defineStore("usuariosEmpresas", () => {
 
   async function checkLimiteDestacadas(idEmpresa: number) {
     try {
-      const res = await fetch(`http://localhost:4444/api/PublicacionesEmpresas/puede-publicar-destacada/${idEmpresa}`);
+      const res = await fetch(`https://wannagamesapi.retocsv.es/api/PublicacionesEmpresas/puede-publicar-destacada/${idEmpresa}`);
       if (!res.ok) throw new Error("Error al comprobar si puede publicar destacada");
       return await res.json();
     } catch (err) {

@@ -4,6 +4,7 @@ import { useIdeasStore } from "@/stores/Ideas";
 import { useUsersStore } from "@/stores/users";
 import { useSocialStore } from "@/stores/RedSocial";
 import type { IdeaDto } from "@/stores/dtos/Ideas.dto";
+import Swal from 'sweetalert2'
 
 const emit = defineEmits(["ideaPublicada"]);
 
@@ -25,21 +26,46 @@ const nuevaIdea = ref<IdeaDto>({
   fechaCaducidad: null,
 });
 
+const isSubmitting = ref(false);
 
 const publicar = async () => {
   if (!usersStore.currentUser?.id) {
-    alert("Para realizar esta acción debes iniciar sesión.");
+    await Swal.fire({
+      icon: 'info',
+      title: 'Inicia sesión',
+      text: 'Para realizar esta acción debes iniciar sesión.',
+      confirmButtonText: 'Aceptar'
+    })
     return;
   }
 
-  nuevaIdea.value.fkIdUsuario = usersStore.currentUser.id;
+  isSubmitting.value = true;
 
-  await ideasStore.publicarIdea(nuevaIdea.value);
-  emit("ideaPublicada");
+  try {
+    nuevaIdea.value.fkIdUsuario = usersStore.currentUser.id;
 
-nuevaIdea.value = {
+    await ideasStore.publicarIdea(nuevaIdea.value);
+    emit("ideaPublicada");
+
+    resetForm();
+  } catch (error) {
+    console.error('Error al publicar idea:', error);
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error al publicar',
+      text: 'Error al publicar la idea. Por favor, inténtalo de nuevo.',
+      confirmButtonText: 'Aceptar'
+    })
+
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+function resetForm() {
+  nuevaIdea.value = {
     id: 0,
-    fkIdUsuario: usersStore.currentUser.id,
+    fkIdUsuario: usersStore.currentUser?.id ?? 0,
     titulo: "",
     descripcion: "",
     plazasDisponibles: 1,
@@ -48,10 +74,9 @@ nuevaIdea.value = {
     contacto: "",
     instrucciones: "",
     fechaPublicacion: new Date(),
-    fechaCaducidad: null, // Resetear la fecha de caducidad
+    fechaCaducidad: null,
   };
-
-};
+}
 
 onMounted(async () => {
   await socialStore.fetchRedes();
@@ -60,170 +85,233 @@ onMounted(async () => {
 </script>
 
 <template>
-  <form class="formulario-idea" @submit.prevent="publicar">
-    <input
-      class="formulario-idea__input"
-      type="text"
-      placeholder="Título"
-      v-model="nuevaIdea.titulo"
-      required
-    />
+  <div class="form-container">
+    <div class="form-header">
+      <h2 class="form-title">Publicar Nueva Idea</h2>
+      <p class="form-subtitle">Comparte tu idea con la comunidad</p>
+    </div>
+    
+    <form class="formulario" @submit.prevent="publicar">
+      <div class="formulario__fila">
+        <div class="formulario__grupo formulario__grupo--flex-2">
+          <label class="formulario__label">Título *</label>
+          <input 
+            v-model="nuevaIdea.titulo" 
+            type="text" 
+            class="formulario__input" 
+            placeholder="Ingresa el título de tu idea"
+            required 
+          />
+        </div>
 
-    <textarea
-      class="formulario-idea__textarea"
-      placeholder="Descripción"
-      v-model="nuevaIdea.descripcion"
-      required
-    />
+        <div class="formulario__grupo formulario__grupo--flex-1">
+          <label class="formulario__label">Plazas disponibles *</label>
+          <input 
+            v-model.number="nuevaIdea.plazasDisponibles" 
+            type="number" 
+            min="1"
+            class="formulario__input" 
+            placeholder="Número de plazas"
+            required 
+          />
+        </div>
+      </div>
+      <div class="formulario__fila">
+        <div class="formulario__grupo">
+          <label class="formulario__label">Red Social *</label>
+          <select v-model="nuevaIdea.fkIdRedSocial" class="formulario__input formulario__select">
+            <option
+              v-for="red in socialStore.redes"
+              :key="red.id"
+              :value="red.id"
+            >
+              {{ red.nombre }}
+            </option>
+          </select>
+        </div>
 
-    <textarea
-      class="formulario-idea__textarea"
-      placeholder="Instrucciones para los participantes"
-      v-model="nuevaIdea.instrucciones"
-      required
-    />
+        <div class="formulario__grupo">
+          <label class="formulario__label">Tipo de Idea *</label>
+          <select v-model="nuevaIdea.fkIdTipoIdea" class="formulario__input formulario__select" required>
+            <option v-for="tipo in ideasStore.tipos" :key="tipo.id" :value="tipo.id">
+              {{ tipo.nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
 
-    <input
-      class="formulario-idea__input"
-      type="number"
-      min="1"
-      placeholder="Plazas disponibles"
-      v-model.number="nuevaIdea.plazasDisponibles"
-      required
-    />
+      <div class="formulario__fila">
+        <div class="formulario__grupo">
+          <label class="formulario__label">Contacto *</label>
+          <input 
+            v-model="nuevaIdea.contacto" 
+            type="text" 
+            class="formulario__input" 
+            placeholder="ej. @usuario"
+            required 
+          />
+        </div>
 
-    <select class="formulario-idea__select" v-model="nuevaIdea.fkIdRedSocial">
-      <option
-        v-for="red in socialStore.redes"
-        :key="red.id"
-        :value="red.id"
-      >
-        {{ red.nombre }}
-      </option>
-    </select>
+        <div class="formulario__grupo">
+          <label class="formulario__label">Fecha de caducidad *</label>
+          <input 
+            v-model="nuevaIdea.fechaCaducidad" 
+            type="datetime-local" 
+            class="formulario__input"
+            required 
+          />
+        </div>
+      </div>
 
-    <select class="formulario-idea__select" v-model="nuevaIdea.fkIdTipoIdea" required>
-      <option v-for="tipo in ideasStore.tipos" :key="tipo.id" :value="tipo.id">
-        {{ tipo.nombre }}
-      </option>
-    </select>
+      <div class="formulario__grupo">
+        <label class="formulario__label">Descripción *</label>
+        <textarea 
+          v-model="nuevaIdea.descripcion" 
+          class="formulario__textarea" 
+          placeholder="Describe tu idea"
+          rows="3"
+          required
+        />
+      </div>
 
-    <input
-      class="formulario-idea__input"
-      type="text"
-      placeholder="Contacto (ej. @usuario)"
-      v-model="nuevaIdea.contacto"
-      required
-    />
+      <div class="formulario__grupo">
+        <label class="formulario__label">Instrucciones para participantes *</label>
+        <textarea 
+          v-model="nuevaIdea.instrucciones" 
+          class="formulario__textarea" 
+          placeholder="Instrucciones detalladas para los participantes"
+          rows="3"
+          required
+        />
+      </div>
 
-    <input
-      class="formulario-idea__input"
-      type="datetime-local"
-      v-model="nuevaIdea.fechaCaducidad"
-      required
-    />
-
-    <button class="formulario-idea__boton" type="submit">
-      Publicar idea
-    </button>
-  </form>
+      <div class="formulario__acciones">
+        <button type="button" class="formulario__boton formulario__boton--secundario" @click="resetForm">
+          <span class="boton-icon">🔄</span>
+          Limpiar
+        </button>
+        <button type="submit" class="formulario__boton formulario__boton--primario" :disabled="isSubmitting">
+          <span class="boton-icon">💡</span>
+          <span v-if="isSubmitting">Publicando...</span>
+          <span v-else>Publicar idea</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/styles/variables.scss";
+@import '@/assets/styles/variables.scss';
 
-@mixin input-base {
-  width: 100%;
-  padding: $spacing-medium $spacing-large;
-  border: 1px solid lighten($secondary-color, 40%);
-  border-radius: $border-radius;
-  font-size: $font-size-base;
-  font-family: inherit;
-  color: $dark-color;
-  background-color: $text-color;
-  transition: $transition;
-  outline: none;
-
-  &:focus {
-    border-color: $accent-color;
-    box-shadow: 0 0 0 3px rgba($accent-color, 0.2);
-  }
-
-  &:hover:not(:focus) {
-    border-color: lighten($secondary-color, 20%);
-  }
-
-  &::placeholder {
-    color: lighten($secondary-color, 25%);
-    font-size: $font-size-small;
-  }
-}
-
-@mixin button-base {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: $transition;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
-.formulario-idea {
-  background-color: $background-color;
-  border-radius: $border-radius;
-  border: 1px solid lighten($dark-color, 40%);
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
   padding: $spacing-large;
-  box-shadow: $box-shadow;
+  background: linear-gradient(135deg, lighten($background-color, 4%) 0%, lighten($background-color, 10%) 100%);
+  border-radius: calc($border-radius * 2);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.1),
+    0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-y: auto;
+  color: $text-color;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: $spacing-large;
+  padding-bottom: $spacing-medium;
+  border-bottom: 2px solid lighten($dark-color, 15%);
+}
+
+.form-title {
+  font-size: $font-size-large;
+  font-weight: 700;
+  background: $primary-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: $spacing-small;
+}
+
+.form-subtitle {
+  color: lighten($text-color, 20%);
+  font-size: $font-size-small;
+  font-weight: 500;
+  margin: 0;
+}
+
+.formulario {
   display: flex;
   flex-direction: column;
-  gap: $spacing-large;
-  margin-bottom: 2rem;
-  position: relative;
+  gap: $spacing-medium;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 0.25rem;
-    background-color: $primary-color;
-    border-radius: $border-radius $border-radius 0 0;
+  &__fila {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: $spacing-medium;
+
+    @media (max-width: $desktop) {
+      grid-template-columns: 1fr;
+      gap: $spacing-small;
+    }
   }
 
-  &__input {
-    @include input-base;
-    height: 3rem;
+  &__grupo {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-extra-small;
 
-    &[type="number"] {
-      -moz-appearance: textfield;
+    &--flex-1 { flex: 1; }
+    &--flex-2 { flex: 2; }
+  }
 
-      &::-webkit-outer-spin-button,
-      &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+  &__label {
+    font-weight: 600;
+    color: $text-color;
+    font-size: $font-size-small;
+    margin-bottom: $spacing-extra-small;
+    display: flex;
+    align-items: center;
+    gap: $spacing-extra-small;
+  }
+
+  &__input,
+  &__textarea,
+  &__select {
+    padding: $spacing-small $spacing-medium;
+    border: 2px solid $color-disabled;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
+    background-color: white;
+    color: $dark-color;
+    transition: $transition;
+    font-family: inherit;
+
+    &::placeholder {
+      color: lighten($dark-color, 35%);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+      transform: translateY(-1px);
+    }
+
+    &:hover:not(:focus) {
+      border-color: lighten($color-disabled, 15%);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
   }
 
   &__textarea {
-    @include input-base;
     resize: vertical;
-    min-height: 100px;
-    line-height: 1.5;
+    min-height: 80px;
+    line-height: 1.4;
   }
 
   &__select {
-    @include input-base;
     appearance: none;
     padding-right: 2.5rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23272727' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -236,61 +324,83 @@ onMounted(async () => {
     }
   }
 
-  &__label {
-    display: block;
-    margin-bottom: $spacing-small;
-    font-size: $font-size-small;
-    font-weight: 600;
-    color: $text-color;
-  }
-
-  &__grupo {
+  &__acciones {
     display: flex;
-    flex-direction: column;
     gap: $spacing-small;
+    justify-content: flex-end;
+    margin-top: $spacing-medium;
+    padding-top: $spacing-medium;
+    border-top: 1px solid lighten($dark-color, 15%);
+
+    @media (max-width: $desktop) {
+      flex-direction: column;
+    }
   }
 
   &__boton {
-    @include button-base;
-    background-color: $btn-color;
-    color: $text-color;
-    padding: $spacing-medium $spacing-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-extra-small;
+    padding: $spacing-small $spacing-large;
     border-radius: $border-radius;
-    font-size: $font-size-base;
-    margin-top: $spacing-medium;
-    align-self: flex-end;
-
-    &:hover {
-      background-color: darken($btn-color, 8%);
-    }
-
-    &:focus {
-      box-shadow: 0 0 0 3px rgba($btn-color, 0.3);
-    }
-  }
-
-  &__mensaje-error {
-    color: $color-error;
     font-size: $font-size-small;
-    font-weight: 500;
-    margin-top: $spacing-extra-small;
-  }
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    min-width: 140px;
+    border: none;
 
-  @media (min-width: $desktop) {
-    padding: $spacing-large * 1.5;
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-    &__grupo-flex {
-      display: flex;
-      gap: $spacing-medium;
+    &--primario {
+      background: $primary-gradient;
+      color: white;
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
 
-      > * {
-        flex: 1;
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(-1px);
       }
     }
 
+    &--secundario {
+      background-color: lighten($background-color, 8%);
+      color: lighten($text-color, 20%);
+      border: 2px solid $color-disabled;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      &:hover {
+        background-color: lighten($background-color, 12%);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: $desktop) {
+  .form-container {
+    padding: $spacing-medium;
+    margin: $spacing-small;
+  }
+
+  .form-title {
+    font-size: $font-size-base;
+  }
+
+  .formulario {
+    gap: $spacing-small;
+
     &__boton {
-      font-size: $font-size-large;
-      padding: $spacing-medium $spacing-large * 1.25;
+      width: 100%;
     }
   }
 }

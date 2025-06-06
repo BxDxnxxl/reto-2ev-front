@@ -2,18 +2,18 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Review } from '@/stores/dtos/Review.dto'
 
-const API_URL = 'http://localhost:4444/api/Review'
+const API_URL = 'https://wannagamesapi.retocsv.es/api/Review'
 
 export const useReviewStore = defineStore('review', () => {
-  // Estado
+
   const review = ref<Review | null>(null)
   const isLoading = ref(false)
 
-  // Obtener la review de un videojuego
+
   const getReviewByVideojuego = async (id: number) => {
     isLoading.value = true
     try {
-      const response = await fetch(`http://localhost:4444/api/Review/videojuego/${id}`)
+      const response = await fetch(`https://wannagamesapi.retocsv.es/api/Review/videojuego/${id}`)
       if (!response.ok) throw new Error('Error al obtener la review')
       const data = await response.json()
       review.value = data
@@ -24,7 +24,7 @@ export const useReviewStore = defineStore('review', () => {
     }
   }
 
-  // Crear o actualizar una review
+
   const postOrUpdateReview = async (newReview: Review) => {
     isLoading.value = true
     try {
