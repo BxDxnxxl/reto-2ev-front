@@ -3,6 +3,7 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
+  <hr>
   <footer class="footer">
     <link
       href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css"
@@ -38,8 +39,6 @@ import { RouterLink } from 'vue-router'
 <style lang="scss">
 @import '@/assets/styles/variables.scss';
 
-
-/* 🔹 Footer */
 .footer {
   width: 100%;
   background: $background-color;
@@ -68,7 +67,6 @@ import { RouterLink } from 'vue-router'
   max-width: 300px;
 }
 
-/* 🔹 Títulos */
 .footer__title {
   font-weight: bold;
   font-size: $font-size-xlarge;

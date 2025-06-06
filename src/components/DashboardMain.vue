@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import type { UserDto } from "@/stores/dtos/user.dto";
+import type { UserUpdateDto } from "@/stores/dtos/UserUpdateDto";
 import PerfilAnimado from './PerfilAnimado.vue';
 
 const usersStore = useUsersStore();
-console.log(usersStore.currentUser)
-// Estado del formulario
+
 const editedUser = ref<UserDto>({
   username: "",
   email: "",
@@ -17,15 +17,16 @@ const editedUser = ref<UserDto>({
   profilePic: ""
 });
 
+const storedPassword = ref<string>("");
+const profilePicFile = ref<File | null>(null);
 const valid = ref(false);
+const isUpdating = ref(false);
 const snackbar = ref(false);
 const snackbarMessage = ref("");
 const snackbarColor = ref("success");
 const editProfileForm = ref<any>(null);
 const showPassword = ref(false);
-const isUpdating = ref(false);
 
-// Reglas de validación para la contraseña
 const passwordRules = [
   (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
   (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
@@ -33,56 +34,70 @@ const passwordRules = [
   (v: string) => !v || /[0-9]/.test(v) || "Password must contain a number"
 ];
 
-// Cargar datos del usuario al montar el componente
 onMounted(() => {
   if (usersStore.currentUser) {
-    editedUser.value = { 
-      ...usersStore.currentUser, 
-      contrasenia: "" 
+    editedUser.value = {
+      ...usersStore.currentUser,
+      contrasenia: ""
     };
+    storedPassword.value = usersStore.currentUser.contrasenia ?? "";
   }
 });
 
-// Manejar subida de imagen de perfil
 const handleProfilePicUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      editedUser.value.profilePic = e.target?.result as string;
-    };
-    reader.readAsDataURL(input.files[0]);
+  if (input.files && input.files.length > 0) {
+    profilePicFile.value = input.files[0];
   }
 };
+
+function getImageSrc(pic: string | File | null | undefined): string {
+  if (!pic) return 'https://via.placeholder.com/100';
+  if (typeof pic === 'string') return pic;
+  if (pic instanceof File) return URL.createObjectURL(pic);
+  return 'https://via.placeholder.com/100';
+}
 
 const updateProfile = async () => {
   if (!editProfileForm.value) return;
 
-  const { valid } = await editProfileForm.value.validate();
-  if (!valid) return;
+  const { valid: formValido } = await editProfileForm.value.validate();
+  if (!formValido) return;
+
+  isUpdating.value = true;
 
   try {
-    if (usersStore.currentUser?.id) {
-      const userToUpdate: UserDto = {
-        ...editedUser.value,
-        contrasenia: editedUser.value.contrasenia && editedUser.value.contrasenia.trim() !== "" 
-          ? editedUser.value.contrasenia 
-          : usersStore.currentUser.contrasenia
-      };
+    const usuario = usersStore.currentUser;
+    if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-      const updatedUser = await usersStore.updateCurrentUser(userToUpdate);
+    const finalPassword = editedUser.value.contrasenia?.trim() || storedPassword.value;
 
-      if (updatedUser) {
-        snackbarMessage.value = "Profile updated successfully!";
-        snackbarColor.value = "success";
-        snackbar.value = true;
+    const userUpdateDto: UserUpdateDto = {
+      username: editedUser.value.username,
+      email: editedUser.value.email,
+      contraseña: finalPassword,
+      nombre: editedUser.value.nombre ?? "",
+      apellido1: editedUser.value.apellido1 ?? "",
+      apellido2: editedUser.value.apellido2 ?? "",
+      profilePic: profilePicFile.value as File || undefined
+    };
 
-        editedUser.value.contrasenia = "";
-      } else {
-        throw new Error("Failed to update profile");
-      }
-    }
+    const loginSuccess = await usersStore.updateCurrentUser(userUpdateDto);
+
+    if (!loginSuccess) throw new Error("Error al reloguear.");
+
+    snackbarMessage.value = "Perfil actualizado correctamente";
+    snackbarColor.value = "success";
+    snackbar.value = true;
+    editedUser.value.contrasenia = "";
+
   } catch (error) {
+    console.error("Error actualizando usuario:", error);
+    snackbarMessage.value = "Error al actualizar perfil";
+    snackbarColor.value = "error";
+    snackbar.value = true;
+  } finally {
+    isUpdating.value = false;
   }
 };
 </script>
@@ -93,8 +108,14 @@ const updateProfile = async () => {
       <v-col cols="12" md="12" lg="10" xl="8">
         <v-card class="elevation-6 profile-card">
           <div class="d-flex justify-center mb-4">
-            <PerfilAnimado />
+            <v-avatar size="100">
+              <img
+                :src="getImageSrc(usersStore.currentUser?.profilePic)"
+                alt="Foto de perfil"
+              />
+            </v-avatar>
           </div>
+
           
           <v-card-title class="text-h5 text-center pb-4">
             Edit Profile
@@ -200,27 +221,133 @@ const updateProfile = async () => {
 </template>
 
 <style scoped lang="scss">
-.profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@import "@/assets/styles/variables.scss";
+
+.profile-edit-container {
+  background-color: $card-background;
+  color: $text-color;
   min-height: 100vh;
-  width: 100%;
-  padding: 1rem;
+  padding: $spacing-large;
 
-  &__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .profile-card {
+    background-color: rgba(30, 30, 30, 0.9) !important;
+    backdrop-filter: blur(20px);
+    color: $text-color !important;
+    padding: $spacing-large;
+    border-radius: calc($border-radius * 4);
+    box-shadow: $box-shadow;
     width: 100%;
-    max-width: 900px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
+    max-width: 800px;
+    border: 2px solid $primary-color;
+
+    .v-card-title {
+      font-size: $font-size-xlarge !important;
+      font-weight: bold !important;
+      color: $text-color !important;
+      text-align: center;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    :deep(.v-text-field),
+    :deep(.v-file-input) {
+      .v-field {
+        background-color: transparent !important;
+        
+        &__field {
+          background-color: transparent !important;
+          color: $text-color !important;
+        }
+
+        &__input {
+          color: $text-color !important;
+          
+          input {
+            color: $text-color !important;
+          }
+        }
+
+        &__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-opacity: 1 !important;
+        }
+
+        &__outline__start,
+        &__outline__notch::before,
+        &__outline__notch::after,
+        &__outline__end {
+          border-color: $primary-color !important;
+          border-width: 2px !important;
+        }
+
+        &--focused .v-field__outline {
+          --v-field-border-color: #{$primary-color} !important;
+          --v-field-border-width: 3px !important;
+        }
+
+        &:hover .v-field__outline {
+          --v-field-border-color: #{lighten($primary-color, 10%)} !important;
+        }
+      }
+
+      .v-label {
+        color: rgba($text-color, 0.8) !important;
+        font-weight: 500;
+        font-size: $font-size-base;
+
+        &.v-field-label--focused {
+          color: $primary-color !important;
+        }
+      }
+
+      .v-field__prepend-inner .v-icon,
+      .v-field__append-inner .v-icon {
+        color: $primary-color !important;
+      }
+
+      .v-messages__message {
+        color: $color-error !important;
+      }
+    }
+
+    :deep(.v-btn) {
+      background: $primary-gradient !important;
+      color: white !important;
+      font-weight: bold;
+      border-radius: $border-radius;
+      padding: $spacing-small $spacing-large;
+      font-size: $font-size-base;
+      transition: $transition;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($primary-color, 0.4);
+      }
+
+      &:disabled {
+        background: $color-disabled !important;
+        color: rgba(white, 0.6) !important;
+      }
+    }
+
+
+    .v-avatar img {
+      border: 3px solid $primary-color;
+      object-fit: cover !important;
+      width: 100%;
+      height: 100%;
+    }
   }
 
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: center;
-    padding: 2rem;
+  :deep(.v-snackbar) {
+    font-size: $font-size-base;
+    font-weight: 500;
   }
-}
-</style>
+}</style>

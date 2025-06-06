@@ -6,6 +6,11 @@ import ContactForm from '@/components/ContactForm.vue'
 import Dashboard from '@/views/DashboardView.vue'
 import Catalog from '@/views/CatalogView.vue'
 import DetalleVideojuego from '@/views/DetalleVideojuegoView.vue'
+import ReviewsView from '@/views/ReviewsView.vue'
+import IdeasView from '@/views/IdeasView.vue'
+import NoticiasUsuarioAfiliadoView from '@/views/NoticiasUsuarioAfiliadoView.vue'
+import NoveadadView from '@/views/NovedadesView.vue'
+import NovedadesView from '@/views/NovedadesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +49,27 @@ const router = createRouter({
       path: '/detalleVideojuego',
       name: 'detalleVideojuego',
       component: DetalleVideojuego,
+    },
+    {
+      path: '/reviewVideojuego',
+      name: 'reviewVideojuego',
+      component: ReviewsView,
+      props: true,
+    },
+    {
+      path: '/ideas',
+      name: 'ideas',
+      component: IdeasView,
+    },
+    {
+      path: '/noticiasafiliado',
+      name: 'noticiasafiliado',
+      component: NoticiasUsuarioAfiliadoView,
+    },
+    {
+      path: '/novedades',
+      name: 'novedades',
+      component: NovedadesView,
     },
   ],
 })

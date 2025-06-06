@@ -2,6 +2,15 @@
 import { ref, onMounted, computed, defineProps } from 'vue'
 import { useGamesStore } from '@/stores/games'
 import type { VideojuegoDetalleDto } from '@/stores/dtos/videojuegoDetalle.dto'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const irAReview = () => {
+  if (props.gameId) {
+    router.push(`/reviewVideojuego?id=${props.gameId}`)
+  }
+}
 
 const props = defineProps({
   gameId: {
@@ -12,6 +21,8 @@ const props = defineProps({
 
 const gamesStore = useGamesStore()
 const videojuego = ref<VideojuegoDetalleDto | null>(null)
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 
 // Función para obtener la URL de la imagen PEGI según el valor
 const getPegiImageUrl = (pegiValue: number) => {
@@ -26,17 +37,17 @@ const getPegiImageUrl = (pegiValue: number) => {
       return 'src/assets/img/pegi16.png'
     case 18:
       return 'src/assets/img/pegi18.png'
+    default:
+      return undefined
   }
 }
-
+const parentDomain = window.location.hostname
 // Formato de fecha a española
 const formatearFechaEspañola = (fecha: string | number | Date) => {
-  // Si es un año, lo devolvemos como string
   if (typeof fecha === 'number') {
     return fecha.toString()
   }
 
-  // Si es fecha completa, la formateamos como DD/MM/AAAA
   const fechaObj = new Date(fecha)
   const dia = fechaObj.getDate().toString().padStart(2, '0')
   const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0')
@@ -45,209 +56,500 @@ const formatearFechaEspañola = (fecha: string | number | Date) => {
   return `${dia}/${mes}/${anio}`
 }
 
+// Computed para la valoración con estrellas
+const valoracionEstrellas = computed(() => {
+  if (!videojuego.value?.valoracionPromedio) return { llenas: 0, media: false, vacias: 5 }
+  
+  const valor = videojuego.value.valoracionPromedio / 2 // Convertir de 10 a 5
+  const llenas = Math.floor(valor)
+  const media = valor % 1 >= 0.5
+  const vacias = 5 - llenas - (media ? 1 : 0)
+  
+  return { llenas, media, vacias }
+})
+
 onMounted(async () => {
   if (props.gameId !== null) {
-    await gamesStore.verDetalleVideojuego(props.gameId)
-    videojuego.value = gamesStore.detalleVideojuego
-    console.log('Cargado:', videojuego.value)
+    try {
+      isLoading.value = true
+      await gamesStore.verDetalleVideojuego(props.gameId)
+      videojuego.value = gamesStore.detalleVideojuego
+      
+      if (videojuego.value?.titulo) {
+        await cargarClips(videojuego.value.titulo)
+      }
+    } catch (err) {
+      error.value = 'Error al cargar el videojuego'
+      console.error('Error:', err)
+    } finally {
+      isLoading.value = false
+    }
   }
 })
+
+const clips = ref<any[]>([])
+
+const cargarClips = async (nombreJuego: string) => {
+  try {
+    const res = await fetch(`http://localhost:4444/api/twitch/clips?game=${encodeURIComponent(nombreJuego)}`)
+    const data = await res.json()
+    clips.value = data.data
+  } catch (error) {
+    console.error("Error cargando clips de Twitch:", error)
+  }
+}
 </script>
 
 <template>
   <div class="detalle-videojuego">
-    <div v-if="videojuego" class="detalle-videojuego__contenedor">
+    <div v-if="isLoading" class="detalle-videojuego__loading">
+      <div class="loading-spinner"></div>
+      <p>Cargando información del videojuego...</p>
+    </div>
+
+    <div v-else-if="error" class="detalle-videojuego__error">
+      <div class="error-icon">⚠️</div>
+      <h3>Error al cargar</h3>
+      <p>{{ error }}</p>
+    </div>
+
+    <div v-else-if="videojuego" class="detalle-videojuego__contenedor">
       <div class="detalle-videojuego__imagen-wrapper">
-        <img
-          :src="videojuego.caratula"
-          :alt="videojuego.titulo"
-          class="detalle-videojuego__imagen"
-        />
+        <div class="imagen-container">
+          <img 
+            :src="videojuego.caratula" 
+            :alt="videojuego.titulo" 
+            class="detalle-videojuego__imagen"
+            loading="lazy"
+          />
+          <div class="imagen-overlay">
+            <div class="overlay-content">
+              <span class="overlay-text">Ver en detalle</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="detalle-videojuego__info">
-        <h1 class="detalle-videojuego__titulo">{{ videojuego.titulo }}</h1>
+        <header class="detalle-videojuego__header">
+          <h1 class="detalle-videojuego__titulo">{{ videojuego.titulo }}</h1>
+          
+          <div class="detalle-videojuego__meta">
+            <div class="meta-item meta-item--valoracion">
+              <div class="valoracion-container">
+                <div class="estrellas">
+                  <span 
+                    v-for="n in valoracionEstrellas.llenas" 
+                    :key="`llena-${n}`" 
+                    class="estrella estrella--llena"
+                  >★</span>
+                  <span 
+                    v-if="valoracionEstrellas.media" 
+                    class="estrella estrella--media"
+                  >★</span>
+                  <span 
+                    v-for="n in valoracionEstrellas.vacias" 
+                    :key="`vacia-${n}`" 
+                    class="estrella estrella--vacia"
+                  >☆</span>
+                </div>
+                <span class="valoracion-numero">{{ videojuego.valoracionPromedio.toFixed(1) }}/10</span>
+              </div>
+            </div>
 
-        <div class="detalle-videojuego__meta">
-          <span class="detalle-videojuego__valoracion">
-            <span class="icono">⭐</span> {{ videojuego.valoracionPromedio.toFixed(2) }}/10
-          </span>
-          <span class="detalle-videojuego__anio">
-            <span class="icono">📅</span> {{ formatearFechaEspañola(videojuego.anioSalida) }}
-          </span>
-          <span v-if="videojuego.pegi" class="detalle-videojuego__pegi">
-            <h3>Pegi:</h3>
-            <img
-              :src="getPegiImageUrl(videojuego.pegi)"
-              :alt="`PEGI ${videojuego.pegi}`"
-              class="pegi-imagen"
-            />
-          </span>
+            <div class="meta-item meta-item--fecha">
+              <span class="meta-icon">📅</span>
+              <span class="meta-text">{{ formatearFechaEspañola(videojuego.anioSalida) }}</span>
+            </div>
+
+            <div v-if="videojuego.pegi" class="meta-item meta-item--pegi">
+              <span class="meta-label">PEGI:</span>
+              <img :src="getPegiImageUrl(videojuego.pegi)" :alt="`PEGI ${videojuego.pegi}`" class="pegi-imagen" />
+            </div>
+          </div>
+        </header>
+
+        <div class="detalle-videojuego__descripcion-section">
+          <p class="detalle-videojuego__descripcion">{{ videojuego.descripcion }}</p>
         </div>
-
-        <p class="detalle-videojuego__descripcion">{{ videojuego.descripcion }}</p>
 
         <div class="detalle-videojuego__compania">
-          <span class="etiqueta">Desarrolladora:</span>
-          <span class="valor">{{ videojuego.compania }}</span>
+          <span class="compania-label">Desarrolladora</span>
+          <span class="compania-nombre">{{ videojuego.compania }}</span>
         </div>
 
-        <!-- Géneros -->
-        <div class="detalle-videojuego__seccion">
-          <h3><span class="icono">🎮</span> Géneros</h3>
+        <section class="detalle-videojuego__seccion">
+          <h3 class="seccion-titulo">
+            <span class="seccion-icon">🎮</span>
+            <span>Géneros</span>
+          </h3>
           <div class="detalle-videojuego__tags">
-            <span v-for="genero in videojuego.generos" :key="genero.id" class="tag tag--genero">
+            <span 
+              v-for="genero in videojuego.generos" 
+              :key="genero.id" 
+              class="tag tag--genero"
+            >
               {{ genero.nombre }}
             </span>
           </div>
-        </div>
+        </section>
 
-        <!-- Plataformas -->
-        <div class="detalle-videojuego__seccion">
-          <h3><span class="icono">🕹️</span> Plataformas</h3>
+        <section class="detalle-videojuego__seccion">
+          <h3 class="seccion-titulo">
+            <span class="seccion-icon">🕹️</span>
+            <span>Plataformas</span>
+          </h3>
           <div class="detalle-videojuego__tags">
-            <span
-              v-for="plataforma in videojuego.plataformas"
-              :key="plataforma.id"
+            <span 
+              v-for="plataforma in videojuego.plataformas" 
+              :key="plataforma.id" 
               class="tag tag--plataforma"
             >
               {{ plataforma.nombre }}
             </span>
           </div>
+        </section>
+
+        <div class="detalle-videojuego__acciones">
+          <button class="btn btn--primary btn--review" @click="irAReview()">
+            <span class="btn-icon">📝</span>
+            <span>Ver Review Completa</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-else class="detalle-videojuego__error">
-      <p>No se ha encontrado información del videojuego.</p>
+    <section class="detalle-videojuego__seccion" v-if="clips.length">
+      <h3><span class="icono">📺</span> Clips populares en Twitch</h3>
+      <div class="detalle-videojuego__clips">
+        <div class="twitch-clip" v-for="clip in clips" :key="clip.id">
+          <iframe
+            :src="`https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}`"
+            width="100%" height="300" allowfullscreen>
+          </iframe>
+          <p>{{ clip.title }}</p>
+        </div>
+      </div>
+    </section>
+
+    <div v-else class="detalle-videojuego__empty">
+      <div class="empty-icon">🎮</div>
+      <h3>Videojuego no encontrado</h3>
+      <p>No se ha encontrado información del videojuego solicitado.</p>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/variables.scss';
+
 .detalle-videojuego {
   width: 100%;
   margin-top: 0;
-  margin-bottom: 24px;
+  margin-bottom: $spacing-xlarge;
+
+  &__loading,
+  &__error,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: $spacing-xlarge;
+    background: $card-background;
+    border-radius: $border-radius * 2;
+    color: $text-color;
+    text-align: center;
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba($primary-color, 0.2);
+      border-top: 4px solid $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: $spacing-medium;
+    }
+
+    .error-icon,
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: $spacing-medium;
+    }
+
+    h3 {
+      font-size: $font-size-xlarge;
+      font-weight: 600;
+      margin: 0 0 $spacing-small 0;
+      color: $text-color;
+    }
+
+    p {
+      font-size: $font-size-base;
+      color: rgba($text-color, 0.7);
+      margin: 0;
+    }
+  }
+
+  &__error {
+    border: 1px solid $color-error;
+    background: rgba($color-error, 0.1);
+  }
 
   &__contenedor {
     display: flex;
     flex-direction: column;
     width: 100%;
-    background: linear-gradient(to bottom, #323232, #272727);
-    border-radius: 16px;
+    background: linear-gradient(135deg, #2a2a2a 0%, $secondary-color 100%);
+    border-radius: $border-radius * 2;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    color: #fff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    color: $text-color;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $primary-gradient;
+    }
   }
 
   &__imagen-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 10px;
+    padding: $spacing-xlarge $spacing-large;
     display: flex;
     justify-content: center;
-    background: #1e1e1e;
-  }
+    background: linear-gradient(135deg, #1a1a1a 0%, $card-background 100%);
 
-  &__imagen {
-    max-width: 280px;
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
+    .imagen-container {
+      position: relative;
+      max-width: 300px;
+      width: 100%;
+      border-radius: $border-radius;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      transition: $transition;
 
-    &:hover {
-      transform: scale(1.02);
+      &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+
+        .imagen-overlay {
+          opacity: 1;
+        }
+      }
+    }
+
+    .imagen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba($primary-color, 0.9), rgba(#ff8c00, 0.9));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: $transition;
+
+      .overlay-content {
+        text-align: center;
+        color: $text-color;
+        font-weight: 600;
+        font-size: $font-size-base;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
     }
   }
 
+  &__imagen {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: $transition;
+  }
+
   &__info {
-    padding: 24px 20px;
+    padding: $spacing-xlarge $spacing-large;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: $spacing-large;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
   }
 
   &__titulo {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
     margin: 0;
-    color: #fff;
+    color: $text-color;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
   }
 
   &__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    font-size: 15px;
+    gap: $spacing-medium;
+    align-items: center;
 
-    > span {
+    .meta-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: $spacing-small;
+      padding: $spacing-small $spacing-medium;
+      background: rgba($text-color, 0.1);
+      border-radius: $border-radius;
+      font-size: $font-size-small;
+      font-weight: 500;
+      transition: $transition;
+
+      &:hover {
+        background: rgba($text-color, 0.15);
+      }
+
+      &--valoracion {
+        background: rgba($color-warning, 0.2);
+        border: 1px solid rgba($color-warning, 0.3);
+      }
+
+      &--fecha {
+        background: rgba($primary-color, 0.1);
+        border: 1px solid rgba($primary-color, 0.2);
+      }
+
+      &--pegi {
+        background: rgba($color-success, 0.1);
+        border: 1px solid rgba($color-success, 0.2);
+      }
     }
 
-    .icono {
-      font-size: 18px;
+    .meta-icon {
+      font-size: 16px;
+    }
+
+    .meta-label {
+      font-size: $font-size-small;
+      color: rgba($text-color, 0.8);
+      font-weight: 500;
     }
   }
 
-  &__valoracion {
-    color: #ffcc00;
-    font-weight: 600;
-  }
-
-  &__pegi {
+  .valoracion-container {
     display: flex;
     align-items: center;
+    gap: $spacing-small;
+
+    .estrellas {
+      display: flex;
+      gap: 2px;
+
+      .estrella {
+        font-size: 16px;
+        transition: $transition;
+
+        &--llena {
+          color: $color-warning;
+        }
+
+        &--media {
+          color: $color-warning;
+          opacity: 0.6;
+        }
+
+        &--vacia {
+          color: rgba($text-color, 0.3);
+        }
+      }
+    }
+
+    .valoracion-numero {
+      font-weight: 600;
+      color: $color-warning;
+      font-size: $font-size-small;
+    }
   }
 
   .pegi-imagen {
-    height: 28px;
+    height: 24px;
     width: auto;
+    border-radius: 4px;
+  }
+
+  &__descripcion-section {
+    position: relative;
+    padding: $spacing-large;
+    background: rgba($text-color, 0.05);
+    border-radius: $border-radius;
+    border-left: 4px solid $primary-color;
   }
 
   &__descripcion {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #e0e0e0;
+    font-size: $font-size-base;
+    line-height: 1.7;
+    color: rgba($text-color, 0.9);
     margin: 0;
+    font-weight: 400;
   }
 
   &__compania {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: $spacing-small;
+    padding: $spacing-medium;
+    background: rgba($primary-color, 0.1);
+    border-radius: $border-radius;
+    border: 1px solid rgba($primary-color, 0.2);
 
-    .etiqueta {
-      font-size: 14px;
-      color: #a0a0a0;
+    .compania-label {
+      font-size: $font-size-small;
+      color: rgba($text-color, 0.7);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .valor {
+    .compania-nombre {
       font-weight: 600;
-      font-size: 16px;
+      font-size: $font-size-base;
+      color: $text-color;
     }
   }
 
   &__seccion {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: $spacing-medium;
 
-    h3 {
+    .seccion-titulo {
       margin: 0;
-      font-size: 18px;
+      font-size: $font-size-large;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: $spacing-small;
+      color: $text-color;
 
-      .icono {
+      .seccion-icon {
         font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: rgba($primary-color, 0.2);
+        border-radius: 50%;
       }
     }
   }
@@ -255,52 +557,169 @@ onMounted(async () => {
   &__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: $spacing-small;
   }
 
   .tag {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-small $spacing-medium;
+    border-radius: $border-radius;
+    font-size: $font-size-small;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: $transition;
+    cursor: default;
 
     &--genero {
-      background: #f25421;
-      color: #fff;
+      background: linear-gradient(135deg, $primary-color, #ff8c00);
+      color: $text-color;
+      box-shadow: 0 2px 8px rgba($primary-color, 0.3);
 
       &:hover {
-        background: #e04a17;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.4);
       }
     }
 
     &--plataforma {
-      background: #333;
-      color: #fff;
-      border: 1px solid #f25421;
+      background: rgba($text-color, 0.1);
+      color: $text-color;
+      border: 1px solid rgba($primary-color, 0.3);
 
       &:hover {
-        background: #3e3e3e;
+        background: rgba($text-color, 0.15);
+        border-color: rgba($primary-color, 0.5);
         transform: translateY(-2px);
       }
     }
   }
 
-  &__error {
+  &__acciones {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    background: #272727;
-    border-radius: 10px;
-    color: #fff;
-    padding: 20px;
+    gap: $spacing-medium;
+    margin-top: $spacing-medium;
   }
 
-  @media (min-width: 768px) {
-    margin-bottom: 40px;
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-small;
+    padding: $spacing-medium $spacing-large;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border-radius: $border-radius;
+    border: none;
+    cursor: pointer;
+    transition: $transition;
+    text-decoration: none;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    &:hover::before {
+      left: 100%;
+    }
+
+    &--primary {
+      background: linear-gradient(135deg, $primary-color, #ff8c00);
+      color: $text-color;
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .btn-icon {
+      font-size: 18px;
+    }
+  }
+
+  &__clips {
+    margin-top: $spacing-large;
+    display: flex;
+    gap: $spacing-medium;
+    overflow-x: auto;
+    padding-bottom: $spacing-small;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    justify-content: flex-start;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .twitch-clip {
+      flex: 0 0 auto;
+      width: 320px;
+      height: 180px;
+      border-radius: $border-radius;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: $transition;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      p {
+        color: $text-color;
+        font-size: $font-size-small;
+        margin-top: $spacing-small;
+        text-align: center;
+        max-width: 100%;
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 400px) {
+    &__clips {
+      padding-bottom: $spacing-small;
+      gap: $spacing-small;
+
+      .twitch-clip {
+        width: 260px;
+        height: 146px;
+      }
+    }
+  }
+
+  @media (min-width: $desktop) {
+    margin-bottom: $spacing-xxl;
 
     &__contenedor {
       flex-direction: row;
@@ -311,7 +730,7 @@ onMounted(async () => {
 
     &__imagen-wrapper {
       width: 40%;
-      padding: 30px;
+      padding: $spacing-xxl;
       align-items: center;
     }
 
@@ -321,8 +740,8 @@ onMounted(async () => {
 
     &__info {
       width: 60%;
-      padding: 30px;
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding: $spacing-xxl;
+      border-left: 1px solid rgba($text-color, 0.1);
     }
 
     &__titulo {
@@ -330,43 +749,43 @@ onMounted(async () => {
     }
 
     &__meta {
-      font-size: 16px;
-
-      .icono {
-        font-size: 20px;
+      .meta-item {
+        font-size: $font-size-base;
       }
     }
 
     .pegi-imagen {
-      height: 32px;
+      height: 28px;
     }
 
     &__descripcion {
-      font-size: 17px;
+      font-size: $font-size-large;
     }
 
     &__compania {
       flex-direction: row;
       align-items: center;
-      gap: 10px;
+      gap: $spacing-medium;
 
-      .etiqueta {
-        font-size: 15px;
+      .compania-label {
+        font-size: $font-size-base;
       }
 
-      .valor {
-        font-size: 17px;
+      .compania-nombre {
+        font-size: $font-size-large;
       }
     }
 
-    &__seccion {
-      h3 {
-        font-size: 20px;
-      }
+    .seccion-titulo {
+      font-size: $font-size-xlarge;
     }
 
     .tag {
-      font-size: 15px;
+      font-size: $font-size-base;
+    }
+
+    .btn {
+      font-size: $font-size-large;
     }
   }
 
@@ -380,7 +799,7 @@ onMounted(async () => {
     }
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: $xl) {
     &__contenedor {
       max-width: 1400px;
     }
@@ -391,7 +810,7 @@ onMounted(async () => {
 
     &__info {
       width: 67%;
-      padding: 40px;
+      padding: $spacing-xxl * 1.5;
     }
 
     &__titulo {
@@ -399,41 +818,42 @@ onMounted(async () => {
     }
 
     &__meta {
-      font-size: 18px;
-
-      .icono {
-        font-size: 22px;
+      .meta-item {
+        font-size: $font-size-large;
       }
     }
 
     .pegi-imagen {
-      height: 38px;
+      height: 32px;
     }
 
     &__descripcion {
-      font-size: 18px;
+      font-size: $font-size-large;
       line-height: 1.8;
     }
 
     &__compania {
-      .etiqueta {
-        font-size: 16px;
+      .compania-label {
+        font-size: $font-size-large;
       }
 
-      .valor {
-        font-size: 18px;
+      .compania-nombre {
+        font-size: $font-size-xlarge;
       }
     }
 
-    &__seccion {
-      h3 {
-        font-size: 22px;
-      }
+    .seccion-titulo {
+      font-size: 24px;
     }
 
     .tag {
-      font-size: 16px;
-      padding: 8px 14px;
+      font-size: $font-size-large;
+      padding: $spacing-small $font-size-large;
+    }
+
+    .btn {
+      font-size: $font-size-large;
+      padding: $spacing-large $spacing-xlarge;
     }
   }
 }

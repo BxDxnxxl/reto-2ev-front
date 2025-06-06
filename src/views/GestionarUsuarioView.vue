@@ -41,12 +41,20 @@ const userId = route.query.id ? Number(route.query.id) : null;
 </template>
 
 <style scoped lang="scss">
+@import '@/assets/styles/variables.scss';
+
 .gestion-usuario {
   padding: 20px;
-  
+  margin-top: 0;
+
   h2 {
-    margin-bottom: 20px;
+    margin-bottom: 2px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $text-color;
   }
+
 }
 
 .error-message {

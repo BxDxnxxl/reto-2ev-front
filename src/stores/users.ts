@@ -5,6 +5,7 @@ import type { UserLoginDto } from "@/stores/dtos/userLogin.dto";
 import type { UserRegistrorDto } from "@/stores/dtos/userRegistro.dto";
 import type { UserInfoDto } from "@/stores/dtos/userInfoListado.dto";
 import type { RolAsignacionDto } from "@/stores/dtos/UsuarioRol.dto";
+import type { UserUpdateDto } from "@/stores/dtos/UserUpdateDto";
 import { useRouter } from "vue-router";
 import { get, set, del } from "idb-keyval";
 const router = useRouter();
@@ -22,7 +23,7 @@ export const useUsersStore = defineStore("users", () => {
   }
   loadPersistedData();
 
-  //Obtener todos los usuarios
+
   async function fetchUsuarios() {
     try {
       const response = await fetch("http://localhost:4444/api/usuario");
@@ -32,7 +33,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  //Obtener todos los usuarios con sus roles
+
   async function fetchUsuariosConRoles() {
     try {
       const response = await fetch("http://localhost:4444/api/usuario/usuarios-con-roles");
@@ -42,138 +43,116 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  //Obtener un usuario por ID
+
   async function fetchUsuarioById(id: number) {
     try {
       const response = await fetch(`http://localhost:4444/api/usuario/${id}`);
       const usuario = await response.json();
       users.value = users.value.filter((u) => u.id !== id);
       users.value.push(usuario);
+      return usuario;
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
     }
   }
 
-  //Crear un nuevo usuario
-  async function createUsuario(nuevoUsuario: UserDto) {
-    try {
-        const response = await fetch("http://localhost:4444/api/usuario", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nuevoUsuario),
-        });
+  async function createUsuario(formData: FormData) {
+  try {
+    const res = await fetch('http://localhost:4444/api/Usuario', {
+      method: 'POST',
+      body: formData,
+    });
 
-        console.log("Raw Response:", response);
+    if (!res.ok) throw new Error(await res.text());
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Error al crear usuario:", errorText);
-            return null;
-        }
-
-        const idString = await response.text();
-        const userId = parseInt(idString, 10);
-
-        if (isNaN(userId)) {
-            console.error("Error: No se pudo convertir la respuesta a un ID válido.");
-            return null;
-        }
-
-        console.log("Usuario creado con ID:", userId);
-        await fetchUsuarios();
-        return { id: userId };
-    } catch (error) {
-        console.error("Error en createUsuario:", error);
-        return null;
-    }
+    await fetchUsuarios();
+    return await res.json();
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+  }
 }
 
 
-  //Actualizar un usuario existente
-  async function updateUsuario(id: number, usuarioActualizado: UserDto) {
-    try {
-      console.log(usuarioActualizado)
-      await fetch(`http://localhost:4444/api/usuario/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(usuarioActualizado),
-      });
-      await fetchUsuarios(); //Refresca la lista después de actualizar
-    } catch (error) {
-      console.error("Error al actualizar usuario:", error);
+async function updateUsuario(id: number, userDto: UserUpdateDto) {
+  try {
+    const formData = new FormData();
+    formData.append('Username', userDto.username.trim());
+    formData.append('Email', userDto.email.trim());
+    formData.append('Contrasenia', userDto.contraseña ?? '');
+    formData.append('Nombre', userDto.nombre ?? '');
+    formData.append('Apellido1', userDto.apellido1 ?? '');
+    formData.append('Apellido2', userDto.apellido2 ?? '');
+
+ 
+    if (userDto.profilePic && typeof userDto.profilePic !== 'string') {
+      formData.append('ProfilePic', userDto.profilePic);
+    } else {
+      const emptyFile = new Blob([], { type: 'image/png' });
+      formData.append('ProfilePic', emptyFile, 'empty.png');
     }
+
+    const res = await fetch(`http://localhost:4444/api/usuario/${id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    await fetchUsuarios();
+  } catch (error) {
+    console.error('Error al actualizar usuario:', error);
   }
+}
 
-async function updateCurrentUser(usuarioActualizado: UserDto) {
-    try {
-        if (!currentUser.value) {
-            throw new Error("No hay usuario autenticado.");
-        }
 
-        let contraseniaFinal = usuarioActualizado.contrasenia?.trim() || "";
-        const usuarioId = currentUser.value.id ?? 0;
+  async function updateCurrentUser(usuarioActualizado: UserUpdateDto) {
+  try {
+    if (!currentUser.value) throw new Error("No hay usuario autenticado.");
+    const usuarioId = currentUser.value.id ?? 0;
 
-        if (!contraseniaFinal) {
-            await fetchUsuarioById(usuarioId);
-            const usuarioDesdeApi = users.value.find(u => u.id === usuarioId);
+    let finalPassword = usuarioActualizado.contraseña?.trim();
 
-            if (!usuarioDesdeApi || !usuarioDesdeApi.contrasenia) {
-                throw new Error("No se pudo obtener la contraseña actual del usuario.");
-            }
-
-            contraseniaFinal = usuarioDesdeApi.contrasenia;
-        }
-
-        const usuarioParaActualizar: UserDto = {
-            id: currentUser.value.id,
-            username: usuarioActualizado.username || currentUser.value.username,
-            email: usuarioActualizado.email || currentUser.value.email || '',
-            nombre: usuarioActualizado.nombre || currentUser.value.nombre,
-            apellido1: usuarioActualizado.apellido1 || currentUser.value.apellido1,
-            apellido2: usuarioActualizado.apellido2 || currentUser.value.apellido2 || '',
-            profilePic: usuarioActualizado.profilePic || currentUser.value.profilePic || '',
-            contrasenia: contraseniaFinal
-        };
-
-        const response = await fetch(`http://localhost:4444/api/usuario/${currentUser.value.id}`, {
-            method: "PUT",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${tokenLogin}`
-            },
-            body: JSON.stringify(usuarioParaActualizar),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error en la actualización: ${await response.text()}`);
-        }
-
-        await fetchUsuarioById(usuarioId);
-        const usuarioActualizadoDesdeApi = users.value.find(u => u.id === usuarioId);
-
-        if (!usuarioActualizadoDesdeApi) {
-            throw new Error("Error al obtener el usuario actualizado.");
-        }
-
-        const usuarioPlano = JSON.parse(JSON.stringify(usuarioActualizadoDesdeApi));
-
-        currentUser.value = usuarioPlano;
-
-        await set("currentUser", usuarioPlano);
-
-        await fetchUsuarios();
-
-        return currentUser.value;
-    } catch (error) {
-        console.error('Error en la actualización del usuario:', error);
-        throw error;
+    if (!finalPassword) {
+      const usuarioFull = await fetchUsuarioById(usuarioId);
+      finalPassword = usuarioFull?.contrasenia?.trim() ?? "";
     }
+
+    const formData = new FormData();
+    formData.append("Username", usuarioActualizado.username);
+    formData.append("Email", usuarioActualizado.email);
+    formData.append("Contrasenia", finalPassword);
+    formData.append("Nombre", usuarioActualizado.nombre ?? "");
+    formData.append("Apellido1", usuarioActualizado.apellido1 ?? "");
+    formData.append("Apellido2", usuarioActualizado.apellido2 ?? "");
+
+    if (usuarioActualizado.profilePic instanceof File) {
+      formData.append("ProfilePic", usuarioActualizado.profilePic);
+    }
+
+    const response = await fetch(`http://localhost:4444/api/usuario/${usuarioId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${tokenLogin.value}`
+      },
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error(`Error en la actualización: ${await response.text()}`);
+
+    const loginDto: UserLoginDto = {
+      username: usuarioActualizado.username,
+      password: finalPassword
+    };
+
+    const loginSuccess = await login(loginDto);
+    return loginSuccess;
+  } catch (error) {
+    console.error("Error en la actualización del usuario:", error);
+    return false;
   }
+}
 
-
-
-
-  //Eliminar un usuario
+  
   async function deleteUsuario(id: number) {
     try {
       await fetch(`http://localhost:4444/api/usuario/${id}`, { method: "DELETE" });
@@ -183,7 +162,7 @@ async function updateCurrentUser(usuarioActualizado: UserDto) {
     }
   }
 
-  //Iniciar sesión y almacenar datos del usuario autenticado
+
   async function login(usuarioLogin: UserLoginDto) {
     try {
       const response = await fetch("http://localhost:4444/api/auth/login", {
@@ -213,7 +192,7 @@ async function updateCurrentUser(usuarioActualizado: UserDto) {
     }
   }
 
-  //Registrar un nuevo usuario desde el formulario
+
   async function register(usuarioNuevo: UserRegistrorDto) {
     try {
       const response = await fetch("http://localhost:4444/api/usuario/CrearDesdeLogin", {
