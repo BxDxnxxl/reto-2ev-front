@@ -25,6 +25,17 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     solicitudes.value = await usuariosApuntadosStore.fetchSolicitudesRecibidas(idCreador);
   }
 };
+
+const rechazar = async (idIdea: number, idUsuarioArechazar: number) => {
+  await usuariosApuntadosStore.rechazarUsuarioApuntado(
+    idIdea,
+    idUsuarioArechazar
+  );
+  const idCreador = usersStore.currentUser?.id;
+  if (idCreador) {
+    solicitudes.value = await usuariosApuntadosStore.fetchSolicitudesRecibidas(idCreador);
+  }
+};
 </script>
 
 <template>
@@ -46,12 +57,18 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
           <p class="solicitudes__usuario-email">{{ s.email }}</p>
           <p class="solicitudes__fecha">Solicitado el {{ new Date(s.fechaSolicitud).toLocaleDateString() }}</p>
         </div>
-        <button class="solicitudes__boton" @click="aceptar(s.idIdea, s.idUsuarioSolicitante)">
-          Aceptar
-        </button>
+        <div class="solicitudes__botones">
+          <button class="solicitudes__boton solicitudes__boton--aceptar" @click="aceptar(s.idIdea, s.idUsuarioSolicitante)">
+            Aceptar
+          </button>
+          <button class="solicitudes__boton solicitudes__boton--rechazar" @click="rechazar(s.idIdea, s.idUsuarioSolicitante)">
+            Rechazar
+          </button>
+        </div>
       </div>
     </div>
 
+    <!-- Vista desktop (tabla) -->
     <div v-if="solicitudes.length > 0" class="solicitudes__tabla-container">
       <table class="solicitudes__tabla">
         <thead>
@@ -74,9 +91,14 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
             <td class="solicitudes__celda-email">{{ s.email }}</td>
             <td class="solicitudes__celda-fecha">{{ new Date(s.fechaSolicitud).toLocaleDateString() }}</td>
             <td class="solicitudes__celda-accion">
-              <button class="solicitudes__boton-tabla" @click="aceptar(s.idIdea, s.idUsuarioSolicitante)">
-                Aceptar
-              </button>
+              <div class="solicitudes__botones-tabla">
+                <button class="solicitudes__boton-tabla solicitudes__boton-tabla--aceptar" @click="aceptar(s.idIdea, s.idUsuarioSolicitante)">
+                  Aceptar
+                </button>
+                <button class="solicitudes__boton-tabla solicitudes__boton-tabla--rechazar" @click="rechazar(s.idIdea, s.idUsuarioSolicitante)">
+                  Rechazar
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -160,6 +182,17 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     color: rgba($text-color, 0.5);
   }
 
+  &__botones {
+    display: flex;
+    gap: $spacing-small;
+    align-self: stretch;
+    flex-direction: column;
+
+    @media (min-width: 480px) {
+      flex-direction: row;
+    }
+  }
+
   &__boton {
     background-color: $btn-color;
     color: white;
@@ -172,10 +205,22 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     transition: $transition;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    align-self: stretch;
+    flex: 1;
 
-    &:hover {
-      background-color: darken($btn-color, 10%);
+    &--aceptar {
+      background-color: $btn-color;
+
+      &:hover {
+        background-color: darken($btn-color, 10%);
+      }
+    }
+
+    &--rechazar {
+      background-color: #dc3545;
+
+      &:hover {
+        background-color: darken(#dc3545, 10%);
+      }
     }
   }
 
@@ -260,22 +305,40 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     text-align: center;
   }
 
+  &__botones-tabla {
+    display: flex;
+    gap: $spacing-small;
+    justify-content: center;
+  }
+
   &__boton-tabla {
-    background-color: $btn-color;
-    color: white;
     border: none;
     border-radius: $border-radius;
-    padding: $spacing-small $spacing-large;
+    padding: $spacing-small $spacing-medium;
     font-size: $font-size-small;
     font-weight: 600;
     cursor: pointer;
     transition: $transition;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: white;
 
-    &:hover {
-      background-color: darken($btn-color, 10%);
-      transform: translateY(-1px);
+    &--aceptar {
+      background-color: $btn-color;
+
+      &:hover {
+        background-color: darken($btn-color, 10%);
+        transform: translateY(-1px);
+      }
+    }
+
+    &--rechazar {
+      background-color: #dc3545;
+
+      &:hover {
+        background-color: darken(#dc3545, 10%);
+        transform: translateY(-1px);
+      }
     }
   }
 }

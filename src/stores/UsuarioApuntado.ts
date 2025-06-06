@@ -85,12 +85,36 @@ export const useUsuariosApuntadosStore = defineStore("usuariosApuntados", () => 
       return [];
     }
   }
+  async function rechazarUsuarioApuntado(idIdea: number, idUsuario: number) {
+    try {
+      const dto: AceptarUsuarioDto = {
+        fkIdIdea: idIdea,
+        fkIdUsuario: idUsuario
+      };    
+
+        const response = await fetch(`https://wannagamesapi.retocsv.es/api/UsuariosApuntados/rechazar`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dto) // <-- CORREGIDO
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.mensaje || 'Error al rechazar el usuario');
+        }
+    } catch (error) {
+        console.error('Error al rechazar usuario apuntado:', error);
+        throw error;
+    }
+  }
+
 
   return {
     unirseAIdea,
     verificarSiUsuarioApuntado,
     verificarEstadoApuntadoYAceptado,
     aceptarUsuarioApuntado,
-    fetchSolicitudesRecibidas
+    fetchSolicitudesRecibidas,
+    rechazarUsuarioApuntado
   };
 });
