@@ -8,7 +8,6 @@ import type { UserDto } from "@/stores/dtos/user.dto";
 const router = useRouter();
 const usersStore = useUsersStore();
 
-// Datos de formularios
 const loginData = ref({ 
   username: "", 
   password: "" 
@@ -158,10 +157,8 @@ const handleRegister = async () => {
     });
     
     if (success) {
-
       isSignup.value = false;
       registerData.value = { username: "", email: "", contrasenia: "", confirmarContrasenia: "" };
- 
       loginErrors.value.general = "Registro exitoso. Por favor, inicie sesión.";
     } else {
       registerErrors.value.general = "No se pudo completar el registro. Por favor, inténtelo de nuevo.";
@@ -191,566 +188,747 @@ const clearLoginError = (field: keyof typeof loginErrors.value) => {
 const clearRegisterError = (field: keyof typeof registerErrors.value) => {
   registerErrors.value[field] = "";
 };
-
-const innerHeight = ref<number>(window.innerHeight);
 </script>
+
 <template>
-  <main class="auth" :style="{ height: innerHeight ? innerHeight + 'px' : '100%' }">
-    <div class="auth__container" :class="{ 'auth__container--signup': isSignup }">
+  <div class="auth">
+    <div class="auth__background">
+      <div class="auth__background-circle auth__background-circle--1"></div>
+      <div class="auth__background-circle auth__background-circle--2"></div>
+      <div class="auth__background-circle auth__background-circle--3"></div>
+    </div>
 
-      <!-- Formulario de Login -->
-      <form class="auth__form auth__form--login" @submit.prevent="handleLogin">
-        <h2 class="auth__title">Bienvenido</h2>
-        
-        <div v-if="loginErrors.general" class="auth__error auth__error--general">
-          {{ loginErrors.general }}
-        </div>
-        
-        <label class="auth__field">
-          <span class="auth__label">Usuario</span>
-          <input 
-            class="auth__input"
-            type="text" 
-            v-model="loginData.username" 
-            @input="clearLoginError('username')"
-            required 
-          />
-          <div v-if="loginErrors.username" class="auth__error">
-            {{ loginErrors.username }}
+    <div class="auth__card" :class="{ 'auth__card--register': isSignup }">
+      <header class="auth__header">
+        <div class="auth__brand">
+          <div class="auth__brand-icon">
+            <span>🔥</span>
           </div>
-        </label>
-        
-        <label class="auth__field">
-          <span class="auth__label">Contraseña</span>
-          <input 
-            class="auth__input"
-            type="password" 
-            v-model="loginData.password" 
-            @input="clearLoginError('password')"
-            required 
-          />
-          <div v-if="loginErrors.password" class="auth__error">
-            {{ loginErrors.password }}
-          </div>
-        </label>
-        
-        <button 
-          type="submit" 
-          class="auth__button" 
-          :disabled="!loginData.username || !loginData.password"
-        >
-          Iniciar Sesión
-        </button>
-        
-        <div v-if="currentUser" class="auth__success">
-          <p class="auth__success-message">Sesión iniciada correctamente</p>
-          <router-link to="/" class="auth__link">Ir al panel principal</router-link>
+          <h1 class="auth__brand-title">Wannagames</h1>
         </div>
-      </form>
+      </header>
 
-      <!-- Contenedor secundario -->
-      <div class="auth__secondary">
-        <div class="auth__image-container">
-          <img class="auth__image" src="@/assets/img/imagenLogin.jpg" alt="Imagen de Login" />
-          <div class="auth__prompt auth__prompt--signup">
-            <h2 class="auth__prompt-title">¿No estás registrado?</h2>
-            <p class="auth__prompt-text">Regístrate y conviértete en uno más de nuestra comunidad</p>
+      <div class="auth__forms">
+        <div class="auth__form" :class="{ 'auth__form--hidden': isSignup }">
+          <div class="auth__form-header">
+            <h2 class="auth__form-title">Bienvenido de vuelta</h2>
+            <p class="auth__form-subtitle">Inicia sesión en tu cuenta</p>
           </div>
-          <div class="auth__prompt auth__prompt--login">
-            <h2 class="auth__prompt-title">¿Ya eres usuario?</h2>
-            <p class="auth__prompt-text">Si ya estás registrado, inicia sesión y empieza a disfrutar</p>
+
+          <form @submit.prevent="handleLogin" class="form">
+            <div v-if="loginErrors.general" class="alert alert--error">
+              {{ loginErrors.general }}
+            </div>
+
+            <div class="form__group">
+              <label class="form__label" for="login-username">Usuario</label>
+              <input 
+                id="login-username"
+                type="text" 
+                class="form__input"
+                :class="{ 'form__input--error': loginErrors.username }"
+                v-model="loginData.username" 
+                @input="clearLoginError('username')"
+                placeholder="Ingresa tu usuario"
+                required 
+              />
+              <div v-if="loginErrors.username" class="form__error">
+                {{ loginErrors.username }}
+              </div>
+            </div>
+
+            <div class="form__group">
+              <label class="form__label" for="login-password">Contraseña</label>
+              <input 
+                id="login-password"
+                type="password" 
+                class="form__input"
+                :class="{ 'form__input--error': loginErrors.password }"
+                v-model="loginData.password" 
+                @input="clearLoginError('password')"
+                placeholder="Ingresa tu contraseña"
+                required 
+              />
+              <div v-if="loginErrors.password" class="form__error">
+                {{ loginErrors.password }}
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="button button--primary button--full"
+              :disabled="!loginData.username || !loginData.password"
+            >
+              <span>Iniciar Sesión</span>
+            </button>
+          </form>
+
+          <div class="auth__switch">
+            <p class="auth__switch-text">¿No tienes cuenta?</p>
+            <button type="button" class="auth__switch-button" @click="toggleSignup">
+              Regístrate aquí
+            </button>
           </div>
-          <button type="button" class="auth__toggle" @click="toggleSignup">
-            <span v-if="!isSignup">Regístrate</span>
-            <span v-else>Inicia Sesión</span>
-          </button>
         </div>
 
-        <!-- Formulario de Registro -->
-        <form class="auth__form auth__form--signup" @submit.prevent="handleRegister">
-          <h2 class="auth__title">Únete a la comunidad</h2>
-          
-          <div v-if="registerErrors.general" class="auth__error auth__error--general">
-            {{ registerErrors.general }}
+        <div class="auth__form" :class="{ 'auth__form--hidden': !isSignup }">
+          <div class="auth__form-header">
+            <h2 class="auth__form-title">Crea tu cuenta</h2>
+            <p class="auth__form-subtitle">Únete a nuestra comunidad</p>
           </div>
-          
-          <label class="auth__field">
-            <span class="auth__label">Nombre de usuario</span>
-            <input 
-              class="auth__input"
-              type="text" 
-              v-model="registerData.username" 
-              @input="clearRegisterError('username')"
-              required 
-            />
-            <div v-if="registerErrors.username" class="auth__error">
-              {{ registerErrors.username }}
+
+          <form @submit.prevent="handleRegister" class="form">
+            <div v-if="registerErrors.general" class="alert alert--error">
+              {{ registerErrors.general }}
             </div>
-          </label>
-          
-          <label class="auth__field">
-            <span class="auth__label">Email</span>
-            <input 
-              class="auth__input"
-              type="email" 
-              v-model="registerData.email" 
-              @input="clearRegisterError('email')"
-              required 
-            />
-            <div v-if="registerErrors.email" class="auth__error">
-              {{ registerErrors.email }}
+
+            <div class="form__group">
+              <label class="form__label" for="register-username">Usuario</label>
+              <input 
+                id="register-username"
+                type="text" 
+                class="form__input"
+                :class="{ 'form__input--error': registerErrors.username }"
+                v-model="registerData.username" 
+                @input="clearRegisterError('username')"
+                placeholder="Elige un nombre de usuario"
+                required 
+              />
+              <div v-if="registerErrors.username" class="form__error">
+                {{ registerErrors.username }}
+              </div>
             </div>
-          </label>
-          
-          <label class="auth__field">
-            <span class="auth__label">Contraseña</span>
-            <input 
-              class="auth__input"
-              type="password" 
-              v-model="registerData.contrasenia" 
-              @input="clearRegisterError('contrasenia')"
-              required 
-            />
-            <div v-if="registerErrors.contrasenia" class="auth__error">
-              {{ registerErrors.contrasenia }}
+
+            <div class="form__group">
+              <label class="form__label" for="register-email">Email</label>
+              <input 
+                id="register-email"
+                type="email" 
+                class="form__input"
+                :class="{ 'form__input--error': registerErrors.email }"
+                v-model="registerData.email" 
+                @input="clearRegisterError('email')"
+                placeholder="tu@email.com"
+                required 
+              />
+              <div v-if="registerErrors.email" class="form__error">
+                {{ registerErrors.email }}
+              </div>
             </div>
-          </label>
-          
-          <label class="auth__field">
-            <span class="auth__label">Confirmar Contraseña</span>
-            <input 
-              class="auth__input"
-              type="password" 
-              v-model="registerData.confirmarContrasenia" 
-              @input="clearRegisterError('confirmarContrasenia')"
-              required 
-            />
-            <div v-if="registerErrors.confirmarContrasenia" class="auth__error">
-              {{ registerErrors.confirmarContrasenia }}
+
+            <div class="form__group">
+              <label class="form__label" for="register-password">Contraseña</label>
+              <input 
+                id="register-password"
+                type="password" 
+                class="form__input"
+                :class="{ 'form__input--error': registerErrors.contrasenia }"
+                v-model="registerData.contrasenia" 
+                @input="clearRegisterError('contrasenia')"
+                placeholder="Crea una contraseña segura"
+                required 
+              />
+              <div v-if="registerErrors.contrasenia" class="form__error">
+                {{ registerErrors.contrasenia }}
+              </div>
             </div>
-          </label>
-          
-          <button 
-            type="submit" 
-            class="auth__button" 
-            :disabled="!registerData.username || !registerData.email || !registerData.contrasenia || !registerData.confirmarContrasenia"
-          >
-            Registrarse
-          </button>
-        </form>
+
+            <div class="form__group">
+              <label class="form__label" for="register-confirm">Confirmar Contraseña</label>
+              <input 
+                id="register-confirm"
+                type="password" 
+                class="form__input"
+                :class="{ 'form__input--error': registerErrors.confirmarContrasenia }"
+                v-model="registerData.confirmarContrasenia" 
+                @input="clearRegisterError('confirmarContrasenia')"
+                placeholder="Repite tu contraseña"
+                required 
+              />
+              <div v-if="registerErrors.confirmarContrasenia" class="form__error">
+                {{ registerErrors.confirmarContrasenia }}
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="button button--primary button--full"
+              :disabled="!registerData.username || !registerData.email || !registerData.contrasenia || !registerData.confirmarContrasenia"
+            >
+              <span>Crear Cuenta</span>
+            </button>
+          </form>
+
+          <div class="auth__switch">
+            <p class="auth__switch-text">¿Ya tienes cuenta?</p>
+            <button type="button" class="auth__switch-button" @click="toggleSignup">
+              Inicia sesión
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="currentUser" class="auth__success">
+        <div class="alert alert--success">
+          <h3 class="alert__title">¡Bienvenido!</h3>
+          <p class="alert__message">Sesión iniciada correctamente</p>
+          <router-link to="/" class="button button--outline button--small">
+            Ir al panel principal
+          </router-link>
+        </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/styles/variables.scss";
 
-$transition-time: 1.2s;
-$primary-color: #f25421;
-$success-color: #4bb543;
-$input-width-mobile: 100%;
-$input-width-desktop: 260px;
-$button-height: 36px;
-$container-width-desktop: 900px;
-$image-width-desktop: 260px;
-$form-width-desktop: $container-width-desktop - $image-width-desktop;
-$label-color: #767676;
 
-@mixin mobile {
-  @media screen and (max-width: 767px) {
-    @content;
+$auth-mobile-padding: 1rem;
+$auth-tablet-padding: 1.5rem;
+$auth-desktop-padding: 2rem;
+$auth-card-width-mobile: 100%;
+$auth-card-width-tablet: 28rem;
+$auth-card-width-desktop: 30rem;
+
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == tablet {
+    @media (min-width: 768px) { @content; }
   }
-}
-
-@mixin desktop {
-  @media screen and (min-width: 768px) {
-    @content;
-  }
-}
-
-@mixin signup-active {
-  .auth__container--signup & {
-    @content;
+  @if $breakpoint == desktop {
+    @media (min-width: 1024px) { @content; }
   }
 }
 
 .auth {
-  padding: 0;
-  margin: 0;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  background-color: #fff;
+  padding: $auth-mobile-padding;
+  background: $background-color;
+  position: relative;
+  overflow: hidden;
 
-  input, button {
-    border: none;
-    outline: none;
+  @include respond-to(tablet) {
+    padding: $auth-tablet-padding;
+  }
+
+  @include respond-to(desktop) {
+    padding: $auth-desktop-padding;
+  }
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+
+  &__background-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba($primary-color, 0.1), rgba($primary-color, 0.05));
+    backdrop-filter: blur(10px);
+    
+
+    &--1 {
+      width: 150px;
+      height: 150px;
+      top: -75px;
+      right: -75px;
+      animation: float 6s ease-in-out infinite;
+
+      @include respond-to(tablet) {
+        width: 250px;
+        height: 250px;
+        top: -125px;
+        right: -125px;
+      }
+
+      @include respond-to(desktop) {
+        width: 300px;
+        height: 300px;
+        top: -150px;
+        right: -150px;
+      }
+    }
+    
+
+    &--2 {
+      width: 100px;
+      height: 100px;
+      bottom: -50px;
+      left: -50px;
+      animation: float 8s ease-in-out infinite reverse;
+
+      @include respond-to(tablet) {
+        width: 150px;
+        height: 150px;
+        bottom: -75px;
+        left: -75px;
+      }
+
+      @include respond-to(desktop) {
+        width: 200px;
+        height: 200px;
+        bottom: -100px;
+        left: -100px;
+      }
+    }
+
+    &--3 {
+      width: 80px;
+      height: 80px;
+      top: 50%;
+      left: -40px;
+      animation: float 7s ease-in-out infinite;
+
+      @include respond-to(tablet) {
+        width: 120px;
+        height: 120px;
+        left: -60px;
+      }
+
+      @include respond-to(desktop) {
+        width: 150px;
+        height: 150px;
+        left: -75px;
+      }
+    }
+  }
+
+
+  &__card {
+    background: $card-background;
+    border-radius: $border-radius * 2;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: $auth-card-width-mobile;
+    max-width: $auth-card-width-tablet;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba($text-color, 0.1);
+
+    @include respond-to(tablet) {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      max-width: $auth-card-width-desktop;
+    }
+
+    @include respond-to(desktop) {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+
+  &__header {
+    padding: 1.5rem 1rem 1rem;
+    text-align: center;
+    background: linear-gradient(135deg, rgba($primary-color, 0.1), rgba($primary-color, 0.05));
+
+    @include respond-to(tablet) {
+      padding: 2rem 1.5rem 1.5rem;
+    }
+
+    @include respond-to(desktop) {
+      padding: 2.5rem 2rem 2rem;
+    }
+  }
+
+  
+  &__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    @include respond-to(tablet) {
+      gap: 1rem;
+    }
+  }
+
+
+  &__brand-icon {
+    width: 40px;
+    height: 40px;
+    background: $primary-gradient;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 6px 12px rgba($primary-color, 0.3);
+
+    @include respond-to(tablet) {
+      width: 45px;
+      height: 45px;
+      font-size: 22px;
+    }
+
+    @include respond-to(desktop) {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      box-shadow: 0 8px 16px rgba($primary-color, 0.3);
+    }
+  }
+
+
+  &__brand-title {
+    font-family: $font-family-title;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+
+    @include respond-to(tablet) {
+      font-size: 1.625rem;
+    }
+
+    @include respond-to(desktop) {
+      font-size: 1.75rem;
+    }
+  }
+
+
+  &__forms {
+    position: relative;
+  }
+
+
+  &__form {
+    padding: 1.5rem 1rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    @include respond-to(tablet) {
+      padding: 2rem 1.5rem;
+    }
+
+    @include respond-to(desktop) {
+      padding: 2.5rem 2rem;
+    }
+    
+
+    &--hidden {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      transform: translateX(100%);
+      pointer-events: none;
+    }
+  }
+
+
+  &__form-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    @include respond-to(tablet) {
+      margin-bottom: 2rem;
+    }
+  }
+
+
+  &__form-title {
+    font-family: $font-family-title;
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0 0 0.5rem;
+
+    @include respond-to(tablet) {
+      font-size: 1.5rem;
+    }
+
+    @include respond-to(desktop) {
+      font-size: $font-size-xlarge;
+    }
+  }
+
+  &__form-subtitle {
+    color: rgba($text-color, 0.7);
+    font-size: 0.875rem;
+    margin: 0;
+
+    @include respond-to(tablet) {
+      font-size: $font-size-base;
+    }
+  }
+
+
+  &__switch {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba($text-color, 0.1);
+
+    @include respond-to(tablet) {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+    }
+  }
+
+
+  &__switch-text {
+    color: rgba($text-color, 0.7);
+    margin: 0 0 0.5rem;
+    font-size: 0.8125rem;
+
+    @include respond-to(tablet) {
+      font-size: $font-size-small;
+    }
+  }
+
+
+  &__switch-button {
     background: none;
-    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    border: none;
+    color: $primary-color;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    font-size: 0.8125rem;
+
+    @include respond-to(tablet) {
+      font-size: $font-size-small;
+    }
+    
+    &:hover {
+      color: lighten($primary-color, 10%);
+      transform: translateY(-1px);
+    }
+  }
+
+
+  &__success {
+    padding: 1.5rem 1rem;
+
+    @include respond-to(tablet) {
+      padding: 2rem 1.5rem;
+    }
+
+    @include respond-to(desktop) {
+      padding: 2rem;
+    }
   }
 }
 
-.auth__container {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  background: #fff;
+.form {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  box-shadow: none;
-  z-index: 1;
-  
-  @include desktop {
-    width: $container-width-desktop;
-    height: 550px;
-    min-height: auto;
-    flex-direction: row;
-    justify-content: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  &--signup {
-    .auth__secondary {
-      @include desktop {
-        transform: translate3d($form-width-desktop * -1, 0, 0);
-      }
-    }
-  }
-}
+  gap: 1rem;
 
-.auth__form {
-  position: relative;
-  width: 100%;
-  padding: 0;
-  transition: transform $transition-time ease-in-out;
-  z-index: 2;
-  
-  @include desktop {
-    width: $form-width-desktop;
-    height: 100%;
-    padding: 10px 20px 0 20px;
+  @include respond-to(tablet) {
+    gap: 1.25rem;
   }
-  
-  &--login {
-    transition-timing-function: ease-out;
-    
-    @include signup-active {
-      transition-timing-function: ease-in-out;
-      transition-duration: $transition-time;
-      transform: translate3d(100%, 0, 0);
-      
-      @include mobile {
-        display: none;
-      }
-      
-      @include desktop {
-        display: block;
-        transform: translate3d($form-width-desktop, 0, 0);
-      }
+
+  @include respond-to(desktop) {
+    gap: 1.5rem;
+  }
+
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-color;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    @include respond-to(tablet) {
+      font-size: $font-size-small;
     }
   }
-  
-  &--signup {
-    display: none;
-    
-    @include signup-active {
-      display: block;
-      transform: translate3d(0, 0, 0);
+
+
+  &__input {
+    padding: 0.875rem;
+    background: rgba($text-color, 0.05);
+    border: 2px solid rgba($text-color, 0.1);
+    border-radius: $border-radius;
+    color: $text-color;
+    font-size: 0.875rem;
+    transition: $transition;
+
+    @include respond-to(tablet) {
+      padding: 1rem;
+      font-size: $font-size-base;
     }
     
-    @include desktop {
-      transform: translate3d($container-width-desktop * -1, 0, 0);
-      
-      @include signup-active {
-        transform: translate3d(0, 0, 0);
-      }
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+    
+    &::placeholder {
+      color: rgba($text-color, 0.5);
+    }
+    
+
+    &--error {
+      border-color: $color-error;
+      background: rgba($color-error, 0.05);
     }
   }
-}
 
-.auth__title {
-  width: 100%;
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 20px;
-  
-  @include desktop {
-    font-size: 26px;
+
+  &__error {
+    font-size: 0.75rem;
+    color: $color-error;
+    font-weight: 500;
   }
 }
 
-.auth__field {
-  display: block;
-  width: $input-width-mobile;
-  max-width: 300px;
-  margin: 25px auto 0;
-  text-align: center;
-  
-  @include desktop {
-    width: $input-width-desktop;
-  }
-}
-
-.auth__label {
-  font-size: 12px;
-  color: $label-color;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 5px;
-}
-
-.auth__input {
-  display: block;
-  width: 100%;
-  margin-top: 5px;
-  padding-bottom: 0;
-  font-size: 16px;
-  border-bottom: 1px solid rgba(0,0,0,0.4);
-  text-align: center;
-}
-
-.auth__button {
-  display: block;
-  margin: 40px auto 20px;
-  width: 100%;
-  max-width: 300px;
-  height: $button-height;
-  border-radius: 30px;
-  color: #fff;
-  font-size: 15px;
+.button {
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  background: #f25421 !important;
-  text-transform: uppercase;
+  transition: $transition;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  @include respond-to(tablet) {
+    padding: 1rem 1.5rem;
+    font-size: $font-size-base;
+  }
   
-  @include desktop {
-    width: $input-width-desktop;
+ 
+  &--primary {
+    background: $primary-gradient;
+    color: $text-color;
+    box-shadow: 0 3px 12px rgba($primary-color, 0.3);
+
+    @include respond-to(desktop) {
+      box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+    }
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+
+      @include respond-to(desktop) {
+        box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+      }
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+  
+  
+  &--outline {
+    background: transparent;
+    color: $primary-color;
+    border: 2px solid $primary-color;
+    
+    &:hover {
+      background: $primary-color;
+      color: $text-color;
+    }
+  }
+  
+
+  &--full {
+    width: 100%;
+  }
+  
+
+  &--small {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+
+    @include respond-to(tablet) {
+      padding: 0.625rem 1rem;
+      font-size: $font-size-small;
+    }
   }
   
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 
-.auth__secondary {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  background: #fff;
-  transition: transform $transition-time ease-in-out;
-  order: -1;
-  margin-bottom: 0;
-  
-  @include desktop {
-    position: absolute;
-    left: $form-width-desktop;
-    top: 0;
-    width: $container-width-desktop;
-    height: 100%;
-    padding-left: $image-width-desktop;
-    order: 0;
-  }
-}
+.alert {
+  padding: 0.875rem;
+  border-radius: $border-radius;
+  margin-bottom: 1rem;
 
-.auth__image-container {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  height: 200px;
-  padding-top: 40px;
-  
-  @include desktop {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: $image-width-desktop;
-    height: 100%;
-    padding-top: 100px;
+  @include respond-to(tablet) {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
   }
   
-  &:before {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('@/assets/img/imagenLogin.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    transition: transform $transition-time ease-in-out;
-    
-    @include desktop {
-      background-size: auto 100%;
-      
-      @include signup-active {
-        transform: translate3d($form-width-desktop, 0, 0);
-      }
-    }
-  }
-  
-  &:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('@/assets/img/imagenLogin.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-}
 
-.auth__image {
-  display: none;
-}
+  &--error {
+    background: rgba($color-error, 0.1);
+    border: 1px solid rgba($color-error, 0.3);
+    color: $color-error;
+  }
+  
 
-.auth__toggle {
-  position: absolute;
-  bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  cursor: pointer;
-  text-align: center;
-  width: 100px;
-  
-  @include desktop {
-    bottom: 50px;
+  &--success {
+    background: rgba($color-success, 0.1);
+    border: 1px solid rgba($color-success, 0.3);
+    color: $color-success;
+    text-align: center;
   }
   
-  span {
-    display: block;
-    color: white;
-    font-size: 16px;
-    text-transform: uppercase;
-    transition: transform $transition-time ease-in-out;
-  }
-}
 
-.auth__prompt {
-  z-index: 2;
-  position: absolute;
-  left: 0;
-  top: 50px;
-  width: 100%;
-  padding: 0 20px;
-  text-align: center;
-  color: #fff;
-  transition: transform $transition-time ease-in-out;
-  
-  @include mobile {
-    display: none;
-    
-    .auth__container--signup & {
-      &--login {
-        display: block;
-      }
-    }
-    
-    .auth__container:not(.auth__container--signup) & {
-      &--signup {
-        display: block;
-      }
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+
+    @include respond-to(tablet) {
+      font-size: $font-size-large;
     }
   }
   
-  &--signup {
-    @include signup-active {
-      @include desktop {
-        transform: translateX($image-width-desktop * 2);
-      }
-    }
-  }
-  
-  &--login {
-    @include desktop {
-      transform: translateX($image-width-desktop * -2);
-    }
-    
-    @include signup-active {
-      transform: translateX(0);
+
+  &__message {
+    margin: 0 0 0.875rem;
+
+    @include respond-to(tablet) {
+      margin: 0 0 1rem;
     }
   }
 }
 
-.auth__prompt-title {
-  margin-bottom: 10px;
-  font-weight: normal;
-  font-size: 20px;
-  
-  @include desktop {
-    font-size: 22px;
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
   }
-}
-
-.auth__prompt-text {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.auth__error {
-  font-size: 12px;
-  color: $primary-color;
-  margin-top: 5px;
-  text-align: center;
-  
-  &--general {
-    margin: 15px auto;
-    width: 100%;
-    max-width: 300px;
-    padding: 8px;
-    background-color: rgba($primary-color, 0.1);
-    border-radius: 4px;
-    
-    @include desktop {
-      width: $input-width-desktop;
-    }
-  }
-}
-
-.auth__success {
-  margin: 15px auto;
-  width: 100%;
-  max-width: 300px;
-  padding: 8px;
-  background-color: rgba($success-color, 0.1);
-  border-radius: 4px;
-  text-align: center;
-  color: $success-color;
-  
-  @include desktop {
-    width: $input-width-desktop;
-  }
-}
-
-.auth__success-message {
-  margin-bottom: 10px;
-}
-
-.auth__link {
-  display: block;
-  margin-top: 10px;
-  color: $primary-color;
-  text-decoration: none;
-  font-weight: bold;
-  
-  &:hover {
-    text-decoration: underline;
+  50% { 
+    transform: translateY(-20px) rotate(180deg); 
   }
 }
 </style>

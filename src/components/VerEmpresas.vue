@@ -8,7 +8,6 @@ import Swal from 'sweetalert2';
 const store = useEmpresasStore();
 const mostrarFormulario = ref(false);
 
-// Paginación
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -16,7 +15,6 @@ onMounted(() => {
   store.fetchEmpresasConAfiliados();
 });
 
-// Computed para la paginación
 const totalPages = computed(() => {
   return Math.ceil((store.empresasConAfiliados?.length || 0) / itemsPerPage.value);
 });
@@ -64,7 +62,6 @@ async function borrarEmpresa(id: number) {
     await store.deleteEmpresa(id);
     await store.fetchEmpresasConAfiliados();
     
-    // Ajustar página si es necesario después de eliminar
     if (empresasPaginadas.value.length === 0 && currentPage.value > 1) {
       currentPage.value = currentPage.value - 1;
     }
@@ -108,7 +105,6 @@ function getAcuerdoTexto(acuerdo: number): string {
 <template>
   <div class="empresas">
     <v-container class="empresas__contenedor" fluid>
-      <!-- Título y botón centrados arriba -->
       <div class="empresas__header">
         <h2 class="empresas__titulo">🏢 Gestión de Empresas</h2>
         <v-btn 
@@ -122,7 +118,6 @@ function getAcuerdoTexto(acuerdo: number): string {
         </v-btn>
       </div>
 
-      <!-- Controles simples -->
       <div class="empresas__controles">
         <div class="empresas__info">
           <span class="empresas__info-texto">Mostrando {{ empresasPaginadas.length }} de {{ store.empresasConAfiliados?.length || 0 }} empresas</span>
@@ -143,7 +138,6 @@ function getAcuerdoTexto(acuerdo: number): string {
         </div>
       </div>
 
-      <!-- Vista móvil: Cards -->
       <div class="empresas__cards-movil">
         <div 
           v-for="empresa in empresasPaginadas" 
@@ -214,7 +208,6 @@ function getAcuerdoTexto(acuerdo: number): string {
           </div>
         </div>
 
-        <!-- Estado vacío para móvil -->
         <div v-if="store.empresasConAfiliados?.length === 0" class="estado-vacio">
           <p>No hay empresas disponibles</p>
           <v-btn 
@@ -226,7 +219,6 @@ function getAcuerdoTexto(acuerdo: number): string {
         </div>
       </div>
 
-      <!-- Vista desktop: Tabla -->
       <div class="empresas__tabla-contenedor">
         <v-table class="empresas__tabla">
           <thead>
@@ -290,7 +282,6 @@ function getAcuerdoTexto(acuerdo: number): string {
           </tbody>
         </v-table>
 
-        <!-- Estado vacío para desktop -->
         <div v-if="store.empresasConAfiliados?.length === 0" class="estado-vacio">
           <p>No hay empresas disponibles</p>
           <v-btn 
@@ -302,7 +293,6 @@ function getAcuerdoTexto(acuerdo: number): string {
         </div>
       </div>
 
-      <!-- Paginación simple -->
       <div class="empresas__paginacion" v-if="totalPages > 1">
         <v-btn 
           :disabled="currentPage === 1"
@@ -331,7 +321,6 @@ function getAcuerdoTexto(acuerdo: number): string {
       </div>
     </v-container>
 
-    <!-- Modal del formulario -->
     <v-dialog 
       v-model="mostrarFormulario" 
       max-width="900"
@@ -357,7 +346,6 @@ function getAcuerdoTexto(acuerdo: number): string {
   color: $text-color;
   min-height: 100vh;
 
-  // Tablet y desktop
   @media (min-width: 768px) {
     padding: 0;
   }
@@ -370,7 +358,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     gap: $spacing-medium;
     padding: 0;
 
-    // Desktop
     @media (min-width: 1024px) {
       max-width: 1400px;
       gap: $spacing-large;
@@ -391,7 +378,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     margin: 0;
     width: 100%;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xl;
       gap: $spacing-large;
@@ -408,7 +394,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-xlarge;
     }
@@ -432,7 +417,6 @@ function getAcuerdoTexto(acuerdo: number): string {
       display: none;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       font-size: $font-size-base;
@@ -465,7 +449,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     border: none;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       gap: $spacing-medium;
@@ -491,7 +474,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     gap: $spacing-extra-small;
     flex-shrink: 0;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
     }
@@ -514,7 +496,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     transition: $transition;
     min-width: 50px;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-small $spacing-medium;
       min-width: 60px;
@@ -527,14 +508,12 @@ function getAcuerdoTexto(acuerdo: number): string {
     }
   }
 
-  // Vista móvil con cards
   &__cards-movil {
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
     padding: 0 $spacing-small;
 
-    // Ocultar en desktop
     @media (min-width: 768px) {
       display: none;
     }
@@ -636,11 +615,9 @@ function getAcuerdoTexto(acuerdo: number): string {
     }
   }
 
-  // Vista desktop con tabla
   &__tabla-contenedor {
     display: none;
 
-    // Mostrar solo en desktop
     @media (min-width: 768px) {
       display: block;
       background: $card-background;
@@ -797,7 +774,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     align-items: center;
     justify-content: center;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xxl;
       font-size: $font-size-large;
@@ -810,7 +786,6 @@ function getAcuerdoTexto(acuerdo: number): string {
       margin-bottom: $spacing-small;
       opacity: 0.5;
 
-      // Desktop
       @media (min-width: 768px) {
         font-size: 3rem;
         margin-bottom: $spacing-medium;
@@ -831,7 +806,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     flex-wrap: wrap;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
       padding: $spacing-medium;
@@ -864,7 +838,6 @@ function getAcuerdoTexto(acuerdo: number): string {
       font-size: $font-size-base;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
@@ -903,7 +876,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     padding: 0 $spacing-small;
     text-align: center;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
       padding: 0 $spacing-medium;
@@ -913,7 +885,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     .pagina-info-completa {
       display: none;
 
-      // Desktop
       @media (min-width: 768px) {
         display: inline;
       }
@@ -922,7 +893,6 @@ function getAcuerdoTexto(acuerdo: number): string {
     .pagina-info-corta {
       display: inline;
 
-      // Desktop
       @media (min-width: 768px) {
         display: none;
       }

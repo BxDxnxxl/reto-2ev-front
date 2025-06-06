@@ -102,22 +102,18 @@ const cargarClips = async (nombreJuego: string) => {
 
 <template>
   <div class="detalle-videojuego">
-    <!-- Loading State -->
     <div v-if="isLoading" class="detalle-videojuego__loading">
       <div class="loading-spinner"></div>
       <p>Cargando información del videojuego...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="detalle-videojuego__error">
       <div class="error-icon">⚠️</div>
       <h3>Error al cargar</h3>
       <p>{{ error }}</p>
     </div>
 
-    <!-- Content -->
     <div v-else-if="videojuego" class="detalle-videojuego__contenedor">
-      <!-- Imagen del juego -->
       <div class="detalle-videojuego__imagen-wrapper">
         <div class="imagen-container">
           <img 
@@ -134,12 +130,10 @@ const cargarClips = async (nombreJuego: string) => {
         </div>
       </div>
 
-      <!-- Información del juego -->
       <div class="detalle-videojuego__info">
         <header class="detalle-videojuego__header">
           <h1 class="detalle-videojuego__titulo">{{ videojuego.titulo }}</h1>
           
-          <!-- Metadatos principales -->
           <div class="detalle-videojuego__meta">
             <div class="meta-item meta-item--valoracion">
               <div class="valoracion-container">
@@ -175,18 +169,15 @@ const cargarClips = async (nombreJuego: string) => {
           </div>
         </header>
 
-        <!-- Descripción -->
         <div class="detalle-videojuego__descripcion-section">
           <p class="detalle-videojuego__descripcion">{{ videojuego.descripcion }}</p>
         </div>
 
-        <!-- Información de la compañía -->
         <div class="detalle-videojuego__compania">
           <span class="compania-label">Desarrolladora</span>
           <span class="compania-nombre">{{ videojuego.compania }}</span>
         </div>
 
-        <!-- Géneros -->
         <section class="detalle-videojuego__seccion">
           <h3 class="seccion-titulo">
             <span class="seccion-icon">🎮</span>
@@ -203,7 +194,6 @@ const cargarClips = async (nombreJuego: string) => {
           </div>
         </section>
 
-        <!-- Plataformas -->
         <section class="detalle-videojuego__seccion">
           <h3 class="seccion-titulo">
             <span class="seccion-icon">🕹️</span>
@@ -220,7 +210,6 @@ const cargarClips = async (nombreJuego: string) => {
           </div>
         </section>
 
-        <!-- Botón de acción -->
         <div class="detalle-videojuego__acciones">
           <button class="btn btn--primary btn--review" @click="irAReview()">
             <span class="btn-icon">📝</span>
@@ -230,7 +219,6 @@ const cargarClips = async (nombreJuego: string) => {
       </div>
     </div>
 
-    <!-- Clips de Twitch (sin modificar) -->
     <section class="detalle-videojuego__seccion" v-if="clips.length">
       <h3><span class="icono">📺</span> Clips populares en Twitch</h3>
       <div class="detalle-videojuego__clips">
@@ -244,7 +232,6 @@ const cargarClips = async (nombreJuego: string) => {
       </div>
     </section>
 
-    <!-- Estado vacío -->
     <div v-else class="detalle-videojuego__empty">
       <div class="empty-icon">🎮</div>
       <h3>Videojuego no encontrado</h3>
@@ -261,7 +248,6 @@ const cargarClips = async (nombreJuego: string) => {
   margin-top: 0;
   margin-bottom: $spacing-xlarge;
 
-  // Estados de carga y error
   &__loading,
   &__error,
   &__empty {
@@ -311,7 +297,6 @@ const cargarClips = async (nombreJuego: string) => {
     background: rgba($color-error, 0.1);
   }
 
-  // Contenedor principal
   &__contenedor {
     display: flex;
     flex-direction: column;
@@ -334,7 +319,6 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Imagen del videojuego
   &__imagen-wrapper {
     position: relative;
     width: 100%;
@@ -392,7 +376,6 @@ const cargarClips = async (nombreJuego: string) => {
     transition: $transition;
   }
 
-  // Información del videojuego
   &__info {
     padding: $spacing-xlarge $spacing-large;
     display: flex;
@@ -463,7 +446,6 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Valoración con estrellas
   .valoracion-container {
     display: flex;
     align-items: center;
@@ -505,7 +487,6 @@ const cargarClips = async (nombreJuego: string) => {
     border-radius: 4px;
   }
 
-  // Descripción
   &__descripcion-section {
     position: relative;
     padding: $spacing-large;
@@ -522,7 +503,6 @@ const cargarClips = async (nombreJuego: string) => {
     font-weight: 400;
   }
 
-  // Compañía
   &__compania {
     display: flex;
     flex-direction: column;
@@ -547,7 +527,6 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Secciones
   &__seccion {
     display: flex;
     flex-direction: column;
@@ -575,7 +554,6 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Tags
   &__tags {
     display: flex;
     flex-wrap: wrap;
@@ -616,14 +594,12 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Acciones
   &__acciones {
     display: flex;
     gap: $spacing-medium;
     margin-top: $spacing-medium;
   }
 
-  // Botones
   .btn {
     display: inline-flex;
     align-items: center;
@@ -675,7 +651,6 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Clips de Twitch (mantenido sin cambios)
   &__clips {
     margin-top: $spacing-large;
     display: flex;
@@ -726,13 +701,11 @@ const cargarClips = async (nombreJuego: string) => {
     }
   }
 
-  // Animaciones
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
 
-  // Media queries
   @media (max-width: 400px) {
     &__clips {
       padding-bottom: $spacing-small;

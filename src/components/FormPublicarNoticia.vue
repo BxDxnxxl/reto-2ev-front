@@ -38,7 +38,6 @@ function handleFileUpload(event: Event) {
   if (input.files && input.files.length > 0) {
     const file = input.files[0];
     
-    // Validar el archivo
     if (!validateFile(file)) {
       input.value = '';
       return;
@@ -50,7 +49,7 @@ function handleFileUpload(event: Event) {
 
 function validateFile(file: File): boolean {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = 5 * 1024 * 1024;
   
       if (!allowedTypes.includes(file.type)) {
        Swal.fire({
@@ -114,7 +113,7 @@ async function submitForm() {
 
 function resetForm() {
   publicacion.value = {
-    fkIdEmpresa: publicacion.value.fkIdEmpresa, // Mantener empresa seleccionada
+    fkIdEmpresa: publicacion.value.fkIdEmpresa, 
     fkIdUsuario: usersStore.currentUser?.id ?? 0,
     titulo: '',
     contenido: '',
@@ -123,7 +122,7 @@ function resetForm() {
   };
   imagenFile.value = null;
   
-  // Limpiar el input de archivo
+
   const fileInput = document.getElementById('imagen-input') as HTMLInputElement;
   if (fileInput) {
     fileInput.value = '';
@@ -139,7 +138,6 @@ function resetForm() {
     </div>
     
     <form class="formulario" @submit.prevent="submitForm">
-      <!-- Título -->
       <div class="formulario__grupo">
         <label class="formulario__label">Título *</label>
         <input 
@@ -151,7 +149,6 @@ function resetForm() {
         />
       </div>
 
-      <!-- Contenido -->
       <div class="formulario__grupo">
         <label class="formulario__label">Contenido *</label>
         <textarea 
@@ -163,7 +160,6 @@ function resetForm() {
         />
       </div>
 
-      <!-- Imagen -->
       <div class="formulario__grupo">
         <label class="formulario__label">Imagen *</label>
         <div class="file-input-container">
@@ -189,7 +185,6 @@ function resetForm() {
         </div>
       </div>
 
-      <!-- Switch de destacada -->
       <div class="formulario__grupo">
         <div class="switch-container">
           <label class="switch-label">
@@ -380,7 +375,6 @@ function resetForm() {
   }
 }
 
-// Estilos para el input de archivo
 .file-input-container {
   width: 100%;
 }
@@ -432,7 +426,6 @@ function resetForm() {
   color: lighten($dark-color, 30%);
 }
 
-// Estilos para el switch personalizado
 .switch-container {
   display: flex;
   align-items: center;
@@ -503,7 +496,6 @@ function resetForm() {
   font-weight: 500;
 }
 
-// Responsive
 @media (max-width: $desktop) {
   .form-container {
     padding: $spacing-medium;

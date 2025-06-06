@@ -5,7 +5,7 @@ import type { RolesDto } from "@/stores/dtos/Roles.dto";
 export const useRolesStore = defineStore("roles", () => {
   const roles = ref<RolesDto[]>([]);
 
-  // Obtener todos los roles desde la API
+
   async function fetchRoles() {
     try {
       const response = await fetch("https://wannagamesapi.retocsv.es/api/Rol");

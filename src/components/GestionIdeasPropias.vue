@@ -35,7 +35,7 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
       No tienes solicitudes pendientes.
     </div>
 
-    <div v-else class="solicitudes__lista">
+    <div v-else class="solicitudes__lista-mobile">
       <div
         v-for="s in solicitudes"
         :key="`${s.idIdea}-${s.idUsuarioSolicitante}`"
@@ -50,6 +50,37 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
           Aceptar
         </button>
       </div>
+    </div>
+
+    <div v-if="solicitudes.length > 0" class="solicitudes__tabla-container">
+      <table class="solicitudes__tabla">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Fecha Solicitud</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="s in solicitudes"
+            :key="`${s.idIdea}-${s.idUsuarioSolicitante}`"
+            class="solicitudes__fila"
+          >
+            <td class="solicitudes__celda-usuario">
+              <span class="solicitudes__usuario-nombre">{{ s.nombre }} {{ s.apellido1 }}</span>
+            </td>
+            <td class="solicitudes__celda-email">{{ s.email }}</td>
+            <td class="solicitudes__celda-fecha">{{ new Date(s.fechaSolicitud).toLocaleDateString() }}</td>
+            <td class="solicitudes__celda-accion">
+              <button class="solicitudes__boton-tabla" @click="aceptar(s.idIdea, s.idUsuarioSolicitante)">
+                Aceptar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -78,10 +109,14 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     padding: $spacing-large;
   }
 
-  &__lista {
+  &__lista-mobile {
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 
   &__card {
@@ -99,13 +134,6 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba($primary-color, 0.15);
     }
-
-    @media (min-width: 600px) {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      padding: $spacing-medium;
-    }
   }
 
   &__info {
@@ -114,10 +142,6 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     gap: $spacing-extra-small;
     color: $text-color;
     margin-bottom: $spacing-small;
-
-    @media (min-width: 600px) {
-      margin-bottom: 0;
-    }
   }
 
   &__usuario-nombre {
@@ -148,16 +172,110 @@ const aceptar = async (idIdea: number, idUsuarioAaceptar: number) => {
     transition: $transition;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    align-self: stretch; 
+    align-self: stretch;
 
     &:hover {
       background-color: darken($btn-color, 10%);
     }
+  }
 
-    @media (min-width: 600px) {
-      align-self: auto;
-      padding: $spacing-small $spacing-large;
-      width: auto;
+  &__tabla-container {
+    display: none;
+    overflow-x: auto;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+  }
+
+  &__tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    overflow: hidden;
+    box-shadow: $box-shadow;
+
+    thead {
+      background-color: $primary-color;
+      
+      th {
+        padding: $spacing-medium;
+        text-align: left;
+        font-weight: 600;
+        color: white;
+        font-size: $font-size-small;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &:first-child {
+          border-top-left-radius: $border-radius;
+        }
+
+        &:last-child {
+          border-top-right-radius: $border-radius;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        transition: $transition;
+
+        &:hover {
+          background-color: rgba($primary-color, 0.05);
+        }
+
+        &:not(:last-child) {
+          border-bottom: 1px solid rgba($primary-color, 0.1);
+        }
+      }
+
+      td {
+        padding: $spacing-medium;
+        color: $text-color;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  &__celda-usuario {
+    .solicitudes__usuario-nombre {
+      font-weight: 600;
+      color: $primary-color;
+    }
+  }
+
+  &__celda-email {
+    color: rgba($text-color, 0.7);
+    font-size: $font-size-small;
+  }
+
+  &__celda-fecha {
+    color: rgba($text-color, 0.5);
+    font-size: $font-size-small;
+  }
+
+  &__celda-accion {
+    text-align: center;
+  }
+
+  &__boton-tabla {
+    background-color: $btn-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius;
+    padding: $spacing-small $spacing-large;
+    font-size: $font-size-small;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background-color: darken($btn-color, 10%);
+      transform: translateY(-1px);
     }
   }
 }

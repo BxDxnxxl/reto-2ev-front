@@ -20,7 +20,6 @@ function handleFileUpload(event: Event) {
   if (input.files?.length) {
     const file = input.files[0];
     
-    // Validar el archivo
     if (!validateFile(file)) {
       input.value = '';
       return;
@@ -106,7 +105,6 @@ function resetForm() {
     LimiteDestacadasMensual: 0
   };
   
-  // Limpiar el input de archivo
   const fileInput = document.getElementById('logo-input') as HTMLInputElement;
   if (fileInput) {
     fileInput.value = '';
@@ -122,7 +120,6 @@ function resetForm() {
     </div>
     
     <form class="formulario" @submit.prevent="submitForm">
-      <!-- Fila 1: Nombre y Sede -->
       <div class="formulario__fila">
         <div class="formulario__grupo formulario__grupo--flex-2">
           <label class="formulario__label">Nombre *</label>
@@ -146,7 +143,6 @@ function resetForm() {
         </div>
       </div>
 
-      <!-- Fila 2: Web y Acuerdo -->
       <div class="formulario__fila">
         <div class="formulario__grupo">
           <label class="formulario__label">Web</label>
@@ -169,7 +165,6 @@ function resetForm() {
         </div>
       </div>
 
-      <!-- Límite Destacadas -->
       <div class="formulario__grupo">
         <label class="formulario__label">Límite destacadas mensual</label>
         <input 
@@ -181,7 +176,6 @@ function resetForm() {
         />
       </div>
 
-      <!-- Descripción -->
       <div class="formulario__grupo">
         <label class="formulario__label">Descripción</label>
         <textarea 
@@ -192,7 +186,6 @@ function resetForm() {
         />
       </div>
 
-      <!-- Logo -->
       <div class="formulario__grupo">
         <label class="formulario__label">Logo *</label>
         <div class="file-input-container">

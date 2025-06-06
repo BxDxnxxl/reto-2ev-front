@@ -11,12 +11,11 @@ const router = useRouter()
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-// Fetch users on component mount
+
 onMounted(() => {
   store.fetchUsuarios()
 })
 
-// Computed para la paginación
 const totalPages = computed(() => {
   return Math.ceil(store.users.length / itemsPerPage.value)
 })
@@ -44,12 +43,10 @@ function cambiarItemsPorPagina(event: Event) {
   currentPage.value = 1 
 }
 
-// Navigate to add user page
 function navigateToAddUser() {
   router.push('/gestionUsuario?edit=false')
 }
 
-// Delete user with confirmation
 async function deleteUsuario(id: number) {
   const confirm = await Swal.fire({
     title: '¿Estás seguro?',
@@ -65,7 +62,6 @@ async function deleteUsuario(id: number) {
   if (confirm.isConfirmed) {
     await store.deleteUsuario(id)
     
-    // Ajustar página si es necesario después de eliminar
     if (usuariosPaginados.value.length === 0 && currentPage.value > 1) {
       currentPage.value = currentPage.value - 1
     }
@@ -79,7 +75,6 @@ async function deleteUsuario(id: number) {
   }
 }
 
-// Navigate to edit user page
 function editUsuario(id: number) {
   router.push(`/gestionUsuario?edit=true&id=${id}`)
 }
@@ -88,7 +83,6 @@ function editUsuario(id: number) {
 <template>
   <div class="usuarios">
     <v-container class="usuarios__contenedor" fluid>
-      <!-- Título y botón centrados arriba -->
       <div class="usuarios__header">
         <h2 class="usuarios__titulo">👥 Gestión de Usuarios</h2>
         <v-btn 
@@ -102,7 +96,6 @@ function editUsuario(id: number) {
         </v-btn>
       </div>
 
-      <!-- Controles simples -->
       <div class="usuarios__controles">
         <div class="usuarios__info">
           <span class="usuarios__info-texto">Mostrando {{ usuariosPaginados.length }} de {{ store.users?.length || 0 }} usuarios</span>
@@ -123,7 +116,6 @@ function editUsuario(id: number) {
         </div>
       </div>
 
-      <!-- Vista móvil: Cards -->
       <div class="usuarios__cards-movil">
         <div 
           v-for="usuario in usuariosPaginados" 
@@ -178,7 +170,6 @@ function editUsuario(id: number) {
           </div>
         </div>
 
-        <!-- Estado vacío para móvil -->
         <div v-if="store.users?.length === 0" class="estado-vacio">
           <p>No hay usuarios disponibles</p>
           <v-btn 
@@ -190,7 +181,6 @@ function editUsuario(id: number) {
         </div>
       </div>
 
-      <!-- Vista desktop: Tabla -->
       <div class="usuarios__tabla-contenedor">
         <v-table class="usuarios__tabla">
           <thead>
@@ -232,7 +222,6 @@ function editUsuario(id: number) {
           </tbody>
         </v-table>
 
-        <!-- Estado vacío para desktop -->
         <div v-if="store.users?.length === 0" class="estado-vacio">
           <p>No hay usuarios disponibles</p>
           <v-btn 
@@ -244,7 +233,6 @@ function editUsuario(id: number) {
         </div>
       </div>
 
-      <!-- Paginación simple -->
       <div class="usuarios__paginacion" v-if="totalPages > 1">
         <v-btn 
           :disabled="currentPage === 1"
@@ -284,7 +272,6 @@ function editUsuario(id: number) {
   color: $text-color;
   min-height: 100vh;
 
-  // Tablet y desktop
   @media (min-width: 768px) {
     padding: 0;
   }
@@ -297,7 +284,6 @@ function editUsuario(id: number) {
     gap: $spacing-medium;
     padding: 0;
 
-    // Desktop
     @media (min-width: 1024px) {
       max-width: 1400px;
       gap: $spacing-large;
@@ -318,7 +304,6 @@ function editUsuario(id: number) {
     margin: 0;
     width: 100%;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xl;
       gap: $spacing-large;
@@ -335,7 +320,6 @@ function editUsuario(id: number) {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-xlarge;
     }
@@ -359,7 +343,6 @@ function editUsuario(id: number) {
       display: none;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       font-size: $font-size-base;
@@ -392,7 +375,6 @@ function editUsuario(id: number) {
     border: none;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       gap: $spacing-medium;
@@ -410,7 +392,6 @@ function editUsuario(id: number) {
     &-texto {
       display: block;
       
-      // En móvil muy pequeño, texto más corto
       @media (max-width: 480px) {
         &::before {
           content: "{{ usuariosPaginados.length }}/{{ store.users?.length || 0 }}";
@@ -425,7 +406,6 @@ function editUsuario(id: number) {
     gap: $spacing-extra-small;
     flex-shrink: 0;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
     }
@@ -447,7 +427,6 @@ function editUsuario(id: number) {
       transition: $transition;
       min-width: 50px;
 
-      // Desktop
       @media (min-width: 768px) {
         padding: $spacing-small $spacing-medium;
         min-width: 60px;
@@ -461,14 +440,12 @@ function editUsuario(id: number) {
     }
   }
 
-  // Vista móvil con cards
   &__cards-movil {
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
     padding: 0 $spacing-small;
 
-    // Ocultar en desktop
     @media (min-width: 768px) {
       display: none;
     }
@@ -548,11 +525,9 @@ function editUsuario(id: number) {
     min-width: 70px;
   }
 
-  // Vista desktop con tabla
   &__tabla-contenedor {
     display: none;
 
-    // Mostrar solo en desktop
     @media (min-width: 768px) {
       display: block;
       background: $card-background;
@@ -662,7 +637,6 @@ function editUsuario(id: number) {
     align-items: center;
     justify-content: center;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xxl;
       font-size: $font-size-large;
@@ -675,7 +649,6 @@ function editUsuario(id: number) {
       margin-bottom: $spacing-small;
       opacity: 0.5;
 
-      // Desktop
       @media (min-width: 768px) {
         font-size: 3rem;
         margin-bottom: $spacing-medium;
@@ -696,7 +669,6 @@ function editUsuario(id: number) {
     flex-wrap: wrap;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
       padding: $spacing-medium;
@@ -729,7 +701,6 @@ function editUsuario(id: number) {
       font-size: $font-size-base;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
@@ -768,7 +739,6 @@ function editUsuario(id: number) {
     padding: 0 $spacing-small;
     text-align: center;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
       padding: 0 $spacing-medium;
@@ -778,7 +748,6 @@ function editUsuario(id: number) {
     .pagina-info-completa {
       display: none;
 
-      // Desktop
       @media (min-width: 768px) {
         display: inline;
       }
@@ -787,7 +756,6 @@ function editUsuario(id: number) {
     .pagina-info-corta {
       display: inline;
 
-      // Desktop
       @media (min-width: 768px) {
         display: none;
       }
@@ -802,7 +770,6 @@ function editUsuario(id: number) {
     color: rgba($text-color, 0.7);
     font-size: $font-size-base;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xxl;
     }

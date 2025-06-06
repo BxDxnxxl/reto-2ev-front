@@ -23,7 +23,7 @@ export const useUsersStore = defineStore("users", () => {
   }
   loadPersistedData();
 
-  //Obtener todos los usuarios
+
   async function fetchUsuarios() {
     try {
       const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario");
@@ -33,7 +33,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  //Obtener todos los usuarios con sus roles
+
   async function fetchUsuariosConRoles() {
     try {
       const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario/usuarios-con-roles");
@@ -43,7 +43,7 @@ export const useUsersStore = defineStore("users", () => {
     }
   }
 
-  //Obtener un usuario por ID
+
   async function fetchUsuarioById(id: number) {
     try {
       const response = await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`);
@@ -83,7 +83,7 @@ async function updateUsuario(id: number, userDto: UserUpdateDto) {
     formData.append('Apellido1', userDto.apellido1 ?? '');
     formData.append('Apellido2', userDto.apellido2 ?? '');
 
-    // ✅ Siempre enviar ProfilePic
+ 
     if (userDto.profilePic && typeof userDto.profilePic !== 'string') {
       formData.append('ProfilePic', userDto.profilePic);
     } else {
@@ -152,7 +152,7 @@ async function updateUsuario(id: number, userDto: UserUpdateDto) {
   }
 }
 
-  //Eliminar un usuario
+  
   async function deleteUsuario(id: number) {
     try {
       await fetch(`https://wannagamesapi.retocsv.es/api/usuario/${id}`, { method: "DELETE" });
@@ -162,7 +162,7 @@ async function updateUsuario(id: number, userDto: UserUpdateDto) {
     }
   }
 
-  //Iniciar sesión y almacenar datos del usuario autenticado
+
   async function login(usuarioLogin: UserLoginDto) {
     try {
       const response = await fetch("https://wannagamesapi.retocsv.es/api/auth/login", {
@@ -192,7 +192,7 @@ async function updateUsuario(id: number, userDto: UserUpdateDto) {
     }
   }
 
-  //Registrar un nuevo usuario desde el formulario
+
   async function register(usuarioNuevo: UserRegistrorDto) {
     try {
       const response = await fetch("https://wannagamesapi.retocsv.es/api/usuario/CrearDesdeLogin", {

@@ -92,7 +92,6 @@ onMounted(async () => {
     </div>
     
     <form class="formulario" @submit.prevent="publicar">
-      <!-- Fila 1: Título y Plazas -->
       <div class="formulario__fila">
         <div class="formulario__grupo formulario__grupo--flex-2">
           <label class="formulario__label">Título *</label>
@@ -117,8 +116,6 @@ onMounted(async () => {
           />
         </div>
       </div>
-
-      <!-- Fila 2: Red Social y Tipo de Idea -->
       <div class="formulario__fila">
         <div class="formulario__grupo">
           <label class="formulario__label">Red Social *</label>
@@ -143,7 +140,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Fila 3: Contacto y Fecha -->
       <div class="formulario__fila">
         <div class="formulario__grupo">
           <label class="formulario__label">Contacto *</label>
@@ -167,7 +163,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Descripción -->
       <div class="formulario__grupo">
         <label class="formulario__label">Descripción *</label>
         <textarea 
@@ -179,7 +174,6 @@ onMounted(async () => {
         />
       </div>
 
-      <!-- Instrucciones -->
       <div class="formulario__grupo">
         <label class="formulario__label">Instrucciones para participantes *</label>
         <textarea 

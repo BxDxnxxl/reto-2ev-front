@@ -13,7 +13,6 @@ const isScrolled = ref(false)
 const isLoggedIn = computed(() => !!userStore.currentUser)
 const username = computed(() => userStore.currentUser?.username || 'Iniciar Sesión')
 
-// Roles permitidos para mostrar el enlace
 const puedeVerNoticiasAfiliado = computed(() => {
   const rolesUsuario = userStore.currentUser?.roles.map((r) => r.id) || []
   return (
@@ -36,7 +35,6 @@ function getImageSrc(pic: string | File | null | undefined): string {
   return 'https://via.placeholder.com/40'
 }
 
-// ⬇️ Función para ajustar el padding de <main> según la altura real del header
 function adjustMainPadding() {
   const header = document.querySelector('.header') as HTMLElement
   const main = document.querySelector('main') as HTMLElement
@@ -47,7 +45,7 @@ function adjustMainPadding() {
 
 function handleScroll() {
   isScrolled.value = window.scrollY > 10
-  adjustMainPadding() // Por si cambia la altura al hacer scroll
+  adjustMainPadding()
 }
 
 onMounted(() => {
@@ -121,7 +119,6 @@ onUnmounted(() => {
       </button>
     </section>
 
-    <!-- Overlay para cerrar el menú en móvil -->
     <div v-if="menuOpen" class="header__overlay" @click="closeMenu"></div>
   </header>
 </template>
@@ -321,7 +318,6 @@ onUnmounted(() => {
     display: none;
   }
 
-  // Responsive
   @media (max-width: 768px) {
     padding: 1rem 4%;
 

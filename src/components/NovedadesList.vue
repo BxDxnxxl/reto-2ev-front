@@ -7,7 +7,6 @@ import type { NovedadesDto } from "@/stores/dtos/Novedades.dto";
 const publicacionesStore = usePublicacionesEmpresasStore();
 const userStore = useUsersStore();
 
-// Estado para el modal
 const isModalOpen = ref(false);
   const selectedNovedad = ref<NovedadesDto | null>(null);
 
@@ -15,21 +14,18 @@ onMounted(async () => {
   await publicacionesStore.fetchNovedades();
 });
 
-// Función para abrir el modal
 const openModal = (novedad: NovedadesDto ) => {
   selectedNovedad.value = novedad;
   isModalOpen.value = true;
-  document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+  document.body.style.overflow = 'hidden';
 };
 
-// Función para cerrar el modal
 const closeModal = () => {
   isModalOpen.value = false;
   selectedNovedad.value = null;
-  document.body.style.overflow = 'auto'; // Restaurar scroll del body
+  document.body.style.overflow = 'auto';
 };
 
-// Cerrar modal con tecla Escape
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && isModalOpen.value) {
     closeModal()
@@ -45,7 +41,6 @@ console.log(publicacionesStore.novedades);
 
 <template>
   <section class="novedades-blog">
-    <!-- Fondo decorativo con gradiente animado -->
     <div class="novedades-blog__background"></div>
     
     <div class="novedades-blog__container">
@@ -56,10 +51,8 @@ console.log(publicacionesStore.novedades);
           class="novedades-blog__card"
           :style="{ '--delay': `${index * 0.1}s` }"
         >
-          <!-- Efecto de brillo en hover -->
           <div class="novedades-blog__card-shine"></div>
           
-          <!-- Header de la card con gradiente -->
           <div class="novedades-blog__card-header">
             <div class="novedades-blog__empresa-info">
               <div class="novedades-blog__logo-container">
@@ -86,11 +79,9 @@ console.log(publicacionesStore.novedades);
             </div>
           </div>
 
-          <!-- Contenido principal -->
           <div class="novedades-blog__content">
             <h3 class="novedades-blog__titulo-noticia">{{ novedad.titulo }}</h3>
             
-            <!-- Layout mejorado para imagen y texto -->
             <div class="novedades-blog__main-content">
               <div class="novedades-blog__imagen-container">
                 <img 
@@ -113,7 +104,6 @@ console.log(publicacionesStore.novedades);
             </div>
           </div>
 
-          <!-- Footer mejorado -->
           <footer class="novedades-blog__card-footer">
             <div class="novedades-blog__contacto">
               <div class="novedades-blog__contacto-info">
@@ -146,12 +136,10 @@ console.log(publicacionesStore.novedades);
       </div>
     </div>
 
-    <!-- Modal para mostrar contenido completo -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="isModalOpen && selectedNovedad" class="modal-overlay" @click="closeModal">
           <div class="modal-container" @click.stop>
-            <!-- Header del modal -->
             <div class="modal-header">
               <div class="modal-header__content">
                 <div class="modal-logo-container">
@@ -179,7 +167,6 @@ console.log(publicacionesStore.novedades);
               </button>
             </div>
 
-            <!-- Contenido del modal -->
             <div class="modal-content">
               <h1 class="modal-title">{{ selectedNovedad.titulo }}</h1>
               
@@ -195,7 +182,6 @@ console.log(publicacionesStore.novedades);
                 <p>{{ selectedNovedad.contenido }}</p>
               </div>
 
-              <!-- Footer del modal -->
               <div class="modal-footer">
                 <div class="modal-contact">
                   <span class="modal-contact-label">
@@ -221,7 +207,6 @@ console.log(publicacionesStore.novedades);
 <style scoped lang="scss">
 @import "@/assets/styles/variables.scss";
 
-// Mixins mejorados
 @mixin card-hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 40px rgba($primary-color, 0.3), 
@@ -248,7 +233,6 @@ console.log(publicacionesStore.novedades);
   position: relative;
   overflow: hidden;
 
-  // Fondo decorativo animado
   &__background {
     position: fixed;
     top: 0;
@@ -462,12 +446,11 @@ console.log(publicacionesStore.novedades);
     }
   }
 
-  // Nuevo layout para el contenido principal
   &__main-content {
     display: flex;
     gap: $spacing-large;
     flex: 1;
-    min-height: 0; // Permite que flex funcione correctamente
+    min-height: 0;
   }
 
   &__imagen-container {
@@ -522,7 +505,6 @@ console.log(publicacionesStore.novedades);
     overflow-wrap: break-word;
     hyphens: auto;
     
-    // Limitar el número de líneas si es necesario
     display: -webkit-box;
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
@@ -605,7 +587,6 @@ console.log(publicacionesStore.novedades);
     }
   }
 
-  // Animaciones
   @keyframes backgroundPulse {
     0% { opacity: 0.4; }
     100% { opacity: 0.8; }
@@ -633,7 +614,6 @@ console.log(publicacionesStore.novedades);
     }
   }
 
-  // Responsive mejorado
   @media (max-width: 768px) {
     padding: $spacing-large $spacing-medium;
 
@@ -713,7 +693,6 @@ console.log(publicacionesStore.novedades);
   }
 }
 
-// Estilos del Modal
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -845,7 +824,6 @@ console.log(publicacionesStore.novedades);
   max-height: calc(90vh - 120px);
   overflow-y: auto;
   
-  // Personalizar scrollbar
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -952,7 +930,6 @@ console.log(publicacionesStore.novedades);
   }
 }
 
-// Transiciones del modal
 .modal-enter-active, .modal-leave-active {
   transition: all 0.3s ease;
 }
@@ -977,7 +954,6 @@ console.log(publicacionesStore.novedades);
   }
 }
 
-// Responsive para el modal
 @media (max-width: 768px) {
   .modal-overlay {
     padding: $spacing-medium;

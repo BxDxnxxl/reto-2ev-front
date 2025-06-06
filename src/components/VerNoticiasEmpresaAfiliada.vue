@@ -14,7 +14,6 @@ const usersStore = useUsersStore();
 const mostrarFormulario = ref(false);
 const publicacionEnEdicion = ref<PublicacionEmpresaDto | undefined>(undefined);
 
-// Paginación
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
@@ -22,7 +21,6 @@ onMounted(() => {
   store.fetchPublicaciones();
 });
 
-// Computed para la paginación
 const totalPages = computed(() => {
   return Math.ceil((store.publicaciones?.length || 0) / itemsPerPage.value);
 });
@@ -34,7 +32,6 @@ const publicacionesPaginadas = computed(() => {
   return publicaciones.slice(start, end);
 });
 
-// Computed para el texto corto en móvil
 const textoCortoMovil = computed(() => {
   return `${publicacionesPaginadas.value.length}/${store.publicaciones?.length || 0}`;
 });
@@ -118,7 +115,6 @@ async function guardarPublicacion(formData: FormData) {
     await store.addPublicacion(formData);
     mostrarFormulario.value = false;
     
-    // Ajustar página si es necesario después de agregar
     if (publicacionesPaginadas.value.length === 0 && currentPage.value > 1) {
       currentPage.value = currentPage.value - 1;
     }
@@ -142,7 +138,6 @@ async function borrarPublicacion(id: number) {
   if (confirm.isConfirmed) {
     await store.deletePublicacion(id);
     
-    // Ajustar página si es necesario después de eliminar
     if (publicacionesPaginadas.value.length === 0 && currentPage.value > 1) {
       currentPage.value = currentPage.value - 1;
     }
@@ -160,7 +155,6 @@ async function borrarPublicacion(id: number) {
 <template>
   <div class="publicaciones">
     <v-container class="publicaciones__contenedor" fluid>
-      <!-- Título y botón centrados arriba -->
       <div class="publicaciones__header">
         <h2 class="publicaciones__titulo">📰 Gestión de Publicaciones</h2>
         <v-btn 
@@ -174,7 +168,6 @@ async function borrarPublicacion(id: number) {
         </v-btn>
       </div>
 
-      <!-- Controles simples -->
       <div class="publicaciones__controles">
         <div class="publicaciones__info">
           <span class="publicaciones__info-texto publicaciones__info-texto--completa">
@@ -200,7 +193,6 @@ async function borrarPublicacion(id: number) {
         </div>
       </div>
 
-      <!-- Vista móvil: Cards -->
       <div class="publicaciones__cards-movil">
         <div 
           v-for="pub in publicacionesPaginadas" 
@@ -245,7 +237,6 @@ async function borrarPublicacion(id: number) {
           </div>
         </div>
 
-        <!-- Estado vacío para móvil -->
         <div v-if="store.publicaciones?.length === 0" class="estado-vacio">
           <p>No hay publicaciones disponibles</p>
           <v-btn 
@@ -257,7 +248,6 @@ async function borrarPublicacion(id: number) {
         </div>
       </div>
 
-      <!-- Vista desktop: Tabla -->
       <div class="publicaciones__tabla-contenedor">
         <v-table class="publicaciones__tabla">
           <thead>
@@ -305,7 +295,6 @@ async function borrarPublicacion(id: number) {
           </tbody>
         </v-table>
 
-        <!-- Estado vacío para desktop -->
         <div v-if="store.publicaciones?.length === 0" class="estado-vacio">
           <p>No hay publicaciones disponibles</p>
           <v-btn 
@@ -317,7 +306,6 @@ async function borrarPublicacion(id: number) {
         </div>
       </div>
 
-      <!-- Paginación simple -->
       <div class="publicaciones__paginacion" v-if="totalPages > 1">
         <v-btn 
           :disabled="currentPage === 1"
@@ -346,7 +334,6 @@ async function borrarPublicacion(id: number) {
       </div>
     </v-container>
 
-    <!-- Modal del formulario -->
     <v-dialog 
       v-model="mostrarFormulario" 
       max-width="900"
@@ -372,7 +359,6 @@ async function borrarPublicacion(id: number) {
   color: $text-color;
   min-height: 100vh;
 
-  // Tablet y desktop
   @media (min-width: 768px) {
     padding: 0;
   }
@@ -385,7 +371,6 @@ async function borrarPublicacion(id: number) {
     gap: $spacing-medium;
     padding: 0;
 
-    // Desktop
     @media (min-width: 1024px) {
       max-width: 1400px;
       gap: $spacing-large;
@@ -406,7 +391,6 @@ async function borrarPublicacion(id: number) {
     margin: 0;
     width: 100%;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xl;
       gap: $spacing-large;
@@ -423,7 +407,6 @@ async function borrarPublicacion(id: number) {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-xlarge;
     }
@@ -447,7 +430,6 @@ async function borrarPublicacion(id: number) {
       display: none;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       font-size: $font-size-base;
@@ -480,7 +462,6 @@ async function borrarPublicacion(id: number) {
     border: none;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       gap: $spacing-medium;
@@ -498,17 +479,15 @@ async function borrarPublicacion(id: number) {
     &-texto {
       display: block;
       
-      // Texto completo por defecto
       &--completa {
         display: block;
-        
-        // Ocultar en móvil pequeño
+
         @media (max-width: 480px) {
           display: none;
         }
       }
       
-      // Texto corto solo en móvil pequeño
+
       &--corta {
         display: none;
         
@@ -525,7 +504,6 @@ async function borrarPublicacion(id: number) {
     gap: $spacing-extra-small;
     flex-shrink: 0;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
     }
@@ -547,7 +525,6 @@ async function borrarPublicacion(id: number) {
       transition: $transition;
       min-width: 50px;
 
-      // Desktop
       @media (min-width: 768px) {
         padding: $spacing-small $spacing-medium;
         min-width: 60px;
@@ -561,14 +538,12 @@ async function borrarPublicacion(id: number) {
     }
   }
 
-  // Vista móvil con cards
   &__cards-movil {
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
     padding: 0 $spacing-small;
 
-    // Ocultar en desktop
     @media (min-width: 768px) {
       display: none;
     }
@@ -648,11 +623,9 @@ async function borrarPublicacion(id: number) {
     max-width: 120px;
   }
 
-  // Vista desktop con tabla
   &__tabla-contenedor {
     display: none;
 
-    // Mostrar solo en desktop
     @media (min-width: 768px) {
       display: block;
       background: $card-background;
@@ -795,7 +768,6 @@ async function borrarPublicacion(id: number) {
     align-items: center;
     justify-content: center;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xxl;
       font-size: $font-size-large;
@@ -808,7 +780,6 @@ async function borrarPublicacion(id: number) {
       margin-bottom: $spacing-small;
       opacity: 0.5;
 
-      // Desktop
       @media (min-width: 768px) {
         font-size: 3rem;
         margin-bottom: $spacing-medium;
@@ -829,7 +800,6 @@ async function borrarPublicacion(id: number) {
     flex-wrap: wrap;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
       padding: $spacing-medium;
@@ -862,7 +832,6 @@ async function borrarPublicacion(id: number) {
       font-size: $font-size-base;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
@@ -901,7 +870,6 @@ async function borrarPublicacion(id: number) {
     padding: 0 $spacing-small;
     text-align: center;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
       padding: 0 $spacing-medium;
@@ -911,7 +879,6 @@ async function borrarPublicacion(id: number) {
     .pagina-info-completa {
       display: none;
 
-      // Desktop
       @media (min-width: 768px) {
         display: inline;
       }
@@ -920,7 +887,6 @@ async function borrarPublicacion(id: number) {
     .pagina-info-corta {
       display: inline;
 
-      // Desktop
       @media (min-width: 768px) {
         display: none;
       }
@@ -935,7 +901,6 @@ async function borrarPublicacion(id: number) {
     color: rgba($text-color, 0.7);
     font-size: $font-size-base;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xxl;
     }

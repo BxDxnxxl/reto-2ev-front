@@ -46,7 +46,6 @@ function prevSlide() {
 
 <template>
   <section class="carousel">
-    <!-- Navigation arrows -->
     <button
       @click="prevSlide"
       class="carousel__nav carousel__nav--prev"
@@ -64,7 +63,6 @@ function prevSlide() {
     </button>
 
     <div class="carousel__main">
-      <!-- Background blur effect -->
       <div class="carousel__background">
         <img
           :src="store.top5Videojuegos[currentSlide]?.caratula"
@@ -73,7 +71,6 @@ function prevSlide() {
         />
       </div>
 
-      <!-- Main image -->
       <img
         :src="store.top5Videojuegos[currentSlide]?.caratula"
         alt="Imagen principal"
@@ -81,10 +78,8 @@ function prevSlide() {
         :class="{ 'carousel__image--transitioning': isTransitioning }"
       />
 
-      <!-- Overlay gradient -->
       <div class="carousel__overlay"></div>
 
-      <!-- Content info -->
       <div class="carousel__info">
         <div class="carousel__content">
           <h3 class="carousel__title">{{ store.top5Videojuegos[currentSlide]?.titulo }}</h3>
@@ -110,7 +105,6 @@ function prevSlide() {
         </div>
       </div>
 
-      <!-- Progress bar -->
       <div class="carousel__progress">
         <div
           class="carousel__progress-bar"
@@ -136,7 +130,6 @@ function prevSlide() {
       </svg>
     </button>
 
-    <!-- Thumbnails -->
     <div class="carousel__thumbnails">
       <div class="carousel__thumbnail-container">
         <div
@@ -158,7 +151,6 @@ function prevSlide() {
       </div>
     </div>
 
-    <!-- Dots indicator -->
     <div class="carousel__dots">
       <button
         v-for="(_, index) in store.top5Videojuegos"

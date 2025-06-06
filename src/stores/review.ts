@@ -5,11 +5,11 @@ import type { Review } from '@/stores/dtos/Review.dto'
 const API_URL = 'https://wannagamesapi.retocsv.es/api/Review'
 
 export const useReviewStore = defineStore('review', () => {
-  // Estado
+
   const review = ref<Review | null>(null)
   const isLoading = ref(false)
 
-  // Obtener la review de un videojuego
+
   const getReviewByVideojuego = async (id: number) => {
     isLoading.value = true
     try {
@@ -24,7 +24,7 @@ export const useReviewStore = defineStore('review', () => {
     }
   }
 
-  // Crear o actualizar una review
+
   const postOrUpdateReview = async (newReview: Review) => {
     isLoading.value = true
     try {

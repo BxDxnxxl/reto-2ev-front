@@ -7,7 +7,7 @@ const route = useRoute()
 const games = useGamesStore()
 
 const gamesToDisplay = computed(() => {
-  // Si hay un filtro activo, se aplica
+
   if (games.filtroActivo) {
     return games.juegosFiltrados
   }
@@ -211,7 +211,6 @@ onMounted(() => {
   }
 }
 
-// Media queries usando las variables definidas
 @media (min-width: $desktop) {
   .games-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -270,7 +269,6 @@ onMounted(() => {
   }
 }
 
-// Estados de loading y error
 .game-card {
   &--loading {
     background-color: $color-disabled;
@@ -287,7 +285,6 @@ onMounted(() => {
   }
 }
 
-// Mejoras de accesibilidad
 .game-card {
   &:focus-visible {
     outline: 2px solid $primary-color;
@@ -299,7 +296,6 @@ onMounted(() => {
   }
 }
 
-// Animación de entrada
 @keyframes fadeInUp {
   from {
     opacity: 0;

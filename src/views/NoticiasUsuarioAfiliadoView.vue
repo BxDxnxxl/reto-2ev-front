@@ -19,7 +19,7 @@ const isAuthorized = computed(() => {
 
 onMounted(async () => {
   if (!isAuthorized.value) {
-    router.push('/'); // redirige al inicio si no está autorizado
+    router.push('/'); 
     return;
   }
 

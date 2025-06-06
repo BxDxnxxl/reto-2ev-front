@@ -141,7 +141,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
 
 <template>
   <div class="ideas-container">
-    <!-- Header con controles -->
     <div class="ideas-header">
       <div class="ideas-header__content">
         <h1 class="ideas-header__title">
@@ -169,7 +168,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
       </div>
     </div>
 
-    <!-- Modal mejorado -->
     <Transition name="modal">
       <div v-if="mostrarFormulario" class="modal-overlay" @click="cerrarModal">
         <div class="modal-content" @click.stop>
@@ -192,7 +190,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
       </div>
     </Transition>
 
-    <!-- Grid de ideas -->
     <div class="ideas-grid">
       <TransitionGroup name="card" tag="div" class="ideas-grid__container">
         <div
@@ -205,7 +202,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
             'idea-card--accepted': estadoAceptado[idea.id]
           }"
         >
-          <!-- Indicador de estado -->
           <div class="idea-card__status" v-if="usersStore.currentUser">
             <div v-if="usersStore.currentUser.id === idea.fkIdUsuario" class="status-badge status-badge--creator">
               👑 Tu Idea
@@ -219,7 +215,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
           </div>
 
           <div class="idea-card__content">
-            <!-- Header de la card -->
             <div class="idea-card__header">
               <h3 class="idea-card__title">{{ idea.titulo }}</h3>
               <div class="idea-card__type-badge">
@@ -227,16 +222,13 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
               </div>
             </div>
 
-            <!-- Descripción -->
             <p class="idea-card__description">{{ idea.descripcion }}</p>
 
-            <!-- Fecha de caducidad -->
             <div class="idea-card__expiry" v-if="idea.fechaCaducidad">
               <span class="expiry-icon">⏰</span>
               Caduca el {{ new Date(idea.fechaCaducidad).toLocaleDateString() }}
             </div>
 
-            <!-- Plazas con animación -->
             <div class="idea-card__spots">
               <div class="spots-header">
                 <span class="spots-text">
@@ -269,7 +261,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
               </div>
             </div>
 
-            <!-- Información extra para usuarios aceptados -->
             <Transition name="expand">
               <div v-if="estadoAceptado && estadoAceptado[idea.id]" class="idea-card__extra">
                 <div class="extra-section">
@@ -288,7 +279,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
             </Transition>
           </div>
 
-          <!-- Acciones -->
           <div class="idea-card__actions">
             <template v-if="usersStore.currentUser">
               <template v-if="usersStore.currentUser.id === idea.fkIdUsuario">
@@ -308,7 +298,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
                 </button>
               </template>
               
-              <!-- Botón eliminar mejorado -->
               <button
                 v-if="usersStore.currentUser.id === idea.fkIdUsuario || usersStore.currentUser.roles.some(r => r.id === rolesStore.ADMIN)"
                 @click="eliminarIdea(idea.id, idea.titulo)"
@@ -335,7 +324,6 @@ const eliminarIdea = async (idIdea: number, tituloIdea: string) => {
 @import "@/assets/styles/variables.scss";
 @import "@/assets/styles/mixins.scss";
 
-// Variables adicionales para el diseño mejorado
 $glassmorphism-bg: rgba(255, 255, 255, 0.08);
 $glassmorphism-border: rgba(255, 255, 255, 0.12);
 $gradient-primary: linear-gradient(135deg, #f25421, #ff8c00, #ffd700);
@@ -363,7 +351,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Header mejorado
 .ideas-header {
   position: relative;
   z-index: 1;
@@ -402,7 +389,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Controles mejorados
 .ideas-controls {
   display: flex;
   justify-content: center;
@@ -484,7 +470,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Modal mejorado
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -570,7 +555,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Grid de ideas
 .ideas-grid {
   position: relative;
   z-index: 1;
@@ -585,7 +569,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Cards mejoradas
 .idea-card {
   position: relative;
   background: $glassmorphism-bg;
@@ -737,7 +720,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   font-size: 1.1em;
 }
 
-// Plazas mejoradas
 .idea-card__spots {
   margin-bottom: $spacing-large;
 }
@@ -822,7 +804,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Información extra
 .idea-card__extra {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -856,7 +837,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   line-height: 1.5;
 }
 
-// Acciones
 .idea-card__actions {
   display: flex;
   justify-content: space-between;
@@ -978,7 +958,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   font-size: 1.1em;
 }
 
-// Animaciones
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
@@ -1005,7 +984,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Transiciones
 .modal-enter-active,
 .modal-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1065,7 +1043,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   max-height: 500px;
 }
 
-// Responsive design
 @media (max-width: $laptop) {
   .ideas-grid__container {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1142,7 +1119,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Mejoras de accesibilidad
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -1151,7 +1127,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Tema oscuro mejorado
 @media (prefers-color-scheme: dark) {
   .ideas-container {
     background: linear-gradient(135deg, #000000 0%, #111111 50%, #000000 100%);
@@ -1168,7 +1143,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   }
 }
 
-// Estados de focus mejorados para accesibilidad
 .btn-primary:focus,
 .btn-join:focus,
 .btn-delete:focus,
@@ -1178,7 +1152,6 @@ $neon-glow: 0 0 20px rgba(242, 84, 33, 0.3);
   outline-offset: 2px;
 }
 
-// Hover states para dispositivos táctiles
 @media (hover: hover) {
   .idea-card:hover {
     transform: translateY(-8px) scale(1.02);

@@ -121,7 +121,6 @@ async function saveUser() {
       await usersStore.updateUsuario(userId.value, updateDto);
       savedUserId = userId.value;
     } else {
-      // ⚠️ Usar imagen por defecto si no se ha subido ninguna
       if (!(userData.value.profilePic instanceof File)) {
         const response = await fetch('/predefinida.jpg');
         const blob = await response.blob();
@@ -196,7 +195,6 @@ function cancelar() {
 <template>
   <div class="usuario-form">
     <div class="usuario-form__contenedor">
-      <!-- Título y descripción -->
       <div class="usuario-form__header">
         <h2 class="usuario-form__titulo">
           {{ editMode ? '✏️ Editar Usuario' : '👤 Añadir Usuario' }}
@@ -206,11 +204,10 @@ function cancelar() {
         </p>
       </div>
 
-      <!-- Formulario -->
       <div class="usuario-form__card">
         <v-form @submit.prevent="saveUser" class="usuario-form__form">
           <div class="usuario-form__grid">
-            <!-- Datos básicos -->
+
             <div class="usuario-form__section">
               <h3 class="usuario-form__section-title">Datos Personales</h3>
               
@@ -257,7 +254,6 @@ function cancelar() {
               </div>
             </div>
 
-            <!-- Datos de acceso -->
             <div class="usuario-form__section">
               <h3 class="usuario-form__section-title">Datos de Acceso</h3>
               
@@ -297,7 +293,6 @@ function cancelar() {
               </div>
             </div>
 
-            <!-- Configuración -->
             <div class="usuario-form__section">
               <h3 class="usuario-form__section-title">Configuración</h3>
               
@@ -372,7 +367,6 @@ function cancelar() {
   color: $text-color;
   min-height: 100vh;
 
-  // Tablet y desktop
   @media (min-width: 768px) {
     padding: 0;
   }
@@ -385,7 +379,6 @@ function cancelar() {
     gap: $spacing-medium;
     padding: 0;
 
-    // Desktop
     @media (min-width: 1024px) {
       max-width: 1400px;
       gap: $spacing-large;
@@ -406,7 +399,6 @@ function cancelar() {
     margin: 0;
     width: 100%;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-xl;
       gap: $spacing-medium;
@@ -423,7 +415,6 @@ function cancelar() {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-xlarge;
     }
@@ -435,7 +426,6 @@ function cancelar() {
     margin: 0;
     font-weight: 500;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
     }
@@ -449,7 +439,6 @@ function cancelar() {
     margin: 0 $spacing-small;
     overflow: hidden;
 
-    // Desktop
     @media (min-width: 768px) {
       margin: 0 $spacing-medium;
       border-radius: $border-radius;
@@ -460,7 +449,6 @@ function cancelar() {
   &__form {
     padding: $spacing-medium;
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-large;
     }
@@ -471,7 +459,6 @@ function cancelar() {
     flex-direction: column;
     gap: $spacing-large;
 
-    // Desktop
     @media (min-width: 1024px) {
       gap: $spacing-xl;
     }
@@ -493,7 +480,6 @@ function cancelar() {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-large;
     }
@@ -504,7 +490,6 @@ function cancelar() {
     flex-direction: column;
     gap: $spacing-medium;
 
-    // Desktop
     @media (min-width: 768px) {
       flex-direction: row;
       gap: $spacing-large;
@@ -517,7 +502,6 @@ function cancelar() {
     &--full {
       flex: 1;
 
-      // Desktop
       @media (min-width: 768px) {
         max-width: 50%;
       }
@@ -536,7 +520,6 @@ function cancelar() {
     border-top: 1px solid rgba($primary-color, 0.2);
     margin-top: $spacing-large;
 
-    // Desktop
     @media (min-width: 768px) {
       flex-direction: row;
       justify-content: center;
@@ -554,7 +537,6 @@ function cancelar() {
     transition: $transition;
     min-width: 120px;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
       min-width: 150px;
@@ -581,7 +563,6 @@ function cancelar() {
     letter-spacing: 0.5px;
     min-width: 120px;
 
-    // Desktop
     @media (min-width: 768px) {
       font-size: $font-size-base;
       min-width: 150px;
@@ -598,7 +579,6 @@ function cancelar() {
   }
 }
 
-// Estilos para los campos de Vuetify
 :deep(.v-text-field),
 :deep(.v-select),
 :deep(.v-file-input) {

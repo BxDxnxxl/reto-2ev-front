@@ -7,7 +7,6 @@ import PerfilAnimado from './PerfilAnimado.vue';
 
 const usersStore = useUsersStore();
 
-// Estado del formulario
 const editedUser = ref<UserDto>({
   username: "",
   email: "",
@@ -18,7 +17,7 @@ const editedUser = ref<UserDto>({
   profilePic: ""
 });
 
-const storedPassword = ref<string>(""); // Contraseña real para reloguear si no cambia
+const storedPassword = ref<string>("");
 const profilePicFile = ref<File | null>(null);
 const valid = ref(false);
 const isUpdating = ref(false);
@@ -28,7 +27,6 @@ const snackbarColor = ref("success");
 const editProfileForm = ref<any>(null);
 const showPassword = ref(false);
 
-// Reglas de validación
 const passwordRules = [
   (v: string) => !v || v.length >= 8 || "Password must be at least 8 characters",
   (v: string) => !v || /[A-Z]/.test(v) || "Password must contain an uppercase letter",
@@ -46,7 +44,6 @@ onMounted(() => {
   }
 });
 
-// Manejar subida de imagen
 const handleProfilePicUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
@@ -73,7 +70,6 @@ const updateProfile = async () => {
     const usuario = usersStore.currentUser;
     if (!usuario || !usuario.id) throw new Error("Usuario no autenticado.");
 
-    // ⚠️ Si no se ha cambiado la contraseña, usamos la original almacenada
     const finalPassword = editedUser.value.contrasenia?.trim() || storedPassword.value;
 
     const userUpdateDto: UserUpdateDto = {
@@ -259,10 +255,8 @@ const updateProfile = async () => {
       background-clip: text;
     }
 
-    // Estilos para todos los campos de entrada
     :deep(.v-text-field),
     :deep(.v-file-input) {
-      // Campo base
       .v-field {
         background-color: transparent !important;
         
@@ -279,7 +273,6 @@ const updateProfile = async () => {
           }
         }
 
-        // Bordes y contornos
         &__outline {
           --v-field-border-color: #{$primary-color} !important;
           --v-field-border-opacity: 1 !important;
@@ -293,19 +286,16 @@ const updateProfile = async () => {
           border-width: 2px !important;
         }
 
-        // Estado de foco
         &--focused .v-field__outline {
           --v-field-border-color: #{$primary-color} !important;
           --v-field-border-width: 3px !important;
         }
 
-        // Estado hover
         &:hover .v-field__outline {
           --v-field-border-color: #{lighten($primary-color, 10%)} !important;
         }
       }
 
-      // Labels
       .v-label {
         color: rgba($text-color, 0.8) !important;
         font-weight: 500;
@@ -316,19 +306,16 @@ const updateProfile = async () => {
         }
       }
 
-      // Iconos
       .v-field__prepend-inner .v-icon,
       .v-field__append-inner .v-icon {
         color: $primary-color !important;
       }
 
-      // Mensajes de error
       .v-messages__message {
         color: $color-error !important;
       }
     }
 
-    // Botón
     :deep(.v-btn) {
       background: $primary-gradient !important;
       color: white !important;
@@ -350,7 +337,7 @@ const updateProfile = async () => {
       }
     }
 
-    // Avatar
+
     .v-avatar img {
       border: 3px solid $primary-color;
       object-fit: cover !important;
@@ -359,7 +346,6 @@ const updateProfile = async () => {
     }
   }
 
-  // Snackbar
   :deep(.v-snackbar) {
     font-size: $font-size-base;
     font-weight: 500;

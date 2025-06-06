@@ -10,7 +10,6 @@ const top5Companias = ref([])
 const top5Generos = ref([])
 const isLoading = ref(true)
 
-// Estados para animaciones staggered
 const genresVisible = ref(false)
 const companiesVisible = ref(false)
 
@@ -21,7 +20,6 @@ onMounted(async () => {
     top5Companias.value = companiesStore.top5Companias
     top5Generos.value = genresStore.top5Generos
     
-    // Animaciones escalonadas
     setTimeout(() => {
       genresVisible.value = true
       setTimeout(() => {
@@ -39,7 +37,6 @@ onMounted(async () => {
 
 <template>
   <div class="cards-container">
-    <!-- Loading skeleton -->
     <div v-if="isLoading" class="loading-container">
       <div class="skeleton-section" v-for="i in 2" :key="i">
         <div class="skeleton-title"></div>
@@ -49,9 +46,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Content -->
     <template v-else>
-      <!-- Sección de Géneros Populares -->
       <div 
         class="section" 
         :class="{ 'section--visible': genresVisible }"
@@ -103,7 +98,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Sección de Compañías Populares -->
       <div 
         class="section" 
         :class="{ 'section--visible': companiesVisible }"
@@ -174,7 +168,6 @@ onMounted(async () => {
   }
 }
 
-// Loading Skeleton
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -212,7 +205,6 @@ onMounted(async () => {
   border-radius: 16px;
 }
 
-// Sections
 .section {
   display: flex;
   flex-direction: column;
@@ -279,7 +271,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-// Cards Grid
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -292,7 +283,6 @@ onMounted(async () => {
   }
 }
 
-// Card Component
 .card {
   position: relative;
   display: flex;
@@ -444,7 +434,6 @@ onMounted(async () => {
   pointer-events: none;
 }
 
-// Animations
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -492,7 +481,6 @@ onMounted(async () => {
   }
 }
 
-// Responsive Design
 @media (max-width: 640px) {
   .cards {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

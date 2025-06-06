@@ -95,7 +95,7 @@ async function borrarVideojuego(id: number) {
     await store.deleteVideojuego(id);
     await store.fetchVideojuegos();
     
-    // Ajustar página si es necesario después de eliminar
+  
     if (videojuegosPaginados.value.length === 0 && currentPage.value > 1) {
       currentPage.value = currentPage.value - 1;
     }
@@ -305,7 +305,7 @@ async function guardarVideojuego(videojuego: any) {
   color: $text-color;
   min-height: 100vh;
 
-  // Tablet y desktop
+
   @media (min-width: 768px) {
     padding: 0;
   }
@@ -318,7 +318,7 @@ async function guardarVideojuego(videojuego: any) {
     gap: $spacing-medium;
     padding: 0;
 
-    // Desktop
+
     @media (min-width: 1024px) {
       max-width: 1400px;
       gap: $spacing-large;
@@ -339,7 +339,7 @@ async function guardarVideojuego(videojuego: any) {
     margin: 0;
     width: 100%;
 
-    // Desktop
+
     @media (min-width: 768px) {
       padding: $spacing-xl;
       gap: $spacing-large;
@@ -356,7 +356,7 @@ async function guardarVideojuego(videojuego: any) {
     -webkit-text-fill-color: transparent;
     background-clip: text;
 
-    // Desktop
+ 
     @media (min-width: 768px) {
       font-size: $font-size-xlarge;
     }
@@ -380,7 +380,7 @@ async function guardarVideojuego(videojuego: any) {
       display: none;
     }
 
-    // Desktop
+
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       font-size: $font-size-base;
@@ -413,7 +413,7 @@ async function guardarVideojuego(videojuego: any) {
     border: none;
     margin: 0 $spacing-small;
 
-    // Desktop
+  
     @media (min-width: 768px) {
       padding: $spacing-medium $spacing-large;
       gap: $spacing-medium;
@@ -431,7 +431,7 @@ async function guardarVideojuego(videojuego: any) {
     &-texto {
       display: block;
       
-      // En móvil muy pequeño, texto más corto
+  
       @media (max-width: 480px) {
         &::before {
           content: "{{ videojuegosPaginados.length }}/{{ store.games?.length || 0 }}";
@@ -446,7 +446,7 @@ async function guardarVideojuego(videojuego: any) {
     gap: $spacing-extra-small;
     flex-shrink: 0;
 
-    // Desktop
+
     @media (min-width: 768px) {
       gap: $spacing-small;
     }
@@ -468,7 +468,7 @@ async function guardarVideojuego(videojuego: any) {
       transition: $transition;
       min-width: 50px;
 
-      // Desktop
+
       @media (min-width: 768px) {
         padding: $spacing-small $spacing-medium;
         min-width: 60px;
@@ -482,14 +482,13 @@ async function guardarVideojuego(videojuego: any) {
     }
   }
 
-  // Vista móvil con cards
   &__cards-movil {
     display: flex;
     flex-direction: column;
     gap: $spacing-medium;
     padding: 0 $spacing-small;
 
-    // Ocultar en desktop
+
     @media (min-width: 768px) {
       display: none;
     }
@@ -567,11 +566,11 @@ async function guardarVideojuego(videojuego: any) {
     min-width: 80px;
   }
 
-  // Vista desktop con tabla
+
   &__tabla-contenedor {
     display: none;
 
-    // Mostrar solo en desktop
+
     @media (min-width: 768px) {
       display: block;
       background: $card-background;
@@ -703,7 +702,7 @@ async function guardarVideojuego(videojuego: any) {
     align-items: center;
     justify-content: center;
 
-    // Desktop
+
     @media (min-width: 768px) {
       padding: $spacing-xxl;
       font-size: $font-size-large;
@@ -716,7 +715,6 @@ async function guardarVideojuego(videojuego: any) {
       margin-bottom: $spacing-small;
       opacity: 0.5;
 
-      // Desktop
       @media (min-width: 768px) {
         font-size: 3rem;
         margin-bottom: $spacing-medium;
@@ -737,7 +735,6 @@ async function guardarVideojuego(videojuego: any) {
     flex-wrap: wrap;
     margin: 0 $spacing-small;
 
-    // Desktop
     @media (min-width: 768px) {
       gap: $spacing-small;
       padding: $spacing-medium;
@@ -770,7 +767,6 @@ async function guardarVideojuego(videojuego: any) {
       font-size: $font-size-base;
     }
 
-    // Desktop
     @media (min-width: 768px) {
       padding: $spacing-small $spacing-large;
       font-size: $font-size-base;
@@ -809,7 +805,7 @@ async function guardarVideojuego(videojuego: any) {
     padding: 0 $spacing-small;
     text-align: center;
 
-    // Desktop
+  
     @media (min-width: 768px) {
       font-size: $font-size-base;
       padding: 0 $spacing-medium;
@@ -819,7 +815,7 @@ async function guardarVideojuego(videojuego: any) {
     .pagina-info-completa {
       display: none;
 
-      // Desktop
+    
       @media (min-width: 768px) {
         display: inline;
       }
@@ -828,7 +824,7 @@ async function guardarVideojuego(videojuego: any) {
     .pagina-info-corta {
       display: inline;
 
-      // Desktop
+    
       @media (min-width: 768px) {
         display: none;
       }
@@ -843,7 +839,7 @@ async function guardarVideojuego(videojuego: any) {
     color: rgba($text-color, 0.7);
     font-size: $font-size-base;
 
-    // Desktop
+  
     @media (min-width: 768px) {
       padding: $spacing-xxl;
     }

@@ -25,7 +25,7 @@ function handleFile(event: Event) {
   if (target.files && target.files.length > 0) {
     const file = target.files[0];
     
-    // Validar el archivo
+   
     if (!validateFile(file)) {
       target.value = '';
       return;
@@ -33,7 +33,7 @@ function handleFile(event: Event) {
     
     form.value.caratula = file;
     
-    // Crear vista previa
+
     const reader = new FileReader();
     reader.onload = (e) => {
       imagePreview.value = e.target?.result as string;
@@ -44,7 +44,7 @@ function handleFile(event: Event) {
 
 function validateFile(file: File): boolean {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const maxSize = 5 * 1024 * 1024;  
   
   if (!allowedTypes.includes(file.type)) {
    Swal.fire({
@@ -100,7 +100,6 @@ async function handleSubmit() {
       formData.append("pegi", form.value.pegi.toString());
     }
     formData.append("fkIdCompania", form.value.fkIdCompania.toString());
-    // ¡IMPORTANTE! El backend espera "Imagen", no "caratula"
     formData.append("Imagen", form.value.caratula);
 
     await store.createVideojuegos(formData);
@@ -130,14 +129,12 @@ function resetForm() {
   };
   imagePreview.value = null;
   
-  // Limpiar el input de archivo
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   if (fileInput) {
     fileInput.value = '';
   }
 }
 
-// Limpiar vista previa si se quita la imagen
 watch(() => form.value.caratula, (newValue) => {
   if (!newValue) {
     imagePreview.value = null;
@@ -152,7 +149,6 @@ watch(() => form.value.caratula, (newValue) => {
     </div>
     
     <form class="formulario" @submit.prevent="handleSubmit">
-      <!-- Fila 1: Título y Año -->
       <div class="formulario__fila">
         <div class="formulario__grupo formulario__grupo--flex-2">
           <label class="formulario__label">Título *</label>
@@ -176,7 +172,6 @@ watch(() => form.value.caratula, (newValue) => {
         </div>
       </div>
 
-      <!-- Fila 2: PEGI y ID Compañía -->
       <div class="formulario__fila">
         <div class="formulario__grupo">
           <label class="formulario__label">PEGI</label>
@@ -203,7 +198,6 @@ watch(() => form.value.caratula, (newValue) => {
         </div>
       </div>
 
-      <!-- Descripción -->
       <div class="formulario__grupo">
         <label class="formulario__label">Descripción</label>
         <textarea 
@@ -214,7 +208,6 @@ watch(() => form.value.caratula, (newValue) => {
         />
       </div>
 
-      <!-- Carátula -->
       <div class="formulario__grupo">
         <label class="formulario__label">Carátula *</label>
         <div class="file-input-container">
@@ -478,7 +471,6 @@ watch(() => form.value.caratula, (newValue) => {
   color: lighten($dark-color, 30%);
 }
 
-// Responsive
 @media (max-width: $desktop) {
   .form-container {
     padding: $spacing-medium;

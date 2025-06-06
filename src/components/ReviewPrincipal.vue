@@ -36,7 +36,6 @@ const trailerEmbedUrl = computed(() => {
 
   const url = review.value.trailer
 
-  // Detectar y convertir formato YouTube
   const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
   if (youtubeMatch) {
     return `https://www.youtube.com/embed/${youtubeMatch[1]}`

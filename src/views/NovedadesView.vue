@@ -8,7 +8,7 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
   <div class="novedades-view">
     <Header />
     
-    <!-- Hero Section -->
+
     <section class="novedades-hero">
       <div class="novedades-hero__container">
         <div class="novedades-hero__content">
@@ -41,7 +41,7 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
 
   &__contenido {
     flex: 1;
-    padding: $spacing-large 0; // Reducido de $spacing-xxl a $spacing-large
+    padding: $spacing-large 0; 
     position: relative;
     
     &::before {
@@ -64,8 +64,8 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
 
 .novedades-hero {
   background: linear-gradient(135deg, $secondary-color 0%, #1a1a1a 100%);
-  padding: calc($spacing-xxl + 2rem) 0 $spacing-large 0; // Reducido padding inferior de $spacing-xxl a $spacing-large
-  margin-top: 9rem; // Añadido margen superior para separar del header
+  padding: calc($spacing-xxl + 2rem) 0 $spacing-large 0; 
+  margin-top: 9rem;
   position: relative;
   overflow: hidden;
 
@@ -166,10 +166,10 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
   }
 }
 
-// Responsive Design
+
 @media (max-width: $desktop) {
   .novedades-hero {
-    padding: calc($spacing-xl + 1.5rem) 0 $spacing-medium 0; // Reducido padding inferior de $spacing-xl a $spacing-medium
+    padding: calc($spacing-xl + 1.5rem) 0 $spacing-medium 0;
     margin-top: 6rem;
     
     &__title {
@@ -184,7 +184,7 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
   
   .novedades-view {
     &__contenido {
-      padding: $spacing-medium 0; // Reducido de $spacing-xl a $spacing-medium
+      padding: $spacing-medium 0; 
     }
     
     &__container {
@@ -196,7 +196,7 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
 @media (max-width: 480px) {
   .novedades-hero {
     margin-top: 4rem;
-    padding: calc($spacing-large + 1rem) 0 $spacing-small 0; // Reducido padding inferior de $spacing-large a $spacing-small
+    padding: calc($spacing-large + 1rem) 0 $spacing-small 0; 
     
     &__container,
     .novedades-view__container {
@@ -206,7 +206,7 @@ import NovedadesBlogComponent from "@/components/NovedadesList.vue";
   
   .novedades-view {
     &__contenido {
-      padding: $spacing-small 0; // Reducido para móviles
+      padding: $spacing-small 0; 
     }
   }
 }
