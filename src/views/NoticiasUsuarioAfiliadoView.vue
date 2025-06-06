@@ -41,9 +41,10 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .vista-afiliado {
-  padding: 1rem;
+  padding: 2rem 1rem 1rem 1rem; // Aumentado el padding superior
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 9rem; // Añadido margen superior para separar del header
 
   &__titulo {
     font-size: 2rem;
@@ -57,6 +58,21 @@ onMounted(async () => {
     margin-top: 4rem;
     font-size: 1.2rem;
     color: #b00020;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .vista-afiliado {
+    margin-top: 6rem;
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vista-afiliado {
+    margin-top: 4rem;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
   }
 }
 </style>

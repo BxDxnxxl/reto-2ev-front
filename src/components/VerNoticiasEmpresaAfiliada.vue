@@ -34,6 +34,11 @@ const publicacionesPaginadas = computed(() => {
   return publicaciones.slice(start, end);
 });
 
+// Computed para el texto corto en móvil
+const textoCortoMovil = computed(() => {
+  return `${publicacionesPaginadas.value.length}/${store.publicaciones?.length || 0}`;
+});
+
 const paginasVisibles = computed(() => {
   const total = totalPages.value;
   const current = currentPage.value;
@@ -172,7 +177,12 @@ async function borrarPublicacion(id: number) {
       <!-- Controles simples -->
       <div class="publicaciones__controles">
         <div class="publicaciones__info">
-          <span class="publicaciones__info-texto">Mostrando {{ publicacionesPaginadas.length }} de {{ store.publicaciones?.length || 0 }} publicaciones</span>
+          <span class="publicaciones__info-texto publicaciones__info-texto--completa">
+            Mostrando {{ publicacionesPaginadas.length }} de {{ store.publicaciones?.length || 0 }} publicaciones
+          </span>
+          <span class="publicaciones__info-texto publicaciones__info-texto--corta">
+            {{ textoCortoMovil }}
+          </span>
         </div>
         
         <div class="publicaciones__items-por-pagina">
@@ -488,10 +498,22 @@ async function borrarPublicacion(id: number) {
     &-texto {
       display: block;
       
-      // En móvil muy pequeño, texto más corto
-      @media (max-width: 480px) {
-        &::before {
-          content: "{{ publicacionesPaginadas.length }}/{{ store.publicaciones?.length || 0 }}";
+      // Texto completo por defecto
+      &--completa {
+        display: block;
+        
+        // Ocultar en móvil pequeño
+        @media (max-width: 480px) {
+          display: none;
+        }
+      }
+      
+      // Texto corto solo en móvil pequeño
+      &--corta {
+        display: none;
+        
+        @media (max-width: 480px) {
+          display: block;
         }
       }
     }

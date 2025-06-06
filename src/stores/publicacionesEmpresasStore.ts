@@ -110,7 +110,20 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
       console.error("Error:", error);
     }
   }
-  
+
+  async function marcarPublicacionComoLeida(idUsuario: number, idPublicacion: number) {
+  try {
+    await fetch('https://wannagamesapi.retocsv.es/api/UsuariosNoticiasLeidas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idUsuario, idPublicacion })
+    });
+
+    destacadasNoLeidas.value = destacadasNoLeidas.value.filter(p => p.id !== idPublicacion);
+  } catch (error) {
+    console.error("Error al marcar publicación como leída:", error);
+  }
+}
 
   return {
     novedades,
@@ -124,6 +137,7 @@ export const usePublicacionesEmpresasStore = defineStore("publicacionesEmpresas"
     updatePublicacion,
     deletePublicacion,
     fetchNovedades,
-    actualizarAcuerdo
+    actualizarAcuerdo,
+    marcarPublicacionComoLeida
   };
 });
