@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useRolesStore } from '@/stores/roles'
 import PerfilAnimado from './PerfilAnimado.vue'
@@ -29,17 +29,6 @@ function closeMenu() {
   menuOpen.value = false
 }
 
-function handleScroll() {
-  isScrolled.value = window.scrollY > 10
-
-  const headerElement = document.querySelector('.header') as HTMLElement
-  const mainElement = document.querySelector('main') as HTMLElement
-  if (headerElement && mainElement) {
-    const headerHeight = headerElement.offsetHeight
-    mainElement.style.paddingTop = `${headerHeight}px`
-  }
-}
-
 function getImageSrc(pic: string | File | null | undefined): string {
   if (!pic) return 'https://via.placeholder.com/40'
   if (typeof pic === 'string') return pic
@@ -47,8 +36,23 @@ function getImageSrc(pic: string | File | null | undefined): string {
   return 'https://via.placeholder.com/40'
 }
 
+// ⬇️ Función para ajustar el padding de <main> según la altura real del header
+function adjustMainPadding() {
+  const header = document.querySelector('.header') as HTMLElement
+  const main = document.querySelector('main') as HTMLElement
+  if (header && main) {
+    main.style.paddingTop = `${header.offsetHeight}px`
+  }
+}
+
+function handleScroll() {
+  isScrolled.value = window.scrollY > 10
+  adjustMainPadding() // Por si cambia la altura al hacer scroll
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  adjustMainPadding()
 })
 
 onUnmounted(() => {
@@ -121,6 +125,7 @@ onUnmounted(() => {
     <div v-if="menuOpen" class="header__overlay" @click="closeMenu"></div>
   </header>
 </template>
+
 
 <style scoped lang="scss">
 :root {
